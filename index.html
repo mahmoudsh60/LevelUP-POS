@@ -23,7 +23,6 @@
         .btn-wa { background: #25D366; color: white; margin-top: 15px; }
         .btn-qr { background: #1877F2; color: white; margin-top: 10px; }
         
-        /* شبكة الإكسسوارات */
         .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px;}
         .item-card { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between;}
         .item-card:hover { border-color: var(--pri); background: #172033; }
@@ -31,7 +30,6 @@
         .item-price { color: var(--pri); font-size: 14px; font-weight: bold; margin-bottom: 5px;}
         .item-stock { font-size: 11px; padding: 2px 5px; border-radius: 4px; background: rgba(0,0,0,0.5);}
 
-        /* سلة المبيعات */
         .cart-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px dashed var(--border); padding: 5px 0; }
         .cart-item span:first-child { color: var(--txt); }
@@ -40,28 +38,24 @@
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
         .totals-box h3 { margin: 0; color: white; }
 
-        /* معاينة الليبل */
         .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
         .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border-radius: 4px; align-items: center; }
         .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 2px;}
         .label-preview .l-logo { font-weight: 900; font-size: 14px; }
         .label-preview .l-order { font-size: 12px; font-weight: bold; }
         .label-preview .l-name { font-size: 18px; font-weight: bold; margin: 2px 0; }
-        .label-preview .l-phone { font-size: 14px; margin-bottom: 5px; font-family: Arial, sans-serif; font-weight: 900; letter-spacing: 1px; }
+        .label-preview .l-phone { font-size: 15px; margin-bottom: 5px; font-family: Arial, sans-serif; font-weight: 900; letter-spacing: 1px; }
         .label-preview .l-device { font-size: 14px; font-weight: bold; border: 1px dashed #000; padding: 2px 5px; }
-        .label-preview .l-date { font-size: 12px; width: 100%; text-align: left; font-weight: bold; }
+        .label-preview .l-date { font-size: 13px; width: 100%; text-align: left; font-weight: bold; }
 
-        /* إخفاء منطقة الطباعة في الوضع العادي */
         #printArea { display: none; }
 
-        /* 🖨️ إعدادات الطباعة الصارمة للملصقات 40x25 ملم */
         @media print {
             body > *:not(#printArea) { display: none !important; }
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
             @page { size: 40mm 25mm; margin: 0mm !important; }
             body, html { margin: 0 !important; padding: 0 !important; background: white; }
             
-            /* تصميم ليبل الصيانة العادي */
             .real-label { 
                 width: 40mm; height: 24.5mm; 
                 box-sizing: border-box; padding: 1mm; 
@@ -75,27 +69,24 @@
             .real-label .l-logo { font-size: 8px; font-weight: 900; line-height: 1; }
             .real-label .l-order { font-size: 7px; font-weight: bold; line-height: 1; }
             .real-label .l-name { font-size: 11px; font-weight: bold; margin: 1px 0; text-align: center; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; }
-            .real-label .l-phone { font-size: 9.5px; text-align: center; line-height: 1; font-family: Arial, Helvetica, sans-serif; font-weight: 900; margin-bottom: 1px; }
+            .real-label .l-phone { font-size: 10px; text-align: center; line-height: 1; font-family: Arial, Helvetica, sans-serif; font-weight: 900; margin-bottom: 1px; }
             .real-label .l-device { font-size: 9px; border: 1px solid #000; padding: 1px 4px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
-            .real-label .l-date { font-size: 8px; width: 100%; text-align: left; font-weight: bold; }
+            .real-label .l-date { font-size: 9px; width: 100%; text-align: left; font-weight: bold; margin-top: 1px; }
             .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; }
 
-            /* 🖨️ تصميم ليبل الـ QR Code الجديد المخصوص */
-            .qr-custom-label { 
+            /* تصميم الـ QR الجديد المبسط */
+            .qr-simplest-label { 
                 width: 40mm; height: 24.5mm; 
-                box-sizing: border-box; padding: 1.5mm; 
+                box-sizing: border-box; padding: 2mm; 
                 display: flex; flex-direction: column; justify-content: space-between; 
                 page-break-after: always; page-break-inside: avoid;
                 background: white; color: black; overflow: hidden;
-                font-family: 'Tajawal', sans-serif;
             }
-            .qr-custom-label:last-child { page-break-after: auto; }
-            .qr-header { width: 100%; text-align: left; }
-            .qr-order { font-size: 7px; font-weight: bold; }
-            .qr-body { display: flex; justify-content: space-between; align-items: center; width: 100%; flex: 1; padding: 0 2mm; box-sizing: border-box; }
-            .qr-logo-img { width: 16mm; height: 16mm; object-fit: contain; }
-            .qr-code-img { width: 16mm; height: 16mm; object-fit: contain; }
-            .qr-footer { width: 100%; text-align: center; font-size: 9px; font-weight: 900; font-family: Arial, sans-serif; padding-bottom: 1px;}
+            .qr-simplest-label:last-child { page-break-after: auto; }
+            .qr-top-link { width: 100%; text-align: center; font-size: 11px; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: 0.5px; margin-bottom: 2px; border-bottom: 1.5px solid #000; padding-bottom: 2px; }
+            .qr-body-center { display: flex; justify-content: space-between; align-items: center; width: 100%; flex: 1; box-sizing: border-box; padding: 0 1mm;}
+            .qr-logo-centered { width: 16mm; height: 16mm; object-fit: contain; }
+            .qr-code-centered { width: 16mm; height: 16mm; object-fit: contain; }
         }
     </style>
 </head>
@@ -134,7 +125,7 @@
             </div>
 
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px; color: #1877F2;">2. طباعة ملصق الـ QR للألعاب</h4>
+                <h4 style="margin: 0 0 10px; color: #1877F2;">2. طباعة ملصق الـ QR لروابط الألعاب</h4>
                 <div class="input-group" style="margin-bottom: 10px;">
                     <label>توليد ملصق لـ:</label>
                     <select id="qrConsole">
@@ -142,13 +133,12 @@
                         <option value="Modded">ألعاب التعديل والتهكير (bit.ly/4modps4)</option>
                     </select>
                 </div>
-                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR بتصميم المحل</button>
+                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR (تصميم مبسط)</button>
             </div>
         </div>
 
         <div class="panel">
             <h2>🛒 تسليم ومبيعات (Checkout)</h2>
-            
             <div style="display: flex; gap: 10px;">
                 <div class="input-group" style="flex: 1;">
                     <label>مصنعية الصيانة (بيع):</label>
@@ -188,44 +178,42 @@
     <div id="printArea"></div>
 
     <script>
-        // رابط جوجل شيت الصحيح والنهائي
-        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbz_Gbc1q5mlw63yd2u2cn0hs6jnzf2gljhr486u3dkgm2yGHEHr_2Ut8_HaEmxu9lVeZK0Cj7d/exec';
+        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzitNgeacplEjHYYuHqZCDoNZbBauk1Hjoww0SAnnWi2MurBhyjNeePUYvs_BGs7au8/exec';
 
-        // 📦 قاعدة بيانات البضاعة (29 صنف مسعرة بالظبط والكميات صفر)
+        // 29 صنف بأسعارها الدقيقة (الكميات 0 للخصم بالسالب)
         const accessoriesDB = [
-            { id: 1, name: "جراب 4", price: 50, cost: 0, stock: 0 },
-            { id: 2, name: "جراب 5", price: 100, cost: 0, stock: 0 },
-            { id: 3, name: "جريبس اشكال", price: 20, cost: 0, stock: 0 },
-            { id: 4, name: "جريبس كارتون", price: 30, cost: 0, stock: 0 },
-            { id: 5, name: "دراع 2", price: 150, cost: 0, stock: 0 },
-            { id: 6, name: "دراع 3 اسود", price: 350, cost: 0, stock: 0 },
-            { id: 7, name: "دراع اصلي 4 امريكي", price: 1100, cost: 0, stock: 0 },
-            { id: 8, name: "دراع اصلي 4 اوروبي", price: 1200, cost: 0, stock: 0 },
-            { id: 9, name: "دراع اصلي 4 برو", price: 1400, cost: 0, stock: 0 },
-            { id: 10, name: "دراع اصلي 5 استعمال", price: 2700, cost: 0, stock: 0 },
-            { id: 11, name: "دراع اصلي 5 جديد", price: 3850, cost: 0, stock: 0 },
-            { id: 12, name: "دراع كوبي 4 جديد اول", price: 600, cost: 0, stock: 0 },
-            { id: 13, name: "دراع كوبي 4 استعمال", price: 400, cost: 0, stock: 0 },
-            { id: 14, name: "ستاند شحن 4", price: 250, cost: 0, stock: 0 },
-            { id: 15, name: "ستاند شحن 5", price: 350, cost: 0, stock: 0 },
-            { id: 16, name: "سكبن برو", price: 100, cost: 0, stock: 0 },
-            { id: 17, name: "سكين سليم", price: 100, cost: 0, stock: 0 },
-            { id: 18, name: "سكين فات", price: 100, cost: 0, stock: 0 },
-            { id: 19, name: "شاحن 8 مخرج", price: 200, cost: 0, stock: 0 },
-            { id: 20, name: "شنطه", price: 250, cost: 0, stock: 0 },
-            { id: 21, name: "كابل 5", price: 150, cost: 0, stock: 0 },
-            { id: 22, name: "كابل بوار", price: 50, cost: 0, stock: 0 },
-            { id: 23, name: "كابل شحن 3", price: 50, cost: 0, stock: 0 },
-            { id: 24, name: "كابل شحن 4 اصلي", price: 150, cost: 0, stock: 0 },
-            { id: 25, name: "كابل شحن 4 كوبي", price: 50, cost: 0, stock: 0 },
-            { id: 26, name: "كابل av", price: 50, cost: 0, stock: 0 },
-            { id: 27, name: "كابل hdmi", price: 80, cost: 0, stock: 0 },
-            { id: 28, name: "دراع 3 اسود ألوان", price: 400, cost: 0, stock: 0 },
-            { id: 29, name: "دراع كوبي 4 جديد ثاني", price: 500, cost: 0, stock: 0 }
+            { id: 1, name: "جراب 4", price: 50, cost: 25, stock: 0 },
+            { id: 2, name: "جراب 5", price: 100, cost: 40, stock: 0 },
+            { id: 3, name: "جريبس اشكال", price: 20, cost: 7.5, stock: 0 },
+            { id: 4, name: "جريبس كارتون", price: 30, cost: 15, stock: 0 },
+            { id: 5, name: "دراع 2", price: 150, cost: 100, stock: 0 },
+            { id: 6, name: "دراع 3 اسود", price: 350, cost: 280, stock: 0 },
+            { id: 7, name: "دراع اصلي 4 امريكي", price: 1100, cost: 950, stock: 0 },
+            { id: 8, name: "دراع اصلي 4 اوروبي", price: 1200, cost: 1050, stock: 0 },
+            { id: 9, name: "دراع اصلي 4 برو", price: 1400, cost: 1300, stock: 0 },
+            { id: 10, name: "دراع اصلي 5 استعمال", price: 2700, cost: 2400, stock: 0 },
+            { id: 11, name: "دراع اصلي 5 جديد", price: 3850, cost: 3600, stock: 0 },
+            { id: 12, name: "دراع كوبي 4 جديد اول", price: 600, cost: 400, stock: 0 },
+            { id: 13, name: "دراع كوبي 4 استعمال", price: 400, cost: 250, stock: 0 },
+            { id: 14, name: "ستاند شحن 4", price: 250, cost: 180, stock: 0 },
+            { id: 15, name: "ستاند شحن 5", price: 350, cost: 260, stock: 0 },
+            { id: 16, name: "سكبن برو", price: 100, cost: 45, stock: 0 },
+            { id: 17, name: "سكين سليم", price: 100, cost: 45, stock: 0 },
+            { id: 18, name: "سكين فات", price: 100, cost: 45, stock: 0 },
+            { id: 19, name: "شاحن 8 مخرج", price: 200, cost: 135, stock: 0 },
+            { id: 20, name: "شنطه", price: 250, cost: 175, stock: 0 },
+            { id: 21, name: "كابل 5", price: 150, cost: 80, stock: 0 },
+            { id: 22, name: "كابل بوار", price: 50, cost: 25, stock: 0 },
+            { id: 23, name: "كابل شحن 3", price: 50, cost: 25, stock: 0 },
+            { id: 24, name: "كابل شحن 4 اصلي", price: 150, cost: 80, stock: 0 },
+            { id: 25, name: "كابل شحن 4 كوبي", price: 50, cost: 25, stock: 0 },
+            { id: 26, name: "كابل av", price: 50, cost: 25, stock: 0 },
+            { id: 27, name: "كابل hdmi", price: 80, cost: 35, stock: 0 },
+            { id: 28, name: "دراع 3 اسود ألوان", price: 400, cost: 320, stock: 0 },
+            { id: 29, name: "دراع كوبي 4 جديد ثاني", price: 500, cost: 350, stock: 0 }
         ];
 
         let posCart = [];
-        // توليد رقم أوردر عشوائي دايماً أعلى من 100
         const orderIdStr = '#' + Math.floor((Math.random() * 8900) + 100);
         document.getElementById('prevOrder').innerText = orderIdStr;
         
@@ -241,7 +229,6 @@
         accessoriesDB.forEach(item => {
             let stockColor = 'var(--danger)';
             let stockText = 'نفذت ⚠️ (متاح للبيع)';
-            
             grid.innerHTML += `
                 <div class="item-card" onclick="addToCart(${item.id})">
                     <div class="item-name">${item.name}</div>
@@ -262,8 +249,7 @@
         function addToCart(id) {
             let item = accessoriesDB.find(i => i.id === id);
             let existing = posCart.find(c => c.id === id);
-            if(existing) { existing.qty += 1; } 
-            else { posCart.push({ ...item, qty: 1 }); }
+            if(existing) { existing.qty += 1; } else { posCart.push({ ...item, qty: 1 }); }
             renderCart();
         }
 
@@ -275,10 +261,8 @@
                 posCart.forEach((c, index) => {
                     list.innerHTML += `<div class="cart-item">
                         <span>${c.name} (x${c.qty})</span>
-                        <span>
-                            <span style="color:var(--pri); font-weight:bold;">${c.price * c.qty} ج</span>
-                            <span style="cursor:pointer; color:var(--dang); margin-right:10px; font-size: 16px;" onclick="posCart.splice(${index},1); renderCart();">✖</span>
-                        </span>
+                        <span><span style="color:var(--pri); font-weight:bold;">${c.price * c.qty} ج</span>
+                        <span style="cursor:pointer; color:var(--dang); margin-right:10px; font-size: 16px;" onclick="posCart.splice(${index},1); renderCart();">✖</span></span>
                     </div>`;
                 });
             }
@@ -294,79 +278,41 @@
             document.getElementById('tFinal').innerText = (mRev + gRev) + " ج";
         }
 
-        // 🖨️ طباعة ملصقات الصيانة
         function printLabels() {
             const name = document.getElementById('cName').value.trim();
             const phone = document.getElementById('cPhone').value.trim();
             const count = parseInt(document.getElementById('cCount').value);
             if(!name || !phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
-            // إرسال الإيصال للشيت
             fetch(GOOGLE_URL, {
                 method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    systemType: "Receipt", orderId: orderIdStr, name: name, phone: phone, deviceCount: count
-                })
+                body: JSON.stringify({ systemType: "Receipt", orderId: orderIdStr, name: name, phone: phone, deviceCount: count })
             }).catch(e => console.log(e));
 
             const pa = document.getElementById('printArea');
             pa.innerHTML = '';
-
             for(let i = 1; i <= count; i++) {
-                pa.innerHTML += `
-                <div class="real-label">
-                    <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div>
-                    <div class="l-name">${name}</div>
-                    <div class="l-phone">${phone}</div>
-                    <div class="l-device">جهاز ${i} من ${count}</div>
-                    <div class="l-date">${dateStr}</div>
-                </div>`;
+                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name">${name}</div><div class="l-phone">${phone}</div><div class="l-device">جهاز ${i} من ${count}</div><div class="l-date">${dateStr}</div></div>`;
             }
-            
-            pa.innerHTML += `
-            <div class="real-label">
-                <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div>
-                <div class="l-name">${name}</div>
-                <div class="l-phone" style="font-size:9px;">إيصال استلام للعميل</div>
-                <div class="l-device">عدد: ${count} أجهزة</div>
-                <div class="l-date">${dateStr}</div>
-            </div>`;
-            
-            pa.innerHTML += `
-            <div class="real-label" style="justify-content: center;">
-                <div class="l-header" style="justify-content:center; border:none;"><span class="l-logo" style="font-size:10px;">⚠️ Level UP ⚠️</span></div>
-                <div class="warning-text">المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})</div>
-                <div class="l-order" style="margin-top: 2px;">الأوردر: ${orderIdStr}</div>
-            </div>`;
-            
+            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name">${name}</div><div class="l-phone" style="font-size:9.5px;">إيصال استلام للعميل</div><div class="l-device">عدد: ${count} أجهزة</div><div class="l-date">${dateStr}</div></div>`;
+            pa.innerHTML += `<div class="real-label" style="justify-content: center;"><div class="l-header" style="justify-content:center; border:none;"><span class="l-logo" style="font-size:10px;">⚠️ Level UP ⚠️</span></div><div class="warning-text">المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})</div><div class="l-order" style="margin-top: 2px;">الأوردر: ${orderIdStr}</div></div>`;
             window.print();
         }
 
-        // 🖨️ طباعة ملصق الـ QR بتصميم Level UP
         function printQRLabel() {
             const qrType = document.getElementById('qrConsole').value;
-            
-            // تحديد الصورة والنص بناءً على اختيار العميل
             let qrImgSrc = qrType === 'Offers' ? 'sale.png' : 'mod.png';
             let linkTxt = qrType === 'Offers' ? 'bit.ly/lvlupsale' : 'bit.ly/4modps4';
 
             const pa = document.getElementById('printArea');
-            
             pa.innerHTML = `
-            <div class="qr-custom-label">
-                <div class="qr-header">
-                    <span class="qr-order">${orderIdStr}</span>
-                </div>
-                <div class="qr-body">
-                    <img src="lvlup.png" alt="Level UP" class="qr-logo-img">
-                    <img src="${qrImgSrc}" alt="QR Code" class="qr-code-img">
-                </div>
-                <div class="qr-footer">
-                    ${linkTxt}
+            <div class="qr-simplest-label">
+                <div class="qr-top-link">${linkTxt}</div>
+                <div class="qr-body-center">
+                    <img src="lvlup.png" alt="Level UP" class="qr-logo-centered">
+                    <img src="${qrImgSrc}" alt="QR Code" class="qr-code-centered">
                 </div>
             </div>`;
-            
-            // مهلة بسيطة لضمان تحميل الصور المحلية قبل الطباعة
             setTimeout(() => { window.print(); }, 500);
         }
 
@@ -383,7 +329,6 @@
             posCart.forEach(c => {
                 gRev += (c.price * c.qty);
                 gCost += (c.cost * c.qty);
-                // التنسيق المطلوب للإكسيل
                 gTxt += `- ${c.name} (x${c.qty}) السعر ${c.price * c.qty}\n`;
                 itemsForInventory.push({ name: c.name, qty: c.qty });
             });
@@ -400,8 +345,7 @@
                 })
             }).catch(e => console.log(e));
 
-            let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${nm}، تم بحمد الله الانتهاء من أجهزتك.\n\n`;
-            waTxt += `🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
+            let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${nm}، تم بحمد الله الانتهاء من أجهزتك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
             if(mRev > 0) waTxt += `🔧 مصنعية الصيانة: ${mRev} ج\n`;
             if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
             waTxt += `\n💰 *الإجمالي المطلوب:* ${totalFinal} جنيه.\n\nنتشرف بزيارتك دائماً!`;
