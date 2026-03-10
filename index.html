@@ -40,13 +40,30 @@
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
         .totals-box h3 { margin: 0; color: white; }
 
-        /* 🖨️ إعدادات الطباعة الدقيقة لمنع إهدار الورق (40x25 ملم) */
+        /* معاينة الليبل */
+        .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
+        .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border-radius: 4px; align-items: center; }
+        .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 2px;}
+        .label-preview .l-logo { font-weight: 900; font-size: 14px; }
+        .label-preview .l-order { font-size: 12px; font-weight: bold; }
+        .label-preview .l-name { font-size: 18px; font-weight: bold; margin: 2px 0; }
+        .label-preview .l-phone { font-size: 12px; margin-bottom: 5px; font-family: Arial, sans-serif; font-weight: bold; }
+        .label-preview .l-device { font-size: 14px; font-weight: bold; border: 1px dashed #000; padding: 2px 5px; }
+        .label-preview .l-date { font-size: 10px; width: 100%; text-align: left; }
+
+        /* إخفاء منطقة الطباعة في الوضع العادي */
+        #printArea { display: none; }
+
+        /* 🖨️ إعدادات الطباعة الصارمة لمنع الورق الفاضي */
         @media print {
-            body * { visibility: hidden; }
-            #printArea, #printArea * { visibility: visible; }
+            /* إخفاء الموقع بالكامل وحذف مساحته */
+            body > *:not(#printArea) { display: none !important; }
+            
+            /* إظهار منطقة الطباعة فقط */
+            #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
+            
             @page { size: 40mm 25mm; margin: 0mm !important; }
             body, html { margin: 0 !important; padding: 0 !important; background: white; }
-            #printArea { position: absolute; left: 0; top: 0; width: 40mm; margin: 0; padding: 0; }
             
             .real-label { 
                 width: 40mm; height: 24.5mm; /* تم التقليل نصف ملم لمنع رمي ورقة بيضاء */
@@ -91,20 +108,31 @@
             <h2>📥 استلام وطباعة (Labels)</h2>
             <div class="input-group">
                 <label>اسم العميل:</label>
-                <input type="text" id="cName" placeholder="مثال: محمود شوقي">
+                <input type="text" id="cName" oninput="syncData()" placeholder="مثال: محمود شوقي">
             </div>
             <div class="input-group">
                 <label>رقم الموبايل:</label>
-                <input type="tel" id="cPhone" placeholder="01XXXXXXXXX">
+                <input type="tel" id="cPhone" oninput="syncData()" placeholder="01XXXXXXXXX">
             </div>
             
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
                 <h4 style="margin: 0 0 10px; color: var(--pri);">1. طباعة أجهزة الصيانة</h4>
                 <div class="input-group" style="margin-bottom: 10px;">
                     <label>عدد الأجهزة / الدراعات المستلمة:</label>
-                    <input type="number" id="cCount" value="1" min="1">
+                    <input type="number" id="cCount" oninput="updatePreview()" value="1" min="1">
                 </div>
-                <button onclick="printLabels()">🖨️ طباعة ملصقات الصيانة</button>
+                
+                <div class="preview-wrapper">
+                    <div class="label-preview">
+                        <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order" id="prevOrder">#----</span></div>
+                        <div class="l-name" id="prevName">اسم العميل</div>
+                        <div class="l-phone" id="prevPhone">رقم الموبايل</div>
+                        <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
+                        <div class="l-date" id="prevDate">--/--/----</div>
+                    </div>
+                </div>
+
+                <button onclick="printLabels()">🖨️ طباعة ملصقات الصيانة (وتسجيل الاستلام)</button>
             </div>
 
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px;">
@@ -162,10 +190,10 @@
     <div id="printArea"></div>
 
     <script>
-        // رابط جوجل شيت
-        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycby8JKZI6cKEMpT3tfJXoE5mYP8uomUgHz_bc1q5mlw63yd2u2cn0hs6jnzf2gljhr486u3dkgm2y/exec';
+        // رابط جوجل شيت الجديد الخاص بك
+        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzojC295Y1PaocikRHy3hvxqeMx5OlJ96JHpIgjFMpkzeFkcpr_ejbzussWJoHbT3zs/exec';
 
-        // 📦 قاعدة بيانات البضاعة (تم تصفير الكميات كما طلبت مع وضع أسعار)
+        // قاعدة بيانات البضاعة (تم تصفير الكميات والأسعار حقيقية)
         const accessoriesDB = [
             { id: 1, name: "دراع كوبي 4", price: 600, cost: 0, stock: 0 },
             { id: 2, name: "دراع كوبي 4 استعمال", price: 400, cost: 0, stock: 0 },
@@ -195,14 +223,17 @@
 
         let posCart = [];
         const orderIdStr = '#' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('prevOrder').innerText = orderIdStr;
         
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-GB');
+        document.getElementById('prevDate').innerText = dateStr;
+
         const nextWeek = new Date(today); 
         nextWeek.setDate(today.getDate() + 7);
         const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
 
-        // رسم البضاعة 
+        // رسم البضاعة مع إظهار حالة "نفذت"
         const grid = document.getElementById('accessoriesGrid');
         accessoriesDB.forEach(item => {
             let isOutOfStock = item.stock <= 0;
@@ -217,6 +248,14 @@
                 </div>
             `;
         });
+
+        function syncData() { updatePreview(); }
+
+        function updatePreview() {
+            document.getElementById('prevName').innerText = document.getElementById('cName').value || 'اسم العميل';
+            document.getElementById('prevPhone').innerText = document.getElementById('cPhone').value || 'رقم الموبايل';
+            document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
+        }
 
         function addToCart(id) {
             let item = accessoriesDB.find(i => i.id === id);
@@ -253,13 +292,26 @@
             document.getElementById('tFinal').innerText = (mRev + gRev) + " ج";
         }
 
-        // 🖨️ طباعة ملصقات الصيانة العادية
+        // 🖨️ طباعة ملصقات الصيانة (وتسجيل الإيصال في الشيت)
         function printLabels() {
             const name = document.getElementById('cName').value.trim();
             const phone = document.getElementById('cPhone').value.trim();
             const count = parseInt(document.getElementById('cCount').value);
             if(!name || !phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
+            // 1. تسجيل العملية في شيت "ايصالات الاستلام"
+            fetch(GOOGLE_URL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    systemType: "Receipt",
+                    orderId: orderIdStr,
+                    name: name,
+                    phone: phone,
+                    deviceCount: count
+                })
+            }).catch(e => console.log(e));
+
+            // 2. تجهيز منطقة الطباعة
             const pa = document.getElementById('printArea');
             pa.innerHTML = '';
 
@@ -290,6 +342,7 @@
                 <div class="l-order" style="margin-top: 2px;">الأوردر: ${orderIdStr}</div>
             </div>`;
             
+            // استدعاء الطباعة
             window.print();
         }
 
@@ -300,7 +353,6 @@
             const consoleType = document.getElementById('qrConsole').value;
             
             let link = consoleType === 'PS4' ? 'bit.ly/4mops4' : 'bit.ly/3mops3';
-            // توليد كود QR مجاني وسريع
             let qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://${link}`;
 
             const pa = document.getElementById('printArea');
@@ -313,11 +365,10 @@
                 <div class="qr-txt" style="font-size: 8px;">${link}</div>
             </div>`;
             
-            // مهلة نصف ثانية عشان صورة الـ QR تلحق تحمل من الإنترنت قبل ما الطابعة تسحب الورقة
             setTimeout(() => { window.print(); }, 500);
         }
 
-        // إرسال وتسجيل العملية
+        // إرسال وتسجيل عملية الدفع (المبيعات والصيانة)
         function checkout() {
             const nm = document.getElementById('cName').value.trim();
             const ph = document.getElementById('cPhone').value.trim();
