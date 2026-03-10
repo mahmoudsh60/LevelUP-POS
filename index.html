@@ -5,122 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Level UP - لوحة تحكم المحل (POS)</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --pri: #f59e0b; --txt: #f8fafc; --acc: #ef4444; --mut: #94a3b8; --border: #334155; }
         body { background: var(--bg); color: var(--txt); font-family: 'Tajawal', sans-serif; margin: 0; padding: 20px; }
-        .dashboard { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; max-width: 1400px; margin: auto; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1400px; margin: auto; }
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
         
         .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; font-size: 20px;}
-        .section-divider { border-top: 1px solid var(--border); margin: 20px 0; padding-top: 15px; }
+        .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; }
         
-        .input-group { margin-bottom: 12px; }
-        .input-group label { display: block; margin-bottom: 5px; font-size: 13px; color: var(--mut); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--mut); }
         .input-group input, .input-group select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: white; font-family: inherit; box-sizing: border-box; }
         
-        button { background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s; }
-        button:hover { opacity: 0.9; }
-        .btn-wa { background: #25D366; color: white; margin-top: 15px; }
-        .btn-secondary { background: #1877F2; color: white; }
+        button { background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s; margin-bottom: 10px;}
+        button:hover:not(:disabled) { opacity: 0.9; }
+        button:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; }
         
-        /* شبكة الإكسسوارات */
-        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 300px; overflow-y: auto; padding-right: 5px;}
-        .item-card { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between;}
-        .item-card:hover { border-color: var(--pri); background: #172033; }
-        .item-name { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: white;}
-        .item-price { color: var(--pri); font-size: 14px; font-weight: 900;}
-        .item-stock { font-size: 11px; margin-top: 5px; font-weight: bold; padding: 3px; border-radius: 4px;}
-        .stock-in { color: #10b981; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981;}
-        .stock-out { color: var(--acc); background: rgba(239, 68, 68, 0.1); border: 1px solid var(--acc);}
+        .btn-wa { background: #25D366; color: white; }
+        .btn-qr { background: #007bff; color: white; }
+        
+        /* الإكسسوارات */
+        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 250px; overflow-y: auto; padding-right: 5px;}
+        .item-card { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .item-card:hover:not(.out-of-stock) { border-color: var(--pri); background: #172033; }
+        .item-name { font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+        .item-price { color: var(--pri); font-size: 12px; }
+        .out-of-stock { opacity: 0.5; cursor: not-allowed; border-color: var(--acc); }
+        .out-of-stock .item-price { color: var(--acc); }
 
         /* سلة المبيعات */
-        .cart-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 80px; margin-bottom: 15px; }
+        .cart-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px dashed var(--border); padding: 5px 0; }
         .totals-box { display: flex; justify-content: space-between; background: #020617; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
         .totals-box div { text-align: center; }
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
-        .totals-box h3 { margin: 0; color: white; font-size: 16px;}
+        .totals-box h3 { margin: 0; color: white; }
 
-        /* إعدادات الطباعة للملصقات 40x25 ملم - مخصصة لـ Edge والطابعات الحرارية */
+        /* معاينة الليبل على الشاشة */
+        .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
+        .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border-radius: 4px; }
+        .l-header { display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 2px;}
+        .l-logo { font-weight: 900; font-size: 16px; text-transform: uppercase; }
+        .l-order { font-size: 14px; font-weight: bold; }
+        .l-body { flex: 1; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+        .l-name { font-size: 18px; font-weight: bold; margin: 2px 0; }
+        .l-phone { font-size: 14px; margin-bottom: 5px; }
+        .l-device { font-size: 14px; font-weight: bold; border: 1px dashed #000; display: inline-block; padding: 2px 5px; margin: 0 auto;}
+        .l-date { font-size: 10px; text-align: left; }
+
+        /* 🖨️ إعدادات الطباعة الدقيقة (40x25mm) */
         @media print {
-            @page { 
-                size: 40mm 25mm portrait !important; 
-                margin: 0 !important; 
-                padding: 0 !important; 
-            }
-            html, body { 
-                width: 40mm; height: 25mm; 
-                margin: 0; padding: 0; 
-                background: white; 
-            }
-            .dashboard { display: none !important; } 
-            #printArea { display: block !important; width: 40mm; margin: 0; padding: 0; }
+            body * { display: none; }
+            #printArea, #printArea * { display: block; }
+            #printArea { position: absolute; left: 0; top: 0; width: 40mm; margin: 0; padding: 0; }
             
+            @page { size: 40mm 25mm portrait; margin: 0; }
+            
+            body, html { margin: 0; padding: 0; background: white; }
+
             .real-label { 
-                width: 40mm; height: 25mm; 
-                padding: 1.5mm 2mm; /* مسافة أمان للحواف */
+                width: 40mm; 
+                height: 25mm; 
                 box-sizing: border-box; 
-                display: flex; flex-direction: column; justify-content: space-between; 
-                page-break-inside: avoid; page-break-after: always; 
-                font-family: 'Tajawal', sans-serif; background: white; color: black; overflow: hidden;
+                padding: 1.5mm; 
+                display: flex; 
+                flex-direction: column; 
+                justify-content: space-between; 
+                page-break-after: always; 
+                font-family: 'Tajawal', sans-serif; 
+                color: black; 
+                background: white;
+                overflow: hidden;
             }
-            .header-container { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #000; padding-bottom: 1px; margin-bottom: 1px;}
             
-            /* تكبير اللوجو */
-            .logo-img { max-height: 12px; width: auto; } 
-            
-            .order-txt { font-size: 8px; font-weight: 900;} 
-            .client-name { font-size: 11px; font-weight: 900; text-align: center; margin: 1px 0; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;} 
-            .client-phone { font-size: 9px; font-weight: bold; text-align: center; margin-bottom: 1px;}
-            
-            /* ستايل المربع الأسود لجهاز الصيانة */
-            .device-box { font-size: 10px; border: 1px solid #000; padding: 1px 5px; display: inline-block; margin: 1px auto; font-weight: 900; background: #000; color: #fff; border-radius: 2px;}
-            
-            .footer-txt { font-size: 7px; text-align: center; font-weight: bold; margin-top: auto;}
-            .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.2; padding: 1px;}
-            
-            /* ستايل الـ QR Code */
-            .qr-code { width: 13mm; height: 13mm; object-fit: contain; margin: 1px auto; display: block; }
+            /* تنسيق ملصق الصيانة العادي */
+            .real-label .l-header { display: flex; justify-content: space-between; border-bottom: 1.5px solid #000; padding-bottom: 1px; }
+            .real-label .l-logo { font-size: 10px; font-weight: 900; line-height: 1; }
+            .real-label .l-order { font-size: 9px; font-weight: bold; line-height: 1; }
+            .real-label .l-name { font-size: 11px; font-weight: bold; margin: 1px 0; text-align: center; white-space: nowrap; overflow: hidden; }
+            .real-label .l-phone { font-size: 9px; text-align: center; }
+            .real-label .l-device { font-size: 9px; border: 1px solid #000; padding: 1px 4px; font-weight: bold; border-radius: 2px; text-align: center; margin: 0 auto; width: fit-content; }
+            .real-label .l-date { font-size: 6px; text-align: left; margin-top: 1px; }
+            .real-label .warning-text { font-size: 9px; text-align: center; font-weight: 900; line-height: 1.4; padding: 2px; }
+
+            /* تنسيق ملصق الـ QR للألعاب */
+            .qr-label-container {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                width: 100%;
+                height: 100%;
+            }
+            .qr-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: 18mm;
+                width: 100%;
+            }
+            .qr-left {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                width: 21mm;
+                text-align: right;
+            }
+            .qr-logo { font-size: 11px; font-weight: 900; margin-bottom: 2px; }
+            .qr-name { font-size: 9px; font-weight: bold; white-space: nowrap; overflow: hidden; }
+            .qr-phone { font-size: 8px; font-weight: bold; }
+            .qr-box {
+                width: 16mm;
+                height: 16mm;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            .qr-box img { width: 100%; height: 100%; }
+            .qr-link-text {
+                font-size: 8px;
+                text-align: center;
+                font-weight: bold;
+                border-top: 1px dashed #000;
+                padding-top: 1px;
+                white-space: nowrap;
+                overflow: hidden;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="dashboard">
-        
         <div class="panel">
-            <h2>🖨️ إصدار الملصقات (Labels)</h2>
-            
+            <h2>📥 استلام وطباعة (Labels)</h2>
             <div class="input-group">
                 <label>اسم العميل:</label>
-                <input type="text" id="cName" placeholder="مثال: محمود محمد">
+                <input type="text" id="cName" oninput="syncData()" placeholder="مثال: محمود شوقي">
             </div>
             <div class="input-group">
                 <label>رقم الموبايل:</label>
-                <input type="tel" id="cPhone" placeholder="01XXXXXXXXX">
+                <input type="tel" id="cPhone" oninput="syncData()" placeholder="01XXXXXXXXX">
+            </div>
+            <div class="input-group">
+                <label>عدد الأجهزة / الدراعات للصيانة:</label>
+                <input type="number" id="cCount" oninput="updatePreview()" value="1" min="1">
+            </div>
+            
+            <div class="preview-wrapper">
+                <div class="label-preview">
+                    <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order" id="prevOrder">#----</span></div>
+                    <div class="l-body">
+                        <div class="l-name" id="prevName">اسم العميل</div>
+                        <div class="l-phone" id="prevPhone">رقم الموبايل</div>
+                        <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
+                    </div>
+                    <div class="l-date" id="prevDate">--/--/----</div>
+                </div>
             </div>
 
-            <div class="section-divider">
-                <h3 style="margin-top: 0; font-size: 15px; color: var(--pri);">🔧 استلام صيانة</h3>
-                <div class="input-group">
-                    <label>عدد الأجهزة / الدراعات المستلمة:</label>
-                    <input type="number" id="cCount" value="1" min="1">
-                </div>
-                <button onclick="printMaintenanceLabels()">🖨️ طباعة ملصقات الصيانة</button>
+            <button onclick="printLabels()">🖨️ طباعة ملصقات الصيانة</button>
+            
+            <hr style="border-color: var(--border); margin: 15px 0;">
+            
+            <div class="input-group">
+                <label>طباعة ملصق ألعاب (QR Code):</label>
+                <select id="qrType">
+                    <option value="https://bit.ly/4modps4">ألعاب تهكير PS4 (bit.ly/4modps4)</option>
+                    <option value="https://bit.ly/3modps3">ألعاب تهكير PS3 (bit.ly/3modps3)</option>
+                    <option value="https://bit.ly/lvlupsale">ألعاب أصلية PS4/PS5 (bit.ly/lvlupsale)</option>
+                </select>
             </div>
+            <button class="btn-qr" onclick="printQRLabel()">📱 طباعة ملصق الألعاب والـ QR</button>
 
-            <div class="section-divider">
-                <h3 style="margin-top: 0; font-size: 15px; color: #1877F2;">🎮 طباعة QR ألعاب وعروض</h3>
-                <div class="input-group">
-                    <label>نوع الطلب:</label>
-                    <select id="gameType">
-                        <option value="mod">تهكير PS4/PS3 (QR Code)</option>
-                        <option value="sale">عروض أصلية (QR Code)</option>
-                    </select>
-                </div>
-                <button class="btn-secondary" onclick="printGameLabels()">🖨️ طباعة ملصق الـ QR للعميل</button>
-            </div>
         </div>
 
         <div class="panel">
@@ -128,7 +186,7 @@
             
             <div style="display: flex; gap: 10px;">
                 <div class="input-group" style="flex: 1;">
-                    <label>مصنعية الصيانة (إيراد):</label>
+                    <label>مصنعية الصيانة (بيع):</label>
                     <input type="number" id="maintRev" value="0" oninput="calcTotals()">
                 </div>
                 <div class="input-group" style="flex: 1;">
@@ -138,144 +196,106 @@
                 <div class="input-group" style="flex: 1;">
                     <label>الصنايعي:</label>
                     <select id="technician">
-                        <option value="محمود شوقي">محمود شوقي</option>
-                        <option value="احمد يسري">احمد يسري</option>
-                        <option value="عمر ياسر">عمر ياسر</option>
+                        <option value="محمود">محمود</option>
+                        <option value="أحمد">أحمد</option>
+                        <option value="أخرى">أخرى</option>
                     </select>
                 </div>
             </div>
 
-            <h4 style="margin: 0 0 10px; color: var(--pri);">📦 إضافة إكسسوارات:</h4>
+            <h4 style="margin: 0 0 10px; color: var(--pri);">إضافة إكسسوارات (من الجرد):</h4>
             <div class="items-grid" id="accessoriesGrid"></div>
 
             <div class="cart-box" id="posCartList">
-                <p style="text-align:center; color:gray; font-size:12px; margin-top:25px;">لم يتم إضافة إكسسوارات الفاتورة</p>
+                <p style="text-align:center; color:gray; font-size:12px; margin-top: 30px;">لم يتم إضافة إكسسوارات</p>
             </div>
 
             <div class="totals-box">
-                <div><h4>الصيانة</h4><h3 id="tMaint">0 ج</h3></div>
-                <div><h4>المشتريات</h4><h3 id="tGoods">0 ج</h3></div>
+                <div><h4>إجمالي الصيانة</h4><h3 id="tMaint">0 ج</h3></div>
+                <div><h4>إجمالي المشتريات</h4><h3 id="tGoods">0 ج</h3></div>
                 <div><h4 style="color:var(--pri);">المطلوب من العميل</h4><h3 style="color:var(--pri);" id="tFinal">0 ج</h3></div>
             </div>
 
-            <button class="btn-wa" onclick="checkout()">✅ تسليم وإرسال واتساب (وتسجيل بالشيت)</button>
+            <button class="btn-wa" onclick="checkout()">✅ تسليم وإرسال واتساب (وحفظ بالشيت)</button>
         </div>
     </div>
 
     <div id="printArea"></div>
 
     <script>
-        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycby4lxPshR2nUQ7BmSuPLY5XJ0_0n9PSPfu2LulXbVkq-G67WcrrFjAtEAN-Vd6n3WD1/exec';
+        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycby8JKZI6cKEMpT3tfJXoE5mYP8uomUgHz_32g27pXg3O1wroLptz1RyRSPbCLsEIu83/exec';
 
-        // 📦 قاعدة البيانات المحدثة بناءً على طلبك (تستخدم في حالة عدم الاتصال بالشيت أو جرد وهمي)
-        let accessoriesDB = [
-            { name: "جراب 4", price: 150, cost: 0, qty: 100 },
-            { name: "جراب 5", price: 150, cost: 0, qty: 100 },
-            { name: "جريبس اشكال", price: 30, cost: 0, qty: 100 },
-            { name: "جريبس كارتون", price: 30, cost: 0, qty: 100 },
-            { name: "دراع 2", price: 180, cost: 0, qty: 100 },
-            { name: "دراع 3 اسود", price: 300, cost: 0, qty: 100 },
-            { name: "دراع 3 اسود ألوان", price: 350, cost: 0, qty: 100 },
-            { name: "دراع اصلي 4 امريكي", price: 100, cost: 0, qty: 100 },
-            { name: "دراع اصلي 4 اوروبي", price: 800, cost: 0, qty: 100 },
-            { name: "دراع اصلي 4 برو", price: 1300, cost: 0, qty: 100 },
-            { name: "دراع كوبي 4 جديد اول", price: 750, cost: 0, qty: 100 },
-            { name: "دراع كوبي 4 جديد ثاني", price: 650, cost: 0, qty: 100 },
-            { name: "دراع كوبي 4 استعمال", price: 450, cost: 0, qty: 100 },
-            { name: "دراع اصلي 5 استعمال", price: 2300, cost: 0, qty: 100 },
-            { name: "دراع اصلي 5 جديد", price: 3850, cost: 0, qty: 100 },
-            { name: "ستاند شحن 4", price: 250, cost: 0, qty: 100 },
-            { name: "ستاند شحن 5", price: 550, cost: 0, qty: 100 },
-            { name: "سكبن برو", price: 200, cost: 0, qty: 100 },
-            { name: "سكين سليم", price: 200, cost: 0, qty: 100 },
-            { name: "سكين فات", price: 200, cost: 0, qty: 100 },
-            { name: "شاحن 8 مخرج", price: 550, cost: 0, qty: 100 },
-            { name: "شنطه", price: 500, cost: 0, qty: 100 },
-            { name: "كابل 5", price: 200, cost: 0, qty: 100 },
-            { name: "كابل بوار", price: 100, cost: 0, qty: 100 },
-            { name: "كابل شحن 3", price: 70, cost: 0, qty: 100 },
-            { name: "كابل شحن 4 اصلي", price: 150, cost: 0, qty: 100 },
-            { name: "كابل شحن 4 كوبي", price: 50, cost: 0, qty: 100 },
-            { name: "كابل av", price: 50, cost: 0, qty: 100 },
-            { name: "كابل hdmi", price: 120, cost: 0, qty: 100 }
+        // 📦 قاعدة بيانات البضاعة (بها المخزون الفعلي stock)
+        const accessoriesDB = [
+            { id: 1, name: "جراب سيليكون عادي", price: 50, cost: 25, stock: 10 },
+            { id: 2, name: "جراب سيليكون 3D", price: 100, cost: 50, stock: 5 },
+            { id: 3, name: "غطاء انالوج", price: 10, cost: 5, stock: 0 }, // مثال لصنف نفذ
+            { id: 4, name: "كابل شحن اورجينال", price: 100, cost: 50, stock: 12 },
+            { id: 5, name: "كابل شحن هاي كوبي", price: 50, cost: 25, stock: 20 },
+            { id: 6, name: "بطارية دراع اصلي", price: 150, cost: 75, stock: 4 },
+            { id: 7, name: "بطارية دراع كوبي", price: 100, cost: 50, stock: 0 }, // نفذ
+            { id: 8, name: "استيكر دراع", price: 20, cost: 10, stock: 30 }
         ];
-        
+
         let posCart = [];
+        const orderIdStr = '#' + Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('prevOrder').innerText = orderIdStr;
 
-        // محاولة جلب الجرد الحقيقي من الشيت، لو فشل هيستخدم القائمة اللي فوق
-        fetch(GOOGLE_URL)
-            .then(res => res.json())
-            .then(data => {
-                if(data && data.length > 0 && !data.error) {
-                    accessoriesDB = data; // تحديث بالبيانات الحية
-                }
-                renderAccessories();
-            }).catch(err => {
-                console.log("استخدام الجرد المحلي");
-                renderAccessories();
-            });
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('en-GB');
+        document.getElementById('prevDate').innerText = dateStr;
+        
+        const nextWeek = new Date(today); 
+        nextWeek.setDate(today.getDate() + 7);
+        const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
 
-        function generateOrderNumber() { return '#' + Math.floor(1000 + Math.random() * 9000); }
-        function getDates() {
-            const today = new Date();
-            const dateStr = today.toLocaleDateString('en-GB');
-            const nextWeek = new Date(today); 
-            nextWeek.setDate(today.getDate() + 7);
-            const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
-            return { today: dateStr, nextWeek: nextWeekStr };
-        }
-
-        // رسم شبكة البضاعة
-        function renderAccessories() {
-            const grid = document.getElementById('accessoriesGrid');
-            grid.innerHTML = '';
-            accessoriesDB.forEach((item, index) => {
-                let stockClass = item.qty > 0 ? 'stock-in' : 'stock-out';
-                let stockText = item.qty > 0 ? `متاح: ${item.qty}` : `نفذت (${item.qty})`;
-                
+        // رسم البضاعة مع فحص الرصيد
+        const grid = document.getElementById('accessoriesGrid');
+        accessoriesDB.forEach(item => {
+            if (item.stock > 0) {
                 grid.innerHTML += `
-                    <div class="item-card" onclick="addToCart(${index})">
+                    <div class="item-card" onclick="addToCart(${item.id})">
                         <div class="item-name">${item.name}</div>
                         <div class="item-price">${item.price} ج</div>
-                        <div class="item-stock ${stockClass}">${stockText}</div>
-                    </div>
-                `;
-            });
+                    </div>`;
+            } else {
+                grid.innerHTML += `
+                    <div class="item-card out-of-stock">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-price">نفذت ❌</div>
+                    </div>`;
+            }
+        });
+
+        function syncData() { updatePreview(); }
+
+        function updatePreview() {
+            document.getElementById('prevName').innerText = document.getElementById('cName').value || 'اسم العميل';
+            document.getElementById('prevPhone').innerText = document.getElementById('cPhone').value || 'رقم الموبايل';
+            document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
         }
 
-        // الخصم الوهمي والإضافة للسلة
-        function addToCart(index) {
-            let item = accessoriesDB[index];
-            let existing = posCart.find(c => c.name === item.name);
+        function addToCart(id) {
+            let item = accessoriesDB.find(i => i.id === id);
+            if(item.stock <= 0) return; // حماية إضافية
+            
+            let existing = posCart.find(c => c.id === id);
             if(existing) { existing.qty += 1; } 
-            else { posCart.push({ name: item.name, price: item.price, cost: item.cost, qty: 1 }); }
-            
-            item.qty -= 1; 
-            renderAccessories();
-            renderCart();
-        }
-
-        function removeFromCart(index) {
-            let removedItem = posCart[index];
-            let dbItem = accessoriesDB.find(i => i.name === removedItem.name);
-            if(dbItem) dbItem.qty += removedItem.qty; 
-            
-            posCart.splice(index, 1);
-            renderAccessories();
+            else { posCart.push({ ...item, qty: 1 }); }
             renderCart();
         }
 
         function renderCart() {
             const list = document.getElementById('posCartList');
-            if(posCart.length === 0) { list.innerHTML = '<p style="text-align:center; color:gray; font-size:12px; margin-top:25px;">لم يتم إضافة إكسسوارات الفاتورة</p>'; } 
+            if(posCart.length === 0) { list.innerHTML = '<p style="text-align:center; color:gray; font-size:12px; margin-top:30px;">لم يتم إضافة إكسسوارات</p>'; } 
             else {
                 list.innerHTML = '';
                 posCart.forEach((c, index) => {
                     list.innerHTML += `<div class="cart-item">
-                        <span style="color: white;">${c.name} (x${c.qty})</span>
+                        <span>${c.name} (x${c.qty})</span>
                         <span>
                             <span style="color:var(--pri); font-weight:bold;">${c.price * c.qty} ج</span>
-                            <span style="cursor:pointer; color:var(--acc); margin-right:10px; font-weight:bold;" onclick="removeFromCart(${index})">✖</span>
+                            <span style="cursor:pointer; color:var(--dang); margin-right:10px;" onclick="posCart.splice(${index},1); renderCart();">✖</span>
                         </span>
                     </div>`;
                 });
@@ -293,90 +313,89 @@
             document.getElementById('tFinal').innerText = (mRev + gRev) + " ج";
         }
 
-        // 🖨️ طباعة ملصقات الصيانة
-        function printMaintenanceLabels() {
+        function printLabels() {
             const name = document.getElementById('cName').value.trim();
             const phone = document.getElementById('cPhone').value.trim();
             const count = parseInt(document.getElementById('cCount').value);
-            if(!name) return alert("يرجى إدخال اسم العميل أولاً.");
+            if(!name || !phone) return alert("يرجى إدخال الاسم ورقم الموبايل للطباعة.");
 
-            const orderId = generateOrderNumber();
-            const dates = getDates();
             const pa = document.getElementById('printArea');
             pa.innerHTML = '';
 
-            // 1. الأجهزة
+            // ليبلات الأجهزة
             for(let i = 1; i <= count; i++) {
                 pa.innerHTML += `
                 <div class="real-label">
-                    <div class="header-container">
-                        <img src="lvlup.png" class="logo-img" onerror="this.outerHTML='<span style=\\'font-weight:900; font-size:10px;\\'>Level UP</span>'">
-                        <span class="order-txt">${orderId}</span>
-                    </div>
-                    <div class="client-name">${name}</div>
-                    <div class="client-phone">${phone}</div>
-                    <div style="text-align:center;"><span class="device-box">جهاز ${i} من ${count}</span></div>
-                    <div class="footer-txt">${dates.today}</div>
+                    <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div>
+                    <div class="l-name">${name}</div>
+                    <div class="l-phone">${phone}</div>
+                    <div class="l-device">جهاز ${i} من ${count}</div>
+                    <div class="l-date">${dateStr}</div>
                 </div>`;
             }
-            
-            // 2. إيصال الاستلام
+            // إيصال العميل
             pa.innerHTML += `
             <div class="real-label">
-                <div class="header-container">
-                    <img src="lvlup.png" class="logo-img" onerror="this.outerHTML='<span style=\\'font-weight:900; font-size:10px;\\'>Level UP</span>'">
-                    <span class="order-txt">${orderId}</span>
-                </div>
-                <div class="client-name">${name}</div>
-                <div class="client-phone">إيصال استلام</div>
-                <div style="text-align:center;"><span class="device-box">عدد: ${count} أجهزة</span></div>
-                <div class="footer-txt">${dates.today}</div>
+                <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div>
+                <div class="l-name">${name}</div>
+                <div class="l-phone" style="font-size:10px; font-weight:bold;">إيصال استلام العميل</div>
+                <div class="l-device">العدد: ${count} أجهزة</div>
+                <div class="l-date">${dateStr}</div>
             </div>`;
-            
-            // 3. التحذير
+            // التنبيه
             pa.innerHTML += `
-            <div class="real-label">
-                <div class="header-container" style="justify-content:center; border:none;">
-                    <img src="lvlup.png" class="logo-img" onerror="this.outerHTML='<span style=\\'font-weight:900; font-size:10px;\\'>Level UP</span>'">
-                </div>
-                <div class="warning-text">غير مسؤولين عن الأجهزة<br>لأكثر من أسبوع من الاستلام<br>(أقصى موعد: ${dates.nextWeek})</div>
-                <div class="footer-txt">الأوردر: ${orderId}</div>
+            <div class="real-label" style="justify-content: center;">
+                <div class="l-header" style="justify-content:center; border:none;"><span class="l-logo" style="font-size:12px;">⚠️ Level UP ⚠️</span></div>
+                <div class="warning-text">المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})</div>
+                <div class="l-order" style="text-align:center; margin-top: 4px;">الأوردر: ${orderIdStr}</div>
             </div>`;
             
             window.print();
         }
 
-        // 🖨️ طباعة ملصقات الـ QR Code (للتهكير أو العروض)
-        function printGameLabels() {
-            const name = document.getElementById('cName').value.trim();
-            const type = document.getElementById('gameType').value;
-            if(!name) return alert("يرجى إدخال اسم العميل أولاً.");
-
-            const orderId = generateOrderNumber(); 
-            const dates = getDates();
+        function printQRLabel() {
+            const name = document.getElementById('cName').value.trim() || 'عميل LevelUP';
+            const phone = document.getElementById('cPhone').value.trim() || '';
+            const link = document.getElementById('qrType').value;
+            const linkText = document.getElementById('qrType').options[document.getElementById('qrType').selectedIndex].text;
             
-            let qrSrc = type === 'mod' ? 'mod.png' : 'sale.png';
-            let title = type === 'mod' ? 'لألعاب التهكير' : 'لعروض الألعاب';
-
             const pa = document.getElementById('printArea');
+            pa.innerHTML = '';
+
+            // توليد HTML لستيكر الـ QR بتصميم جديد (اللوجو شمال والـ QR يمين)
             pa.innerHTML = `
             <div class="real-label">
-                <div class="header-container" style="justify-content: center; border-bottom: none; margin-bottom:0;">
-                    <img src="lvlup.png" class="logo-img" onerror="this.outerHTML='<span style=\\'font-weight:900; font-size:10px;\\'>Level UP</span>'">
+                <div class="qr-label-container">
+                    <div class="qr-top">
+                        <div class="qr-left">
+                            <div class="qr-logo">LEVEL UP</div>
+                            <div class="qr-name">${name}</div>
+                            <div class="qr-phone">${phone}</div>
+                        </div>
+                        <div class="qr-box" id="qrCodeTarget"></div>
+                    </div>
+                    <div class="qr-link-text">${linkText.split(' ')[0]} ${linkText.split(' ')[1]} | ${link}</div>
                 </div>
-                <img src="${qrSrc}" class="qr-code" alt="QR">
-                <div style="font-size: 8px; text-align: center; font-weight: bold; margin-top:2px;">امسح الكود ${title}</div>
-                <div class="footer-txt">${dates.today} | ${orderId}</div>
             </div>`;
-            
-            window.print();
+
+            // إنشاء الباركود
+            new QRCode(document.getElementById("qrCodeTarget"), {
+                text: link,
+                width: 60, // المقاس بالبيكسل عشان يناسب الـ 16ملم
+                height: 60,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.L
+            });
+
+            // الانتظار جزء من الثانية لتوليد الصورة ثم الطباعة
+            setTimeout(() => { window.print(); }, 300);
         }
 
-        // ✅ إتمام التسليم
         function checkout() {
             const nm = document.getElementById('cName').value.trim();
-            const ph = document.getElementById('cPhone').value.trim() || "غير مسجل";
-            if(!nm) return alert("يرجى إدخال اسم العميل في قسم الاستلام أولاً.");
+            const ph = document.getElementById('cPhone').value.trim();
+            if(!nm || !ph) return alert("يرجى إدخال اسم العميل ورقم الموبايل أولاً.");
 
             let mRev = parseFloat(document.getElementById('maintRev').value) || 0;
             let mCost = parseFloat(document.getElementById('maintCost').value) || 0;
@@ -385,42 +404,32 @@
             let gRev = 0, gCost = 0, gTxt = "", itemsForInventory = [];
             posCart.forEach(c => {
                 gRev += (c.price * c.qty);
-                gCost += (c.cost * c.qty); // لو الكوست 0 هيتحسب 0 عادي
+                gCost += (c.cost * c.qty);
                 gTxt += `- ${c.name} (x${c.qty})\n`;
                 itemsForInventory.push({ name: c.name, qty: c.qty });
             });
 
             let totalFinal = mRev + gRev;
-            if(totalFinal === 0) return alert("الفاتورة فارغة! أضف سعر صيانة أو اختر مشتريات.");
-            
-            const currentOrderId = generateOrderNumber();
+            if(totalFinal === 0) return alert("الفاتورة فارغة! أضف صيانة أو مشتريات.");
 
-            // إرسال لجوجل شيت
             fetch(GOOGLE_URL, {
                 method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    systemType: "Maintenance",
-                    orderId: currentOrderId, name: nm, phone: ph, technician: tech,
-                    maintRevenue: mRev, maintCost: mCost,
-                    goodsRevenue: gRev, goodsCost: gCost,
-                    purchasesDetails: gTxt || "لا يوجد",
-                    purchasedItems: itemsForInventory
+                    systemType: "Maintenance", orderId: orderIdStr, name: nm, phone: ph, technician: tech,
+                    maintRevenue: mRev, maintCost: mCost, goodsRevenue: gRev, goodsCost: gCost,
+                    purchasesDetails: gTxt || "لا يوجد", purchasedItems: itemsForInventory
                 })
             }).catch(e => console.log(e));
 
-            // إرسال للواتساب
             let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${nm}، تم بحمد الله الانتهاء من أجهزتك.\n\n`;
-            waTxt += `🧾 *تفاصيل الفاتورة (${currentOrderId}):*\n`;
-            if(mRev > 0) waTxt += `🔧 الصيانة: ${mRev} ج\n`;
+            waTxt += `🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
+            if(mRev > 0) waTxt += `🔧 مصنعية الصيانة: ${mRev} ج\n`;
             if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
             waTxt += `\n💰 *الإجمالي المطلوب:* ${totalFinal} جنيه.\n\nنتشرف بزيارتك دائماً!`;
 
-            alert("تم التسجيل والخصم من الجرد بنجاح! جاري تحويلك للواتساب...");
-            if(ph !== "غير مسجل") {
-                window.open(`https://wa.me/2${ph}?text=${encodeURIComponent(waTxt)}`, '_blank');
-            }
-            
-            setTimeout(() => { window.location.reload(); }, 1500);
+            alert("تم تسجيل العملية بنجاح! جاري تحويلك للواتساب...");
+            window.open(`https://wa.me/2${ph}?text=${encodeURIComponent(waTxt)}`, '_blank');
+            setTimeout(() => { window.location.reload(); }, 1000);
         }
     </script>
 </body>
