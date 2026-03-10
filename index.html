@@ -2,7 +2,6 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Level UP - لوحة تحكم المحل (POS)</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -44,12 +43,13 @@
         .label-preview .l-logo { font-weight: 900; font-size: 14px; }
         .label-preview .l-order { font-size: 12px; font-weight: bold; }
         .label-preview .l-name { font-size: 18px; font-weight: bold; margin: 2px 0; }
-        .label-preview .l-phone { font-size: 15px; margin-bottom: 5px; font-family: Arial, sans-serif; font-weight: 900; letter-spacing: 1px; }
+        .label-preview .l-phone { font-size: 14px; margin-bottom: 5px; font-family: Arial, sans-serif; font-weight: 900; letter-spacing: 1px; }
         .label-preview .l-device { font-size: 14px; font-weight: bold; border: 1px dashed #000; padding: 2px 5px; }
-        .label-preview .l-date { font-size: 13px; width: 100%; text-align: left; font-weight: bold; }
+        .label-preview .l-date { font-size: 12px; width: 100%; text-align: left; font-weight: bold; }
 
         #printArea { display: none; }
 
+        /* إعدادات الطباعة الدقيقة */
         @media print {
             body > *:not(#printArea) { display: none !important; }
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
@@ -69,15 +69,15 @@
             .real-label .l-logo { font-size: 8px; font-weight: 900; line-height: 1; }
             .real-label .l-order { font-size: 7px; font-weight: bold; line-height: 1; }
             .real-label .l-name { font-size: 11px; font-weight: bold; margin: 1px 0; text-align: center; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; }
-            .real-label .l-phone { font-size: 10px; text-align: center; line-height: 1; font-family: Arial, Helvetica, sans-serif; font-weight: 900; margin-bottom: 1px; }
+            .real-label .l-phone { font-size: 9.5px; text-align: center; line-height: 1; font-family: Arial, Helvetica, sans-serif; font-weight: 900; margin-bottom: 1px; }
             .real-label .l-device { font-size: 9px; border: 1px solid #000; padding: 1px 4px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
-            .real-label .l-date { font-size: 9px; width: 100%; text-align: left; font-weight: bold; margin-top: 1px; }
+            .real-label .l-date { font-size: 8.5px; width: 100%; text-align: left; font-weight: bold; margin-top: 1px; }
             .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; }
 
-            /* تصميم الـ QR الجديد المبسط */
+            /* تصميم الـ QR المبسط (رابط فوق، لوجو و QR تحت) */
             .qr-simplest-label { 
                 width: 40mm; height: 24.5mm; 
-                box-sizing: border-box; padding: 2mm; 
+                box-sizing: border-box; padding: 1.5mm; 
                 display: flex; flex-direction: column; justify-content: space-between; 
                 page-break-after: always; page-break-inside: avoid;
                 background: white; color: black; overflow: hidden;
@@ -107,7 +107,7 @@
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
                 <h4 style="margin: 0 0 10px; color: var(--pri);">1. طباعة أجهزة الصيانة</h4>
                 <div class="input-group" style="margin-bottom: 10px;">
-                    <label>عدد الأجهزة / الدراعات المستلمة:</label>
+                    <label>عدد الأجهزة المستلمة:</label>
                     <input type="number" id="cCount" oninput="updatePreview()" value="1" min="1">
                 </div>
                 
@@ -120,7 +120,6 @@
                         <div class="l-date" id="prevDate">--/--/----</div>
                     </div>
                 </div>
-
                 <button onclick="printLabels()">🖨️ طباعة ملصقات الصيانة (وتسجيل الاستلام)</button>
             </div>
 
@@ -133,7 +132,7 @@
                         <option value="Modded">ألعاب التعديل والتهكير (bit.ly/4modps4)</option>
                     </select>
                 </div>
-                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR (تصميم مبسط)</button>
+                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR (بدون اسم ورقم)</button>
             </div>
         </div>
 
@@ -158,7 +157,7 @@
                 </div>
             </div>
 
-            <h4 style="margin: 0 0 10px; color: var(--pri);">إضافة إكسسوارات (الكميات 0 للخصم بالسالب):</h4>
+            <h4 style="margin: 0 0 10px; color: var(--pri);">إضافة إكسسوارات (جميع الكميات نفذت للخصم بالسالب):</h4>
             <div class="items-grid" id="accessoriesGrid"></div>
 
             <div class="cart-box" id="posCartList">
@@ -180,7 +179,7 @@
     <script>
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzitNgeacplEjHYYuHqZCDoNZbBauk1Hjoww0SAnnWi2MurBhyjNeePUYvs_BGs7au8/exec';
 
-        // 29 صنف بأسعارها الدقيقة (الكميات 0 للخصم بالسالب)
+        // 29 صنف بأسعارها الدقيقة والكميات 0
         const accessoriesDB = [
             { id: 1, name: "جراب 4", price: 50, cost: 25, stock: 0 },
             { id: 2, name: "جراب 5", price: 100, cost: 40, stock: 0 },
@@ -220,20 +219,16 @@
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-GB');
         document.getElementById('prevDate').innerText = dateStr;
-
-        const nextWeek = new Date(today); 
-        nextWeek.setDate(today.getDate() + 7);
+        const nextWeek = new Date(today); nextWeek.setDate(today.getDate() + 7);
         const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
 
         const grid = document.getElementById('accessoriesGrid');
         accessoriesDB.forEach(item => {
-            let stockColor = 'var(--danger)';
-            let stockText = 'نفذت ⚠️ (متاح للبيع)';
             grid.innerHTML += `
                 <div class="item-card" onclick="addToCart(${item.id})">
                     <div class="item-name">${item.name}</div>
                     <div class="item-price">${item.price} ج</div>
-                    <div class="item-stock" style="color: ${stockColor}; border: 1px solid ${stockColor};">${stockText}</div>
+                    <div class="item-stock" style="color: var(--danger); border: 1px solid var(--danger);">نفذت ⚠️</div>
                 </div>
             `;
         });
@@ -271,8 +266,7 @@
 
         function calcTotals() {
             let mRev = parseFloat(document.getElementById('maintRev').value) || 0;
-            let gRev = 0;
-            posCart.forEach(c => { gRev += (c.price * c.qty); });
+            let gRev = 0; posCart.forEach(c => { gRev += (c.price * c.qty); });
             document.getElementById('tMaint').innerText = mRev + " ج";
             document.getElementById('tGoods').innerText = gRev + " ج";
             document.getElementById('tFinal').innerText = (mRev + gRev) + " ج";
@@ -289,8 +283,7 @@
                 body: JSON.stringify({ systemType: "Receipt", orderId: orderIdStr, name: name, phone: phone, deviceCount: count })
             }).catch(e => console.log(e));
 
-            const pa = document.getElementById('printArea');
-            pa.innerHTML = '';
+            const pa = document.getElementById('printArea'); pa.innerHTML = '';
             for(let i = 1; i <= count; i++) {
                 pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name">${name}</div><div class="l-phone">${phone}</div><div class="l-device">جهاز ${i} من ${count}</div><div class="l-date">${dateStr}</div></div>`;
             }
@@ -317,8 +310,7 @@
         }
 
         function checkout() {
-            const nm = document.getElementById('cName').value.trim();
-            const ph = document.getElementById('cPhone').value.trim();
+            const nm = document.getElementById('cName').value.trim(), ph = document.getElementById('cPhone').value.trim();
             if(!nm || !ph) return alert("يرجى إدخال اسم العميل ورقم الموبايل في قسم الاستلام أولاً.");
 
             let mRev = parseFloat(document.getElementById('maintRev').value) || 0;
@@ -327,8 +319,8 @@
             
             let gRev = 0, gCost = 0, gTxt = "", itemsForInventory = [];
             posCart.forEach(c => {
-                gRev += (c.price * c.qty);
-                gCost += (c.cost * c.qty);
+                gRev += (c.price * c.qty); gCost += (c.cost * c.qty);
+                // التنسيق المطلوب بالظبط: - الصنف (x1) السعر 000
                 gTxt += `- ${c.name} (x${c.qty}) السعر ${c.price * c.qty}\n`;
                 itemsForInventory.push({ name: c.name, qty: c.qty });
             });
@@ -350,7 +342,7 @@
             if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
             waTxt += `\n💰 *الإجمالي المطلوب:* ${totalFinal} جنيه.\n\nنتشرف بزيارتك دائماً!`;
 
-            alert("تم تسجيل العملية بنجاح! جاري تحويلك للواتساب...");
+            alert("تم تسجيل العملية في الشيت! جاري تحويلك للواتساب...");
             window.open(`https://wa.me/2${ph}?text=${encodeURIComponent(waTxt)}`, '_blank');
             setTimeout(() => { window.location.reload(); }, 1500);
         }
