@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Level UP - لوحة تحكم المحل (POS)</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -15,20 +16,28 @@
         
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--mut); }
-        .input-group input, .input-group select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: white; font-family: inherit; box-sizing: border-box; }
-        
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: white; font-family: inherit; box-sizing: border-box; }
+        .input-group textarea { resize: vertical; }
+
         button { background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s; }
         button:hover { opacity: 0.9; }
         .btn-wa { background: #25D366; color: white; margin-top: 15px; }
         .btn-qr { background: #1877F2; color: white; margin-top: 10px; }
         
-        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px;}
-        .item-card { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between;}
+        /* شبكة الإكسسوارات */
+        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px;}
+        .item-card { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; position: relative;}
         .item-card:hover { border-color: var(--pri); background: #172033; }
-        .item-name { font-size: 12px; font-weight: bold; margin-bottom: 5px; line-height: 1.4;}
-        .item-price { color: var(--pri); font-size: 14px; font-weight: bold; margin-bottom: 5px;}
+        .item-name { font-size: 13px; font-weight: bold; margin-bottom: 8px; line-height: 1.4;}
+        
+        /* مربع السعر القابل للتعديل */
+        .price-input-container { margin-bottom: 5px; }
+        .price-input { width: 60px; padding: 2px; text-align: center; font-weight: bold; color: var(--pri); background: transparent; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; }
+        .price-input:focus { outline: none; border-color: var(--pri); }
+        
         .item-stock { font-size: 11px; padding: 2px 5px; border-radius: 4px; background: rgba(0,0,0,0.5);}
 
+        /* سلة المبيعات */
         .cart-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px dashed var(--border); padding: 5px 0; }
         .cart-item span:first-child { color: var(--txt); }
@@ -37,50 +46,56 @@
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
         .totals-box h3 { margin: 0; color: white; }
 
+        /* معاينة الليبل */
         .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
-        .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; border-radius: 4px; align-items: center; }
-        .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 2px;}
+        .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
+        .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
         .label-preview .l-logo { font-weight: 900; font-size: 14px; }
         .label-preview .l-order { font-size: 12px; font-weight: bold; }
-        .label-preview .l-name { font-size: 18px; font-weight: bold; margin: 2px 0; }
-        .label-preview .l-phone { font-size: 14px; margin-bottom: 5px; font-family: Arial, sans-serif; font-weight: 900; letter-spacing: 1px; }
-        .label-preview .l-device { font-size: 14px; font-weight: bold; border: 1px dashed #000; padding: 2px 5px; }
-        .label-preview .l-date { font-size: 12px; width: 100%; text-align: left; font-weight: bold; }
+        .label-preview .l-name-phone { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 4px;}
+        .label-preview .l-details { font-size: 11px; flex-grow: 1; text-align: center; white-space: pre-wrap; font-weight: bold;}
+        .label-preview .l-footer { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: auto;}
+        .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
+        .label-preview .l-date { font-size: 12px; font-weight: bold; }
 
         #printArea { display: none; }
 
-        /* إعدادات الطباعة الدقيقة */
+        /* 🖨️ إعدادات الطباعة الصارمة */
         @media print {
             body > *:not(#printArea) { display: none !important; }
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
             @page { size: 40mm 25mm; margin: 0mm !important; }
             body, html { margin: 0 !important; padding: 0 !important; background: white; }
             
+            /* تصميم ليبل الصيانة الجديد */
             .real-label { 
                 width: 40mm; height: 24.5mm; 
-                box-sizing: border-box; padding: 1mm; 
-                display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+                box-sizing: border-box; padding: 1.5mm; 
+                display: flex; flex-direction: column; 
                 page-break-after: always; page-break-inside: avoid;
                 font-family: 'Tajawal', sans-serif; color: black; overflow: hidden;
             }
             .real-label:last-child { page-break-after: auto; } 
 
-            .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; }
+            .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 1px;}
             .real-label .l-logo { font-size: 8px; font-weight: 900; line-height: 1; }
             .real-label .l-order { font-size: 7px; font-weight: bold; line-height: 1; }
-            .real-label .l-name { font-size: 11px; font-weight: bold; margin: 1px 0; text-align: center; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; }
-            .real-label .l-phone { font-size: 9.5px; text-align: center; line-height: 1; font-family: Arial, Helvetica, sans-serif; font-weight: 900; margin-bottom: 1px; }
-            .real-label .l-device { font-size: 9px; border: 1px solid #000; padding: 1px 4px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
-            .real-label .l-date { font-size: 8.5px; width: 100%; text-align: left; font-weight: bold; margin-top: 1px; }
-            .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; }
+            
+            .real-label .l-name-phone { font-size: 10px; font-weight: 900; text-align: center; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; font-family: Arial, sans-serif;}
+            
+            .real-label .l-details { font-size: 8.5px; font-weight: bold; text-align: center; line-height: 1.1; flex-grow: 1; overflow: hidden; white-space: pre-wrap; padding: 0 1mm;}
+            
+            .real-label .l-footer { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: auto;}
+            .real-label .l-date { font-size: 7px; font-weight: bold; }
+            .real-label .l-device { font-size: 8px; border: 1px solid #000; padding: 0 2px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
+            
+            .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; height: 100%; display:flex; flex-direction: column; justify-content: center;}
 
-            /* تصميم الـ QR المبسط (رابط فوق، لوجو و QR تحت) */
+            /* تصميم الـ QR المبسط */
             .qr-simplest-label { 
-                width: 40mm; height: 24.5mm; 
-                box-sizing: border-box; padding: 1.5mm; 
+                width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; 
                 display: flex; flex-direction: column; justify-content: space-between; 
-                page-break-after: always; page-break-inside: avoid;
-                background: white; color: black; overflow: hidden;
+                page-break-after: always; page-break-inside: avoid; background: white; color: black; overflow: hidden;
             }
             .qr-simplest-label:last-child { page-break-after: auto; }
             .qr-top-link { width: 100%; text-align: center; font-size: 11px; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: 0.5px; margin-bottom: 2px; border-bottom: 1.5px solid #000; padding-bottom: 2px; }
@@ -96,28 +111,30 @@
         <div class="panel">
             <h2>📥 استلام وطباعة (Labels)</h2>
             <div class="input-group">
-                <label>اسم العميل:</label>
-                <input type="text" id="cName" oninput="syncData()" placeholder="مثال: محمود شوقي">
+                <label>الاسم ورقم الموبايل (مسافة بينهم):</label>
+                <input type="text" id="cNamePhone" oninput="syncData()" placeholder="مثال: محمود شوقي 01555886990">
             </div>
             <div class="input-group">
-                <label>رقم الموبايل:</label>
-                <input type="tel" id="cPhone" oninput="syncData()" placeholder="01XXXXXXXXX">
+                <label>تفاصيل العميل / المطلوب صيانته:</label>
+                <textarea id="cDetails" rows="2" oninput="syncData()" placeholder="اكتب المشكلة أو الطلب هنا..."></textarea>
             </div>
             
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
                 <h4 style="margin: 0 0 10px; color: var(--pri);">1. طباعة أجهزة الصيانة</h4>
                 <div class="input-group" style="margin-bottom: 10px;">
                     <label>عدد الأجهزة المستلمة:</label>
-                    <input type="number" id="cCount" oninput="updatePreview()" value="1" min="1">
+                    <input type="number" id="cCount" oninput="syncData()" value="1" min="1">
                 </div>
                 
                 <div class="preview-wrapper">
                     <div class="label-preview">
                         <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order" id="prevOrder">#----</span></div>
-                        <div class="l-name" id="prevName">اسم العميل</div>
-                        <div class="l-phone" id="prevPhone">رقم الموبايل</div>
-                        <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
-                        <div class="l-date" id="prevDate">--/--/----</div>
+                        <div class="l-name-phone" id="prevNamePhone">الاسم والرقم</div>
+                        <div class="l-details" id="prevDetails">التفاصيل تظهر هنا...</div>
+                        <div class="l-footer">
+                            <div class="l-date" id="prevDate">--/--/----</div>
+                            <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
+                        </div>
                     </div>
                 </div>
                 <button onclick="printLabels()">🖨️ طباعة ملصقات الصيانة (وتسجيل الاستلام)</button>
@@ -132,7 +149,7 @@
                         <option value="Modded">ألعاب التعديل والتهكير (bit.ly/4modps4)</option>
                     </select>
                 </div>
-                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR (بدون اسم ورقم)</button>
+                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR</button>
             </div>
         </div>
 
@@ -150,14 +167,16 @@
                 <div class="input-group" style="flex: 1;">
                     <label>الصنايعي:</label>
                     <select id="technician">
+                        <option value="المحل">المحل</option>
                         <option value="احمد يسري">احمد يسري</option>
                         <option value="محمود شوقي">محمود شوقي</option>
                         <option value="عمر ياسر">عمر ياسر</option>
+                        <option value="مصروفات">مصروفات</option>
                     </select>
                 </div>
             </div>
 
-            <h4 style="margin: 0 0 10px; color: var(--pri);">إضافة إكسسوارات (جميع الكميات نفذت للخصم بالسالب):</h4>
+            <h4 style="margin: 0 0 10px; color: var(--pri);">إضافة إكسسوارات (الكميات 0 للخصم بالسالب):</h4>
             <div class="items-grid" id="accessoriesGrid"></div>
 
             <div class="cart-box" id="posCartList">
@@ -170,16 +189,17 @@
                 <div><h4 style="color:var(--pri);">المطلوب من العميل</h4><h3 style="color:var(--pri);" id="tFinal">0 ج</h3></div>
             </div>
 
-            <button class="btn-wa" onclick="checkout()">✅ تسليم وإرسال واتساب (وحفظ بالشيت)</button>
+            <button class="btn-wa" onclick="checkout()">✅ تسليم وإرسال واتساب (وحفظ باليومية)</button>
         </div>
     </div>
 
     <div id="printArea"></div>
 
     <script>
-        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzitNgeacplEjHYYuHqZCDoNZbBauk1Hjoww0SAnnWi2MurBhyjNeePUYvs_BGs7au8/exec';
+        // رابط جوجل شيت الخاص بك
+        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbwbJ6A1m0ICsXNvBPaLmfve_rY-CCclPNMyuOwyvFt2VBDcIAwwgCpRCv9LFvgUB0y0/exec';
 
-        // 29 صنف بأسعارها الدقيقة والكميات 0
+        // قاعدة بيانات البضاعة (29 صنف)
         const accessoriesDB = [
             { id: 1, name: "جراب 4", price: 50, cost: 25, stock: 0 },
             { id: 2, name: "جراب 5", price: 100, cost: 40, stock: 0 },
@@ -219,32 +239,55 @@
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-GB');
         document.getElementById('prevDate').innerText = dateStr;
-        const nextWeek = new Date(today); nextWeek.setDate(today.getDate() + 7);
+
+        const nextWeek = new Date(today); 
+        nextWeek.setDate(today.getDate() + 7);
         const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
 
+        // رسم البضاعة مع إمكانية تعديل السعر قبل الإضافة
         const grid = document.getElementById('accessoriesGrid');
         accessoriesDB.forEach(item => {
+            let stockColor = 'var(--danger)';
+            let stockText = 'نفذت ⚠️';
             grid.innerHTML += `
                 <div class="item-card" onclick="addToCart(${item.id})">
                     <div class="item-name">${item.name}</div>
-                    <div class="item-price">${item.price} ج</div>
-                    <div class="item-stock" style="color: var(--danger); border: 1px solid var(--danger);">نفذت ⚠️</div>
+                    <div class="price-input-container">
+                        <input type="number" id="price_${item.id}" class="price-input" value="${item.price}" onclick="event.stopPropagation()"> ج
+                    </div>
+                    <div class="item-stock" style="color: ${stockColor}; border: 1px solid ${stockColor};">${stockText}</div>
                 </div>
             `;
         });
 
-        function syncData() { updatePreview(); }
+        // دالة ذكية لفصل الرقم عن الاسم
+        function parseNamePhone() {
+            let raw = document.getElementById('cNamePhone').value.trim();
+            let phoneMatch = raw.match(/\d{8,}/); 
+            let phone = phoneMatch ? phoneMatch[0] : "";
+            let name = raw.replace(phone, "").trim();
+            if(!name && !phone) return { name: "", phone: "" };
+            if(!name) name = "عميل";
+            return { name, phone };
+        }
 
-        function updatePreview() {
-            document.getElementById('prevName').innerText = document.getElementById('cName').value || 'اسم العميل';
-            document.getElementById('prevPhone').innerText = document.getElementById('cPhone').value || 'رقم الموبايل';
+        function syncData() {
+            let parsed = parseNamePhone();
+            let details = document.getElementById('cDetails').value.trim();
+            
+            document.getElementById('prevNamePhone').innerText = parsed.name + " " + parsed.phone;
+            document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
             document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
         }
 
+        // إضافة للسلة بالسعر المكتوب في الخانة
         function addToCart(id) {
             let item = accessoriesDB.find(i => i.id === id);
-            let existing = posCart.find(c => c.id === id);
-            if(existing) { existing.qty += 1; } else { posCart.push({ ...item, qty: 1 }); }
+            let currentSellPrice = parseFloat(document.getElementById(`price_${id}`).value) || item.price;
+            
+            let existing = posCart.find(c => c.id === id && c.sellPrice === currentSellPrice);
+            if(existing) { existing.qty += 1; } 
+            else { posCart.push({ ...item, qty: 1, sellPrice: currentSellPrice }); }
             renderCart();
         }
 
@@ -256,7 +299,7 @@
                 posCart.forEach((c, index) => {
                     list.innerHTML += `<div class="cart-item">
                         <span>${c.name} (x${c.qty})</span>
-                        <span><span style="color:var(--pri); font-weight:bold;">${c.price * c.qty} ج</span>
+                        <span><span style="color:var(--pri); font-weight:bold;">${c.sellPrice * c.qty} ج</span>
                         <span style="cursor:pointer; color:var(--dang); margin-right:10px; font-size: 16px;" onclick="posCart.splice(${index},1); renderCart();">✖</span></span>
                     </div>`;
                 });
@@ -266,29 +309,60 @@
 
         function calcTotals() {
             let mRev = parseFloat(document.getElementById('maintRev').value) || 0;
-            let gRev = 0; posCart.forEach(c => { gRev += (c.price * c.qty); });
+            let gRev = 0;
+            posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
             document.getElementById('tMaint').innerText = mRev + " ج";
             document.getElementById('tGoods').innerText = gRev + " ج";
             document.getElementById('tFinal').innerText = (mRev + gRev) + " ج";
         }
 
         function printLabels() {
-            const name = document.getElementById('cName').value.trim();
-            const phone = document.getElementById('cPhone').value.trim();
+            let parsed = parseNamePhone();
+            let details = document.getElementById('cDetails').value.trim();
             const count = parseInt(document.getElementById('cCount').value);
-            if(!name || !phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
+            
+            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
             fetch(GOOGLE_URL, {
                 method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ systemType: "Receipt", orderId: orderIdStr, name: name, phone: phone, deviceCount: count })
+                body: JSON.stringify({ systemType: "Receipt", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, deviceCount: count })
             }).catch(e => console.log(e));
 
-            const pa = document.getElementById('printArea'); pa.innerHTML = '';
+            const pa = document.getElementById('printArea');
+            pa.innerHTML = '';
+
             for(let i = 1; i <= count; i++) {
-                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name">${name}</div><div class="l-phone">${phone}</div><div class="l-device">جهاز ${i} من ${count}</div><div class="l-date">${dateStr}</div></div>`;
+                pa.innerHTML += `
+                <div class="real-label">
+                    <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div>
+                    <div class="l-name-phone">${parsed.name} ${parsed.phone}</div>
+                    <div class="l-details">${details}</div>
+                    <div class="l-footer">
+                        <div class="l-date">${dateStr}</div>
+                        <div class="l-device">جهاز ${i} من ${count}</div>
+                    </div>
+                </div>`;
             }
-            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name">${name}</div><div class="l-phone" style="font-size:9.5px;">إيصال استلام للعميل</div><div class="l-device">عدد: ${count} أجهزة</div><div class="l-date">${dateStr}</div></div>`;
-            pa.innerHTML += `<div class="real-label" style="justify-content: center;"><div class="l-header" style="justify-content:center; border:none;"><span class="l-logo" style="font-size:10px;">⚠️ Level UP ⚠️</span></div><div class="warning-text">المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})</div><div class="l-order" style="margin-top: 2px;">الأوردر: ${orderIdStr}</div></div>`;
+            
+            pa.innerHTML += `
+            <div class="real-label">
+                <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div>
+                <div class="l-name-phone">${parsed.name} ${parsed.phone}</div>
+                <div class="l-details" style="font-size: 14px; margin-top: 2px;">إيصال استلام للعميل<br>عدد: ${count} أجهزة</div>
+                <div class="l-footer">
+                    <div class="l-date">${dateStr}</div>
+                </div>
+            </div>`;
+            
+            pa.innerHTML += `
+            <div class="real-label">
+                <div class="warning-text">
+                    <span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>
+                    المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br>
+                    الأوردر: ${orderIdStr}
+                </div>
+            </div>`;
+            
             window.print();
         }
 
@@ -310,8 +384,8 @@
         }
 
         function checkout() {
-            const nm = document.getElementById('cName').value.trim(), ph = document.getElementById('cPhone').value.trim();
-            if(!nm || !ph) return alert("يرجى إدخال اسم العميل ورقم الموبايل في قسم الاستلام أولاً.");
+            let parsed = parseNamePhone();
+            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل في قسم الاستلام أولاً.");
 
             let mRev = parseFloat(document.getElementById('maintRev').value) || 0;
             let mCost = parseFloat(document.getElementById('maintCost').value) || 0;
@@ -319,9 +393,9 @@
             
             let gRev = 0, gCost = 0, gTxt = "", itemsForInventory = [];
             posCart.forEach(c => {
-                gRev += (c.price * c.qty); gCost += (c.cost * c.qty);
-                // التنسيق المطلوب بالظبط: - الصنف (x1) السعر 000
-                gTxt += `- ${c.name} (x${c.qty}) السعر ${c.price * c.qty}\n`;
+                gRev += (c.sellPrice * c.qty);
+                gCost += (c.cost * c.qty);
+                gTxt += `- ${c.name} (x${c.qty}) السعر ${c.sellPrice * c.qty}\n`;
                 itemsForInventory.push({ name: c.name, qty: c.qty });
             });
 
@@ -331,19 +405,19 @@
             fetch(GOOGLE_URL, {
                 method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    systemType: "Maintenance", orderId: orderIdStr, name: nm, phone: ph, technician: tech,
+                    systemType: "Maintenance", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, technician: tech,
                     maintRevenue: mRev, maintCost: mCost, goodsRevenue: gRev, goodsCost: gCost,
                     purchasesDetails: gTxt || "لا يوجد", purchasedItems: itemsForInventory
                 })
             }).catch(e => console.log(e));
 
-            let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${nm}، تم بحمد الله الانتهاء من أجهزتك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
+            let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${parsed.name}، تم بحمد الله الانتهاء من طلبك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
             if(mRev > 0) waTxt += `🔧 مصنعية الصيانة: ${mRev} ج\n`;
             if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
             waTxt += `\n💰 *الإجمالي المطلوب:* ${totalFinal} جنيه.\n\nنتشرف بزيارتك دائماً!`;
 
-            alert("تم تسجيل العملية في الشيت! جاري تحويلك للواتساب...");
-            window.open(`https://wa.me/2${ph}?text=${encodeURIComponent(waTxt)}`, '_blank');
+            alert("تم تسجيل العملية بنجاح في شيت اليومية! جاري تحويلك للواتساب...");
+            window.open(`https://wa.me/2${parsed.phone}?text=${encodeURIComponent(waTxt)}`, '_blank');
             setTimeout(() => { window.location.reload(); }, 1500);
         }
     </script>
