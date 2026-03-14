@@ -10,38 +10,30 @@
         body { background: var(--bg); color: var(--txt); font-family: 'Tajawal', sans-serif; margin: 0; padding: 20px; }
         .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1400px; margin: auto; }
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
-        
         .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
         .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; }
-        
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--mut); }
         .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: white; font-family: inherit; box-sizing: border-box; }
         .input-group textarea { resize: vertical; }
-
         button { background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s; }
         button:hover { opacity: 0.9; }
         .btn-wa { background: #25D366; color: white; margin-top: 15px; }
         .btn-qr { background: #1877F2; color: white; margin-top: 10px; }
-        
         .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px;}
         .item-card { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; position: relative;}
         .item-card:hover { border-color: var(--pri); background: #172033; }
         .item-name { font-size: 13px; font-weight: bold; margin-bottom: 8px; line-height: 1.4;}
-        
         .price-input-container { margin-bottom: 5px; }
         .price-input { width: 60px; padding: 2px; text-align: center; font-weight: bold; color: var(--pri); background: transparent; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; }
         .price-input:focus { outline: none; border-color: var(--pri); }
         .item-stock { font-size: 11px; padding: 2px 5px; border-radius: 4px; background: rgba(0,0,0,0.5);}
-
         .cart-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px dashed var(--border); padding: 5px 0; }
-        .cart-item span:first-child { color: var(--txt); }
         .totals-box { display: flex; justify-content: space-between; background: #020617; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
         .totals-box div { text-align: center; }
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
         .totals-box h3 { margin: 0; color: white; }
-
         .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
         .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
         .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
@@ -50,17 +42,14 @@
         .label-preview .l-name-phone { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 4px;}
         .label-preview .l-details { font-size: 11px; flex-grow: 1; text-align: center; white-space: pre-wrap; font-weight: bold;}
         .label-preview .l-footer { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: auto;}
-        .label-preview .l-device { font-size: 14px; font-weight: bold; border: 1px dashed #000; padding: 2px 5px; }
+        .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
         .label-preview .l-date { font-size: 12px; font-weight: bold; }
-
         #printArea { display: none; }
-
         @media print {
             body > *:not(#printArea) { display: none !important; }
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
             @page { size: 40mm 25mm; margin: 0mm !important; }
             body, html { margin: 0 !important; padding: 0 !important; background: white; }
-            
             .real-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; page-break-after: always; page-break-inside: avoid; font-family: 'Tajawal', sans-serif; color: black; overflow: hidden; }
             .real-label:last-child { page-break-after: auto; } 
             .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 1px;}
@@ -72,7 +61,6 @@
             .real-label .l-date { font-size: 7px; font-weight: bold; }
             .real-label .l-device { font-size: 8px; border: 1px solid #000; padding: 0 2px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
             .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; height: 100%; display:flex; flex-direction: column; justify-content: center;}
-
             .qr-simplest-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; page-break-inside: avoid; background: white; color: black; overflow: hidden; }
             .qr-simplest-label:last-child { page-break-after: auto; }
             .qr-top-link { width: 100%; text-align: center; font-size: 11px; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: 0.5px; margin-bottom: 2px; border-bottom: 1.5px solid #000; padding-bottom: 2px; }
@@ -83,7 +71,6 @@
     </style>
 </head>
 <body>
-
     <div class="dashboard">
         <div class="panel">
             <h2>📥 استلام وطباعة (Labels)</h2>
@@ -173,7 +160,8 @@
     <div id="printArea"></div>
 
     <script>
-        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbxPshLZixJv6HRREVOYdUBpN6XUgMYQ2kHKRq-bc1q5mlw63yd2u2cn0hs6jnzf2gljhr486u3dkgm2y-/exec';
+        // الرابط الجديد لجوجل سكريبت
+        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbyZwX2zpm3qhlmuER-k2p2lN_YddkoQQJwfseVQG6eKz2clBB_NwqNziNpxzAPl_arW/exec';
 
         const accessoriesDB = [
             { id: 1, name: "جراب 4", price: 150, cost: 90, stock: 0 },
@@ -222,7 +210,7 @@
         const grid = document.getElementById('accessoriesGrid');
         accessoriesDB.forEach(item => {
             let stockColor = 'var(--danger)';
-            let stockText = 'نفذت ⚠️ (متاح للبيع)';
+            let stockText = 'نفذت ⚠️';
             grid.innerHTML += `
                 <div class="item-card" onclick="addToCart(${item.id})">
                     <div class="item-name">${item.name}</div>
@@ -247,6 +235,7 @@
         function syncData() {
             let parsed = parseNamePhone();
             let details = document.getElementById('cDetails').value.trim();
+            
             document.getElementById('prevNamePhone').innerText = parsed.name + " " + parsed.phone;
             document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
             document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
@@ -255,6 +244,7 @@
         function addToCart(id) {
             let item = accessoriesDB.find(i => i.id === id);
             let currentSellPrice = parseFloat(document.getElementById(`price_${id}`).value) || item.price;
+            
             let existing = posCart.find(c => c.id === id && c.sellPrice === currentSellPrice);
             if(existing) { existing.qty += 1; } 
             else { posCart.push({ ...item, qty: 1, sellPrice: currentSellPrice }); }
@@ -279,10 +269,20 @@
 
         function calcTotals() {
             let mRev = parseFloat(document.getElementById('maintRev').value) || 0;
-            let gRev = 0; posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
+            let gRev = 0;
+            posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
             document.getElementById('tMaint').innerText = mRev + " ج";
             document.getElementById('tGoods').innerText = gRev + " ج";
             document.getElementById('tFinal').innerText = (mRev + gRev) + " ج";
+        }
+
+        // دالة الإرسال الموحدة لضمان تخطي الـ CORS
+        function sendToGoogle(payload) {
+            return fetch(GOOGLE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
         }
 
         function printLabels() {
@@ -296,23 +296,20 @@
             btn.innerText = "⏳ جاري التسجيل في الشيت...";
             btn.disabled = true;
 
-            // إرسال الإيصال والانتظار حتى يكتمل قبل الطباعة
-            fetch(GOOGLE_URL, {
-                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ systemType: "Receipt", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, deviceCount: count })
-            }).then(() => {
+            sendToGoogle({ systemType: "Receipt", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, deviceCount: count })
+            .then(() => {
                 btn.innerText = "🖨️ تم التسجيل! جاري الطباعة...";
                 const pa = document.getElementById('printArea');
                 pa.innerHTML = '';
                 for(let i = 1; i <= count; i++) {
                     pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`;
                 }
-                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 14px;">إيصال استلام للعميل<br>عدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
-                pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:12px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br>الأوردر: ${orderIdStr}</div></div>`;
+                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 14px; margin-top: 2px;">إيصال استلام للعميل<br>عدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
+                pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br>الأوردر: ${orderIdStr}</div></div>`;
                 
                 window.print();
-                setTimeout(() => { window.location.reload(); }, 1000);
-            }).catch(e => { alert("حدث خطأ في الاتصال بالإنترنت."); btn.disabled = false; btn.innerText = "🖨️ طباعة ملصقات الصيانة (وتسجيل الاستلام)"; });
+                setTimeout(() => { window.location.reload(); }, 1500);
+            }).catch(e => { alert("مشكلة في الاتصال!"); btn.disabled = false; btn.innerText = "🖨️ طباعة ملصقات الصيانة (وتسجيل الاستلام)"; });
         }
 
         function printQRLabel() {
@@ -345,7 +342,7 @@
                 gRev += (c.sellPrice * c.qty);
                 gCost += (c.cost * c.qty);
                 gTxt += `- ${c.name} (x${c.qty}) السعر ${c.sellPrice * c.qty}\n`;
-                itemsForInventory.push({ name: c.name, qty: c.qty });
+                itemsForInventory.push({ name: c.name, qty: c.qty, sellPrice: c.sellPrice });
             });
 
             let totalFinal = mRev + gRev;
@@ -355,24 +352,20 @@
             btn.innerText = "⏳ جاري التسجيل في الشيت...";
             btn.disabled = true;
 
-            // إرسال المبيعات والصيانة لليومية والانتظار حتى تكتمل العملية
-            fetch(GOOGLE_URL, {
-                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    systemType: "Maintenance", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, technician: tech,
-                    maintRevenue: mRev, maintCost: mCost, goodsRevenue: gRev, goodsCost: gCost,
-                    purchasesDetails: gTxt || "لا يوجد", purchasedItems: itemsForInventory
-                })
+            sendToGoogle({
+                systemType: "Maintenance", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, technician: tech,
+                maintRevenue: mRev, maintCost: mCost, goodsRevenue: gRev, goodsCost: gCost,
+                purchasesDetails: gTxt || "لا يوجد", purchasedItems: itemsForInventory
             }).then(() => {
                 let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${parsed.name}، تم بحمد الله الانتهاء من طلبك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
                 if(mRev > 0) waTxt += `🔧 مصنعية الصيانة: ${mRev} ج\n`;
                 if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
                 waTxt += `\n💰 *الإجمالي المطلوب:* ${totalFinal} جنيه.\n\nنتشرف بزيارتك دائماً!`;
 
-                alert("تم تسجيل العملية بنجاح في شيت اليومية! جاري تحويلك للواتساب...");
+                alert("تم تسجيل العملية بنجاح في شيت اليومية!");
                 window.open(`https://wa.me/2${parsed.phone}?text=${encodeURIComponent(waTxt)}`, '_blank');
-                setTimeout(() => { window.location.reload(); }, 1000);
-            }).catch(e => { alert("حدث خطأ في الاتصال بالإنترنت."); btn.disabled = false; btn.innerText = "✅ تسليم وإرسال واتساب (وحفظ باليومية)"; });
+                setTimeout(() => { window.location.reload(); }, 1500);
+            }).catch(e => { alert("مشكلة في الاتصال!"); btn.disabled = false; btn.innerText = "✅ تسليم وإرسال واتساب (وحفظ باليومية)"; });
         }
     </script>
 </body>
