@@ -160,8 +160,7 @@
     <div id="printArea"></div>
 
     <script>
-        // الرابط الجديد لجوجل سكريبت
-        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbyZwX2zpm3qhlmuER-k2p2lN_YddkoQQJwfseVQG6eKz2clBB_NwqNziNpxzAPl_arW/exec';
+        const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
         const accessoriesDB = [
             { id: 1, name: "جراب 4", price: 150, cost: 90, stock: 0 },
@@ -269,19 +268,20 @@
 
         function calcTotals() {
             let mRev = parseFloat(document.getElementById('maintRev').value) || 0;
-            let gRev = 0;
-            posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
+            let gRev = 0; posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
             document.getElementById('tMaint').innerText = mRev + " ج";
             document.getElementById('tGoods').innerText = gRev + " ج";
             document.getElementById('tFinal').innerText = (mRev + gRev) + " ج";
         }
 
-        // دالة الإرسال الموحدة لضمان تخطي الـ CORS
+        // دالة الإرسال الخارقة بصيغة Form
         function sendToGoogle(payload) {
+            const formData = new URLSearchParams();
+            formData.append('data', JSON.stringify(payload));
             return fetch(GOOGLE_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify(payload)
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
             });
         }
 
@@ -289,14 +289,15 @@
             let parsed = parseNamePhone();
             let details = document.getElementById('cDetails').value.trim();
             const count = parseInt(document.getElementById('cCount').value);
-            
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
             let btn = document.getElementById('btnPrint');
+            let originalText = btn.innerText;
             btn.innerText = "⏳ جاري التسجيل في الشيت...";
             btn.disabled = true;
 
             sendToGoogle({ systemType: "Receipt", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, deviceCount: count })
+            .then(response => response.text())
             .then(() => {
                 btn.innerText = "🖨️ تم التسجيل! جاري الطباعة...";
                 const pa = document.getElementById('printArea');
@@ -309,7 +310,7 @@
                 
                 window.print();
                 setTimeout(() => { window.location.reload(); }, 1500);
-            }).catch(e => { alert("مشكلة في الاتصال!"); btn.disabled = false; btn.innerText = "🖨️ طباعة ملصقات الصيانة (وتسجيل الاستلام)"; });
+            }).catch(e => { alert("مشكلة في الاتصال! حاول مرة تانية"); btn.disabled = false; btn.innerText = originalText; });
         }
 
         function printQRLabel() {
@@ -349,6 +350,7 @@
             if(totalFinal === 0 && !document.getElementById('cDetails').value) return alert("الفاتورة فارغة!");
 
             let btn = document.getElementById('btnCheckout');
+            let originalText = btn.innerText;
             btn.innerText = "⏳ جاري التسجيل في الشيت...";
             btn.disabled = true;
 
@@ -356,7 +358,8 @@
                 systemType: "Maintenance", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, technician: tech,
                 maintRevenue: mRev, maintCost: mCost, goodsRevenue: gRev, goodsCost: gCost,
                 purchasesDetails: gTxt || "لا يوجد", purchasedItems: itemsForInventory
-            }).then(() => {
+            }).then(response => response.text())
+            .then(() => {
                 let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${parsed.name}، تم بحمد الله الانتهاء من طلبك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
                 if(mRev > 0) waTxt += `🔧 مصنعية الصيانة: ${mRev} ج\n`;
                 if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
@@ -365,7 +368,7 @@
                 alert("تم تسجيل العملية بنجاح في شيت اليومية!");
                 window.open(`https://wa.me/2${parsed.phone}?text=${encodeURIComponent(waTxt)}`, '_blank');
                 setTimeout(() => { window.location.reload(); }, 1500);
-            }).catch(e => { alert("مشكلة في الاتصال!"); btn.disabled = false; btn.innerText = "✅ تسليم وإرسال واتساب (وحفظ باليومية)"; });
+            }).catch(e => { alert("مشكلة في الاتصال! حاول تاني"); btn.disabled = false; btn.innerText = originalText; });
         }
     </script>
 </body>
