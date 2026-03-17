@@ -34,6 +34,12 @@
         .totals-box div { text-align: center; }
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
         .totals-box h3 { margin: 0; color: white; }
+        
+        /* CSS للآلة الحاسبة السريعة */
+        .quick-calc { width: 50px; background: #172033; border: 1px solid var(--border); color: white; border-radius: 6px; text-align: center; padding: 6px; font-weight: bold; font-family: inherit; font-size: 14px; transition: 0.2s;}
+        .quick-calc:focus { outline: none; border-color: var(--pri); background: #1e293b;}
+        .quick-calc::-webkit-outer-spin-button, .quick-calc::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        
         .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
         .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
         .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
@@ -126,7 +132,19 @@
         </div>
 
         <div class="panel">
-            <h2>🛒 تسليم ومبيعات (Checkout)</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border); padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <h2 style="margin: 0; border: none; padding: 0; color: var(--pri);">🛒 تسليم ومبيعات (Checkout)</h2>
+                
+                <div style="display: flex; align-items: center; gap: 5px; background: var(--bg); padding: 8px 15px; border-radius: 8px; border: 1px solid var(--border); direction: ltr;">
+                    <span style="color:var(--mut); font-size: 12px; margin-right: 10px;" dir="rtl">حاسبة سريعة:</span>
+                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
+                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
+                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
+                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
+                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">=</span>
+                    <strong id="quickCalcResult" style="color: var(--pri); font-size: 18px; margin-left: 8px; min-width: 40px; text-align: center;">0</strong>
+                </div>
+            </div>
             
             <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #131b2e;">
                 <h4 style="margin: 0 0 10px; color: var(--pri);">العمليات (يمكن تسجيل حتى 3 عمليات للعميل):</h4>
@@ -279,6 +297,16 @@
             `;
         });
 
+        // دالة الجمع للآلة الحاسبة السريعة
+        function runQuickCalc() {
+            let inputs = document.querySelectorAll('.quick-calc');
+            let sum = 0;
+            inputs.forEach(input => {
+                sum += parseFloat(input.value) || 0;
+            });
+            document.getElementById('quickCalcResult').innerText = sum;
+        }
+
         function parseNamePhone() {
             let raw = document.getElementById('cNamePhone').value.trim();
             let phoneMatch = raw.match(/\d{8,}/); 
@@ -363,7 +391,6 @@
             btn.innerText = "⏳ جاري التسجيل في الشيت...";
             btn.disabled = true;
 
-            // إرسال البيانات لجوجل سكريبت لتسجيل الإيصال
             sendToGoogle({ systemType: "Receipt", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, deviceCount: count, details: details })
             .then(response => response.text())
             .then(() => {
@@ -406,7 +433,6 @@
             let parsed = parseNamePhone();
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
-            // تجميع العمليات الـ 3
             let operations = [];
             for (let i = 1; i <= 3; i++) {
                 let r = parseFloat(document.getElementById('maintRev'+i).value) || 0;
@@ -423,7 +449,6 @@
                 itemsForInventory.push({ name: c.name, qty: c.qty, sellPrice: c.sellPrice });
             });
 
-            // لو مفيش أي صيانة، بس فيه إكسسوارات، بنعمل عملية وهمية عشان نحفظ الإكسسوارات
             if(operations.length === 0 && posCart.length > 0) {
                 operations.push({ rev: 0, cost: 0, tech: "المحل" });
             }
@@ -441,10 +466,8 @@
             btnWA.disabled = true; btnSave.disabled = true;
 
             try {
-                // إرسال العمليات بالتوالي لشيت الإكسيل عشان كل عملية تنزل في سطر لعمولة الصنايعي
                 for (let i = 0; i < operations.length; i++) {
                     let isFirstRow = (i === 0);
-                    // لو في كذا عملية لنفس الأوردر بنميز الكود
                     let currentOrderId = orderIdStr + (operations.length > 1 ? `-${i+1}` : ''); 
                     
                     let payload = {
@@ -463,7 +486,6 @@
                     await sendToGoogle(payload);
                 }
 
-                // لو ضغط على زرار الواتساب
                 if (sendWA) {
                     let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${parsed.name}، تم بحمد الله الانتهاء من طلبك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
                     if(totalMaintRev > 0) waTxt += `🔧 مصنعية الصيانة: ${totalMaintRev} ج\n`;
