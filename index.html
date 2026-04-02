@@ -1,683 +1,509 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Level UP - لوحة تحكم المحل (POS)</title>
-
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-
     <style>
-
         :root { --bg: #0f172a; --card: #1e293b; --pri: #f59e0b; --txt: #f8fafc; --acc: #ef4444; --mut: #94a3b8; --border: #334155; }
-
         body { background: var(--bg); color: var(--txt); font-family: 'Tajawal', sans-serif; margin: 0; padding: 20px; }
-
         .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1400px; margin: auto; }
-
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
-
         .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-
         .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; }
-
         .input-group { margin-bottom: 15px; }
-
         .input-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--mut); font-weight: bold;}
-
         .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: white; font-family: inherit; box-sizing: border-box; }
-
         .input-group textarea { resize: vertical; }
-
         button { background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s; }
-
         button:hover { opacity: 0.9; }
-
         .btn-wa { background: #25D366; color: white; margin-top: 15px; }
-
         .btn-qr { background: #1877F2; color: white; margin-top: 10px; }
-
         .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px;}
-
         .item-card { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; position: relative;}
-
         .item-card:hover { border-color: var(--pri); background: #172033; }
-
         .item-name { font-size: 13px; font-weight: bold; margin-bottom: 8px; line-height: 1.4;}
-
         .price-input-container { margin-bottom: 5px; }
-
         .price-input { width: 60px; padding: 2px; text-align: center; font-weight: bold; color: var(--pri); background: transparent; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; }
-
         .price-input:focus { outline: none; border-color: var(--pri); }
-
         .item-stock { font-size: 11px; padding: 2px 5px; border-radius: 4px; background: rgba(0,0,0,0.5);}
-
         .cart-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
-
         .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px dashed var(--border); padding: 5px 0; }
-
         .totals-box { display: flex; justify-content: space-between; background: #020617; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
-
         .totals-box div { text-align: center; }
-
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
-
         .totals-box h3 { margin: 0; color: white; }
-
         
-
         /* CSS للآلة الحاسبة السريعة */
-
         .quick-calc { width: 50px; background: #172033; border: 1px solid var(--border); color: white; border-radius: 6px; text-align: center; padding: 6px; font-weight: bold; font-family: inherit; font-size: 14px; transition: 0.2s;}
-
         .quick-calc:focus { outline: none; border-color: var(--pri); background: #1e293b;}
-
         .quick-calc::-webkit-outer-spin-button, .quick-calc::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
         
-
         .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
-
         .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
-
         .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
-
         .label-preview .l-logo { font-weight: 900; font-size: 14px; margin-right: 15px;}
-
         .label-preview .l-order { font-size: 12px; font-weight: bold; margin-left: 15px;}
-
         .label-preview .l-name-phone { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 4px;}
-
         .label-preview .l-details { font-size: 11px; flex-grow: 1; text-align: center; white-space: pre-wrap; font-weight: bold;}
-
         .label-preview .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto;}
-
         .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
-
         .label-preview .l-date { font-size: 12px; font-weight: bold; }
-
         #printArea { display: none; }
-
-        
-
         @media print {
-
             body > *:not(#printArea) { display: none !important; }
-
-            #printArea { 
-
-                display: flex !important; 
-
-                flex-direction: column;
-
-                align-items: flex-start;
-
-                justify-content: flex-start;
-
-                position: static; 
-
-                width: 100%; 
-
-                margin: 0; 
-
-                padding: 0; 
-
-            }
-
-            
-
-            /* تحديد مقاس الرول بالضبط لكروم */
-
-            @page { 
-
-                size: 40mm 25mm; 
-
-                margin: 0 !important; 
-
-            }
-
-            
-
-            body, html { margin: 0 !important; padding: 0 !important; background: white; width: 40mm; height: 25mm; }
-
-            
-
-            .real-label { 
-
-                width: 40mm; 
-
-                height: 25mm; /* تم التعديل لتتناسب مع الـ page size */
-
-                box-sizing: border-box; 
-
-                padding: 1.5mm; 
-
-                display: flex; 
-
-                flex-direction: column; 
-
-                page-break-after: always; 
-
-                page-break-inside: avoid; 
-
-                font-family: 'Tajawal', sans-serif; 
-
-                color: black; 
-
-                overflow: hidden; 
-
-            }
-
+            #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
+            @page { size: 40mm 25mm; margin: 0mm !important; }
+            body, html { margin: 0 !important; padding: 0 !important; background: white; }
+            .real-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; page-break-after: always; page-break-inside: avoid; font-family: 'Tajawal', sans-serif; color: black; overflow: hidden; }
             .real-label:last-child { page-break-after: auto; } 
-
             .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 1px;}
-
             .real-label .l-logo { font-size: 8px; font-weight: 900; line-height: 1; margin-right: 4mm;}
-
             .real-label .l-order { font-size: 7px; font-weight: bold; line-height: 1; margin-left: 4mm;}
-
             .real-label .l-name-phone { font-size: 10px; font-weight: 900; text-align: center; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; font-family: Arial, sans-serif;}
-
             .real-label .l-details { font-size: 8.5px; font-weight: bold; text-align: center; line-height: 1.1; flex-grow: 1; overflow: hidden; white-space: pre-wrap; padding: 0 1mm;}
-
             .real-label .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto; padding-bottom: 1mm;}
-
             .real-label .l-date { font-size: 7px; font-weight: bold; }
-
             .real-label .l-price-tag { font-size: 7px; font-weight: bold; }
-
             .real-label .l-device { font-size: 8px; border: 1px solid #000; padding: 0 2px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
-
             .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; height: 100%; display:flex; flex-direction: column; justify-content: center;}
-
-            
-
-            /* التعديل الجوهري لملصق الـ QR */
-
-            .qr-simplest-label { 
-
-                /* نعكس الأبعاد هنا عشان نجهزها للالتفاف */
-
-                width: 25mm; 
-
-                height: 40mm; 
-
-                box-sizing: border-box; 
-
-                padding: 1.5mm; 
-
-                display: flex; 
-
-                flex-direction: column; 
-
-                justify-content: space-between; 
-
-                page-break-after: always; 
-
-                page-break-inside: avoid; 
-
-                background: white; 
-
-                color: black; 
-
-                overflow: hidden; 
-
-
-
-                /* نلف التصميم 90 درجة */
-
-                transform: rotate(-90deg);
-
-                /* نظبط نقطة الارتكاز بحيث يلف ويفضل في مكانه مظبوط */
-
-                transform-origin: top left;
-
-                
-
-                /* إزاحة بعد اللف عشان يرجع في مكانه الصح داخل مساحة الـ 40x25 */
-
-                position: absolute;
-
-                top: 25mm;
-
-                left: 0;
-
-            }
-
+            .qr-simplest-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; page-break-inside: avoid; background: white; color: black; overflow: hidden; }
             .qr-simplest-label:last-child { page-break-after: auto; }
-
             .qr-top-link { width: 100%; text-align: center; font-size: 11px; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: 0.5px; margin-bottom: 2px; border-bottom: 1.5px solid #000; padding-bottom: 2px; }
-
-            
-
-            /* تعديل اتجاه المحتوى الداخلي للـ QR ليتناسب مع اللف */
-
-            .qr-body-center { 
-
-                display: flex; 
-
-                flex-direction: column; /* نخلي اللوجو والـ QR تحت بعض بدلاً من جنب بعض قبل اللف */
-
-                justify-content: space-evenly; 
-
-                align-items: center; 
-
-                width: 100%; 
-
-                flex: 1; 
-
-                box-sizing: border-box; 
-
-                padding: 0 1mm;
-
-            }
-
-            .qr-logo-centered { width: 14mm; height: 14mm; object-fit: contain; }
-
-            .qr-code-centered { width: 14mm; height: 14mm; object-fit: contain; margin-top: 2mm;}
-
+            .qr-body-center { display: flex; justify-content: space-between; align-items: center; width: 100%; flex: 1; box-sizing: border-box; padding: 0 1mm;}
+            .qr-logo-centered { width: 16mm; height: 16mm; object-fit: contain; }
+            .qr-code-centered { width: 16mm; height: 16mm; object-fit: contain; }
         }
-
     </style>
-
 </head>
-
 <body>
-
     <div class="dashboard">
-
         <div class="panel">
-
             <h2>📥 استلام وطباعة (Labels)</h2>
-
             <div class="input-group">
-
                 <label>الاسم ورقم الموبايل (مسافة بينهم):</label>
-
                 <input type="text" id="cNamePhone" oninput="syncData()" placeholder="مثال: محمود شوقي 01555886990">
-
             </div>
-
             <div class="input-group">
-
                 <label>تفاصيل العميل / المطلوب صيانته:</label>
-
                 <textarea id="cDetails" rows="2" oninput="syncData()" placeholder="اكتب المشكلة أو الطلب هنا..."></textarea>
-
             </div>
-
             
-
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-
                 <h4 style="margin: 0 0 10px; color: var(--pri);">1. طباعة أجهزة الصيانة</h4>
-
                 <div style="display: flex; gap: 10px;">
-
                     <div class="input-group" style="flex: 1; margin-bottom: 10px;">
-
                         <label>عدد الأجهزة المستلمة:</label>
-
                         <input type="number" id="cCount" oninput="syncData()" value="1" min="1">
-
                     </div>
-
                     <div class="input-group" style="flex: 1.5; margin-bottom: 10px;">
-
                         <label>السعر التقديري (للطباعة):</label>
-
                         <input type="text" id="cPricePrint" oninput="syncData()" placeholder="مثال: 500 ج">
-
                     </div>
-
                 </div>
-
                 
-
                 <div class="preview-wrapper">
-
                     <div class="label-preview">
-
                         <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order" id="prevOrder">#----</span></div>
-
                         <div class="l-name-phone" id="prevNamePhone">الاسم والرقم</div>
-
                         <div class="l-details" id="prevDetails">التفاصيل تظهر هنا...</div>
-
                         <div class="l-footer">
-
                             <div class="l-date" id="prevDate">--/--/----</div>
-
                             <div class="l-device" style="border:none; padding:0;" id="prevPriceTag"></div>
-
                             <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
-
                         </div>
-
                     </div>
-
                 </div>
-
                 <button id="btnPrint" onclick="printLabels()">🖨️ طباعة ملصقات الصيانة (وتسجيل الاستلام)</button>
-
             </div>
-
-
 
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px;">
-
                 <h4 style="margin: 0 0 10px; color: #1877F2;">2. طباعة ملصق الـ QR لروابط الألعاب</h4>
-
                 <div class="input-group" style="margin-bottom: 10px;">
-
                     <label>توليد ملصق لـ:</label>
-
                     <select id="qrConsole">
-
                         <option value="Offers">عروض الألعاب الأصلية (bit.ly/lvlupsale)</option>
-
                         <option value="Modded">ألعاب التعديل والتهكير (bit.ly/4modps4)</option>
-
                     </select>
-
                 </div>
-
                 <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR</button>
-
             </div>
-
         </div>
-
-
 
         <div class="panel">
-
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border); padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-
                 <h2 style="margin: 0; border: none; padding: 0; color: var(--pri);">🛒 تسليم ومبيعات (Checkout)</h2>
-
                 
-
                 <div style="display: flex; align-items: center; gap: 5px; background: var(--bg); padding: 8px 15px; border-radius: 8px; border: 1px solid var(--border); direction: ltr;">
-
                     <span style="color:var(--mut); font-size: 12px; margin-right: 10px;" dir="rtl">حاسبة سريعة:</span>
-
                     <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
-
                     <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
-
                     <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
-
                     <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
-
                     <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">=</span>
-
                     <strong id="quickCalcResult" style="color: var(--pri); font-size: 18px; margin-left: 8px; min-width: 40px; text-align: center;">0</strong>
-
                 </div>
-
             </div>
-
             
-
             <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #131b2e;">
-
                 <h4 style="margin: 0 0 10px; color: var(--pri);">العمليات (يمكن تسجيل حتى 3 عمليات للعميل):</h4>
-
                 
-
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>صيانة 1 (بيع):</label>
-
                         <input type="number" id="maintRev1" value="0" oninput="calcTotals()">
-
                     </div>
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>تكلفة 1 (اختياري):</label>
-
                         <input type="number" id="maintCost1" value="0" oninput="calcTotals()">
-
                     </div>
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>صنايعي 1:</label>
-
                         <select id="technician1">
-
                             <option value="المحل">المحل</option>
-
                             <option value="احمد يسري">احمد يسري</option>
-
                             <option value="محمود شوقي">محمود شوقي</option>
-
                             <option value="عمر ياسر">عمر ياسر</option>
-
                             <option value="مصروفات">مصروفات</option>
-
                         </select>
-
                     </div>
-
                 </div>
-
-
 
                 <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>صيانة 2 (بيع):</label>
-
                         <input type="number" id="maintRev2" value="0" oninput="calcTotals()">
-
                     </div>
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>تكلفة 2 (اختياري):</label>
-
                         <input type="number" id="maintCost2" value="0" oninput="calcTotals()">
-
                     </div>
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>صنايعي 2:</label>
-
                         <select id="technician2">
-
                             <option value="المحل">المحل</option>
-
                             <option value="احمد يسري">احمد يسري</option>
-
                             <option value="محمود شوقي">محمود شوقي</option>
-
                             <option value="عمر ياسر">عمر ياسر</option>
-
                             <option value="مصروفات">مصروفات</option>
-
                         </select>
-
                     </div>
-
                 </div>
-
-
 
                 <div style="display: flex; gap: 10px; margin-bottom: 5px;">
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>صيانة 3 (بيع):</label>
-
                         <input type="number" id="maintRev3" value="0" oninput="calcTotals()">
-
                     </div>
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>تكلفة 3 (اختياري):</label>
-
                         <input type="number" id="maintCost3" value="0" oninput="calcTotals()">
-
                     </div>
-
                     <div class="input-group" style="flex: 1; margin:0;">
-
                         <label>صنايعي 3:</label>
-
                         <select id="technician3">
-
                             <option value="المحل">المحل</option>
-
                             <option value="احمد يسري">احمد يسري</option>
-
                             <option value="محمود شوقي">محمود شوقي</option>
-
                             <option value="عمر ياسر">عمر ياسر</option>
-
                             <option value="مصروفات">مصروفات</option>
-
                         </select>
-
                     </div>
-
                 </div>
-
             </div>
-
-
 
             <h4 style="margin: 0 0 10px; color: var(--pri);">إضافة إكسسوارات (الكميات 0 للخصم بالسالب):</h4>
-
             <div class="items-grid" id="accessoriesGrid"></div>
 
-
-
             <div class="cart-box" id="posCartList">
-
                 <p style="text-align:center; color:gray; font-size:12px; margin-top: 30px;">لم يتم إضافة إكسسوارات</p>
-
             </div>
-
-
 
             <div class="totals-box">
-
                 <div><h4>إجمالي الصيانة</h4><h3 id="tMaint">0 ج</h3></div>
-
                 <div><h4>إجمالي المشتريات</h4><h3 id="tGoods">0 ج</h3></div>
-
                 <div><h4 style="color:var(--pri);">المطلوب من العميل</h4><h3 style="color:var(--pri);" id="tFinal">0 ج</h3></div>
-
             </div>
-
-
 
             <div style="display: flex; gap: 10px; margin-top: 15px;">
-
                 <button id="btnCheckoutWA" class="btn-wa" style="flex: 2; margin-top:0;" onclick="processCheckout(true)">✅ تسليم وإرسال واتساب (وحفظ باليومية)</button>
-
                 <button id="btnCheckoutSave" style="flex: 1; background: #475569; color: white;" onclick="processCheckout(false)">💾 حفظ باليومية فقط</button>
-
             </div>
-
         </div>
-
     </div>
-
-
 
     <div id="printArea"></div>
 
-
-
     <script>
-
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
-
-
         const accessoriesDB = [
-
             { id: 1, name: "جراب 4", price: 150, cost: 90, stock: 0 },
-
             { id: 2, name: "جراب 5", price: 150, cost: 90, stock: 0 },
-
             { id: 3, name: "جريبس اشكال", price: 30, cost: 20, stock: 0 },
-
             { id: 4, name: "جريبس كارتون", price: 30, cost: 15, stock: 0 },
-
             { id: 5, name: "دراع 2", price: 180, cost: 150, stock: 0 },
-
             { id: 6, name: "دراع 3 اسود", price: 300, cost: 200, stock: 0 },
-
             { id: 7, name: "دراع 3 اسود ألوان", price: 350, cost: 200, stock: 0 },
-
             { id: 8, name: "دراع اصلي 4 امريكي", price: 1000, cost: 700, stock: 0 },
-
             { id: 9, name: "دراع اصلي 4 اوروبي", price: 800, cost: 600, stock: 0 },
-
             { id: 10, name: "دراع اصلي 4 برو", price: 1300, cost: 900, stock: 0 },
-
             { id: 11, name: "دراع اصلي 5 استعمال", price: 2300, cost: 2000, stock: 0 },
-
             { id: 12, name: "دراع اصلي 5 جديد", price: 3850, cost: 3400, stock: 0 },
-
             { id: 13, name: "دراع كوبي 4 استعمال", price: 450, cost: 250, stock: 0 },
-
             { id: 14, name: "دراع كوبي 4 جديد اول", price: 750, cost: 400, stock: 0 },
-
             { id: 15, name: "دراع كوبي 4 جديد ثاني", price: 650, cost: 400, stock: 0 },
-
             { id: 16, name: "ستاند شحن 4", price: 250, cost: 70, stock: 0 },
-
             { id: 17, name: "ستاند شحن 5", price: 550, cost: 150, stock: 0 },
-
             { id: 18, name: "سكبن برو", price: 200, cost: 120, stock: 0 },
-
             { id: 19, name: "سكين سليم", price: 200, cost: 120, stock: 0 },
-
             { id: 20, name: "سكين فات", price: 200, cost: 120, stock: 0 },
-
             { id: 21, name: "شاحن 8 مخرج", price: 550, cost: 500, stock: 0 },
-
             { id: 22, name: "شنطه", price: 500, cost: 350, stock: 0 },
-
             { id: 23, name: "كابل 5", price: 200, cost: 70, stock: 0 },
-
             { id: 24, name: "كابل بوار", price: 100, cost: 40, stock: 0 },
-
             { id: 25, name: "كابل شحن 3", price: 70, cost: 40, stock: 0 },
-
             { id: 26, name: "كابل شحن 4 اصلي", price: 150, cost: 50, stock: 0 },
-
             { id: 27, name: "كابل شحن 4 كوبي", price: 50, cost: 20, stock: 0 },
-
             { id: 28, name: "av كابل", price: 50, cost: 25, stock: 0 },
-
             { id: 29, name: "hdmi كابل", price: 120, cost: 70, stock: 0 }
-
         ];
 
-
-
         let posCart = [];
-
         const orderIdStr = '#' + Math.floor((Math.random() * 8900) + 100);
-
         document.getElementById('prevOrder').innerText = orderIdStr;
-
         
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('en-GB');
+        document.getElementById('prevDate').innerText = dateStr;
+
+        const nextWeek = new Date(today); 
+        nextWeek.setDate(today.getDate() + 7);
+        const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
+
+        const grid = document.getElementById('accessoriesGrid');
+        accessoriesDB.forEach(item => {
+            let stockColor = 'var(--danger)';
+            let stockText = 'نفذت ⚠️';
+            grid.innerHTML += `
+                <div class="item-card" onclick="addToCart(${item.id})">
+                    <div class="item-name">${item.name}</div>
+                    <div class="price-input-container">
+                        <input type="number" id="price_${item.id}" class="price-input" value="${item.price}" onclick="event.stopPropagation()"> ج
+                    </div>
+                    <div class="item-stock" style="color: ${stockColor}; border: 1px solid ${stockColor};">${stockText}</div>
+                </div>
+            `;
+        });
+
+        // دالة الجمع للآلة الحاسبة السريعة
+        function runQuickCalc() {
+            let inputs = document.querySelectorAll('.quick-calc');
+            let sum = 0;
+            inputs.forEach(input => {
+                sum += parseFloat(input.value) || 0;
+            });
+            document.getElementById('quickCalcResult').innerText = sum;
+        }
+
+        function parseNamePhone() {
+            let raw = document.getElementById('cNamePhone').value.trim();
+            let phoneMatch = raw.match(/\d{8,}/); 
+            let phone = phoneMatch ? phoneMatch[0] : "";
+            let name = raw.replace(phone, "").trim();
+            if(!name && !phone) return { name: "", phone: "" };
+            if(!name) name = "عميل";
+            return { name, phone };
+        }
+
+        function syncData() {
+            let parsed = parseNamePhone();
+            let details = document.getElementById('cDetails').value.trim();
+            let priceTxt = document.getElementById('cPricePrint').value.trim();
+            
+            document.getElementById('prevNamePhone').innerText = parsed.name + " " + parsed.phone;
+            document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
+            document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
+            
+            document.getElementById('prevPriceTag').innerText = priceTxt ? `السعر: ${priceTxt}` : '';
+        }
+
+        function addToCart(id) {
+            let item = accessoriesDB.find(i => i.id === id);
+            let currentSellPrice = parseFloat(document.getElementById(`price_${id}`).value) || item.price;
+            
+            let existing = posCart.find(c => c.id === id && c.sellPrice === currentSellPrice);
+            if(existing) { existing.qty += 1; } 
+            else { posCart.push({ ...item, qty: 1, sellPrice: currentSellPrice }); }
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('posCartList');
+            if(posCart.length === 0) { list.innerHTML = '<p style="text-align:center; color:gray; font-size:12px; margin-top:30px;">لم يتم إضافة إكسسوارات</p>'; } 
+            else {
+                list.innerHTML = '';
+                posCart.forEach((c, index) => {
+                    list.innerHTML += `<div class="cart-item">
+                        <span>${c.name} (x${c.qty})</span>
+                        <span><span style="color:var(--pri); font-weight:bold;">${c.sellPrice * c.qty} ج</span>
+                        <span style="cursor:pointer; color:var(--danger); margin-right:10px; font-size: 16px;" onclick="posCart.splice(${index},1); renderCart();">✖</span></span>
+                    </div>`;
+                });
+            }
+            calcTotals();
+        }
+
+        function calcTotals() {
+            let mRev1 = parseFloat(document.getElementById('maintRev1').value) || 0;
+            let mRev2 = parseFloat(document.getElementById('maintRev2').value) || 0;
+            let mRev3 = parseFloat(document.getElementById('maintRev3').value) || 0;
+            let totalMaintRev = mRev1 + mRev2 + mRev3;
+
+            let gRev = 0; posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
+            
+            document.getElementById('tMaint').innerText = totalMaintRev + " ج";
+            document.getElementById('tGoods').innerText = gRev + " ج";
+            document.getElementById('tFinal').innerText = (totalMaintRev + gRev) + " ج";
+        }
+
+        function sendToGoogle(payload) {
+            const formData = new URLSearchParams();
+            formData.append('data', JSON.stringify(payload));
+            return fetch(GOOGLE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            });
+        }
+
+        function printLabels() {
+            let parsed = parseNamePhone();
+            let details = document.getElementById('cDetails').value.trim();
+            let priceTxt = document.getElementById('cPricePrint').value.trim();
+            const count = parseInt(document.getElementById('cCount').value);
+            
+            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
+
+            let btn = document.getElementById('btnPrint');
+            let originalText = btn.innerText;
+            btn.innerText = "⏳ جاري التسجيل في الشيت...";
+            btn.disabled = true;
+
+            sendToGoogle({ systemType: "Receipt", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, deviceCount: count, details: details })
+            .then(response => response.text())
+            .then(() => {
+                btn.innerText = "🖨️ تم التسجيل! جاري الطباعة...";
+                const pa = document.getElementById('printArea');
+                pa.innerHTML = '';
+                
+                let priceHtml = priceTxt ? `<div class="l-price-tag">السعر: ${priceTxt}</div>` : '';
+
+                for(let i = 1; i <= count; i++) {
+                    pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div>${priceHtml}<div class="l-device">جهاز ${i} من ${count}</div></div></div>`;
+                }
+                
+                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 14px; margin-top: 2px;">إيصال استلام للعميل<br>عدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
+                pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br><span style="font-size:10px; color:black;">01555886990 - 01010763503</span><br><br>الأوردر: ${orderIdStr}</div></div>`;
+                
+                window.print();
+                setTimeout(() => { window.location.reload(); }, 1500);
+            }).catch(e => { alert("مشكلة في الاتصال! حاول مرة تانية"); btn.disabled = false; btn.innerText = originalText; });
+        }
+
+        function printQRLabel() {
+            const qrType = document.getElementById('qrConsole').value;
+            let qrImgSrc = qrType === 'Offers' ? 'sale.png' : 'mod.png';
+            let linkTxt = qrType === 'Offers' ? 'bit.ly/lvlupsale' : 'bit.ly/4modps4';
+
+            const pa = document.getElementById('printArea');
+            pa.innerHTML = `
+            <div class="qr-simplest-label">
+                <div class="qr-top-link">${linkTxt}</div>
+                <div class="qr-body-center">
+                    <img src="lvlup.png" alt="Level UP" class="qr-logo-centered">
+                    <img src="${qrImgSrc}" alt="QR Code" class="qr-code-centered">
+                </div>
+            </div>`;
+            setTimeout(() => { window.print(); }, 500);
+        }
+
+        async function processCheckout(sendWA) {
+            let parsed = parseNamePhone();
+            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
+
+            let operations = [];
+            for (let i = 1; i <= 3; i++) {
+                let r = parseFloat(document.getElementById('maintRev'+i).value) || 0;
+                let c = parseFloat(document.getElementById('maintCost'+i).value) || 0;
+                let t = document.getElementById('technician'+i).value;
+                if (r > 0 || c > 0) { operations.push({ rev: r, cost: c, tech: t }); }
+            }
+
+            let gRev = 0, gCost = 0, gTxt = "", itemsForInventory = [];
+            posCart.forEach(c => {
+                gRev += (c.sellPrice * c.qty);
+                gCost += (c.cost * c.qty);
+                gTxt += `- ${c.name} (x${c.qty}) السعر ${c.sellPrice * c.qty}\n`;
+                itemsForInventory.push({ name: c.name, qty: c.qty, sellPrice: c.sellPrice });
+            });
+
+            if(operations.length === 0 && posCart.length > 0) {
+                operations.push({ rev: 0, cost: 0, tech: "المحل" });
+            }
+
+            let totalMaintRev = operations.reduce((sum, op) => sum + op.rev, 0);
+            let totalFinal = totalMaintRev + gRev;
+
+            if(operations.length === 0 && posCart.length === 0 && !document.getElementById('cDetails').value) {
+                return alert("الفاتورة فارغة!");
+            }
+
+            let btnWA = document.getElementById('btnCheckoutWA');
+            let btnSave = document.getElementById('btnCheckoutSave');
+            btnWA.innerText = "⏳ جاري التسجيل...";
+            btnWA.disabled = true; btnSave.disabled = true;
+
+            try {
+                for (let i = 0; i < operations.length; i++) {
+                    let isFirstRow = (i === 0);
+                    let currentOrderId = orderIdStr + (operations.length > 1 ? `-${i+1}` : ''); 
+                    
+                    let payload = {
+                        systemType: "Maintenance", 
+                        orderId: currentOrderId, 
+                        name: parsed.name, 
+                        phone: parsed.phone, 
+                        technician: operations[i].tech,
+                        maintRevenue: operations[i].rev, 
+                        maintCost: operations[i].cost, 
+                        goodsRevenue: isFirstRow ? gRev : 0, 
+                        goodsCost: isFirstRow ? gCost : 0,
+                        purchasesDetails: isFirstRow ? (gTxt || "لا يوجد") : "تابع لنفس الأوردر", 
+                        purchasedItems: isFirstRow ? itemsForInventory : []
+                    };
+                    await sendToGoogle(payload);
+                }
+
+                if (sendWA) {
+                    let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${parsed.name}، تم بحمد الله الانتهاء من طلبك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
+                    if(totalMaintRev > 0) waTxt += `🔧 مصنعية الصيانة: ${totalMaintRev} ج\n`;
+                    if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
+                    waTxt += `\n💰 *الإجمالي المطلوب:* ${totalFinal} جنيه.\n\nنتشرف بزيارتك دائماً!`;
+                    
+                    window.open(`https://wa.me/2${parsed.phone}?text=${encodeURIComponent(waTxt)}`, '_blank');
+                }
+
+                alert("تم تسجيل العملية بنجاح في شيت اليومية!");
+                setTimeout(() => { window.location.reload(); }, 1500);
+
+            } catch(e) {
+                alert("مشكلة في الاتصال! حاول تاني"); 
+                btnWA.innerText = "✅ تسليم وإرسال واتساب (وحفظ باليومية)";
+                btnWA.disabled = false; btnSave.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
