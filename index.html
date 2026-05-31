@@ -35,10 +35,12 @@
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
         .totals-box h3 { margin: 0; color: white; }
         
-        /* CSS للآلة الحاسبة السريعة */
-        .quick-calc { width: 50px; background: #172033; border: 1px solid var(--border); color: white; border-radius: 6px; text-align: center; padding: 6px; font-weight: bold; font-family: inherit; font-size: 14px; transition: 0.2s;}
-        .quick-calc:focus { outline: none; border-color: var(--pri); background: #1e293b;}
-        .quick-calc::-webkit-outer-spin-button, .quick-calc::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        /* Queue Cards */
+        .queue-card { background: #131b2e; border: 1px solid var(--pri); border-radius: 8px; padding: 10px; min-width: 140px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;}
+        .queue-card .order-id { font-size: 11px; color: var(--mut); margin-bottom: 2px;}
+        .queue-card .c-name { font-weight: bold; font-size: 13px; margin-bottom: 4px;}
+        .queue-card .c-details { font-size: 11px; margin-bottom: 8px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .btn-done { padding: 4px; font-size: 11px; background: #22c55e; color: white; margin: 0; width: 100%; border-radius: 4px; }
         
         .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
         .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
@@ -132,18 +134,10 @@
         </div>
 
         <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed var(--border); padding-bottom: 10px; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin: 0; border: none; padding: 0; color: var(--pri);">🛒 تسليم ومبيعات (Checkout)</h2>
-                
-                <div style="display: flex; align-items: center; gap: 5px; background: var(--bg); padding: 8px 15px; border-radius: 8px; border: 1px solid var(--border); direction: ltr;">
-                    <span style="color:var(--mut); font-size: 12px; margin-right: 10px;" dir="rtl">حاسبة سريعة:</span>
-                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
-                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
-                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
-                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">+</span>
-                    <input type="number" class="quick-calc" oninput="runQuickCalc()"> <span style="color:var(--mut);">=</span>
-                    <strong id="quickCalcResult" style="color: var(--pri); font-size: 18px; margin-left: 8px; min-width: 40px; text-align: center;">0</strong>
-                </div>
+            <h2 style="margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; margin-bottom: 10px; color: var(--pri);">🛒 تسليم ومبيعات (Checkout)</h2>
+            
+            <div id="queueContainer" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;">
+                <div style="color: var(--mut); font-size: 13px;">⏳ جاري تحميل الأجهزة في الانتظار...</div>
             </div>
             
             <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #131b2e;">
@@ -236,6 +230,7 @@
     <div id="printArea"></div>
 
     <script>
+        // ضع رابط السكريبت الجديد هنا
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
         const accessoriesDB = [
@@ -271,6 +266,8 @@
         ];
 
         let posCart = [];
+        let allOngoing = [];
+        
         const orderIdStr = '#' + Math.floor((Math.random() * 8900) + 100);
         document.getElementById('prevOrder').innerText = orderIdStr;
         
@@ -282,9 +279,58 @@
         nextWeek.setDate(today.getDate() + 7);
         const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
 
+        // جلب الإيصالات المعلقة عند فتح الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch(GOOGLE_URL + '?action=getOngoing')
+                .then(res => res.json())
+                .then(data => {
+                    allOngoing = data;
+                    renderQueue();
+                }).catch(err => {
+                    document.getElementById('queueContainer').innerHTML = '<span style="color:var(--acc); font-size: 13px;">حدث خطأ في تحميل الكروت، يرجى التحديث.</span>';
+                });
+        });
+
+        function renderQueue() {
+            const container = document.getElementById('queueContainer');
+            container.innerHTML = '';
+            
+            if (allOngoing.length === 0) {
+                container.innerHTML = '<span style="color: gray; font-size: 13px; margin: auto;">لا يوجد أجهزة قيد الانتظار حالياً 🎉</span>';
+                return;
+            }
+            
+            let toDisplay = allOngoing.slice(0, 6);
+            toDisplay.forEach(order => {
+                container.innerHTML += `
+                    <div class="queue-card">
+                        <div>
+                            <div class="order-id">${order.orderId}</div>
+                            <div class="c-name">${order.name}</div>
+                            <div class="c-details">${order.details || 'صيانة'}</div>
+                        </div>
+                        <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ تم التسليم</button>
+                    </div>
+                `;
+            });
+            
+            if (allOngoing.length > 6) {
+                container.innerHTML += `<div style="display:flex; align-items:center; justify-content:center; color:var(--mut); font-size: 14px; padding: 0 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">+${allOngoing.length - 6} في الانتظار</div>`;
+            }
+        }
+
+        function markAsDone(orderId) {
+            // تحديث الواجهة فوراً
+            allOngoing = allOngoing.filter(o => o.orderId !== orderId);
+            renderQueue();
+            
+            // الإرسال للشيت
+            sendToGoogle({ systemType: "UpdateStatus", orderId: orderId, status: "done" }).catch(e => console.log(e));
+        }
+
         const grid = document.getElementById('accessoriesGrid');
         accessoriesDB.forEach(item => {
-            let stockColor = 'var(--danger)';
+            let stockColor = 'var(--acc)';
             let stockText = 'نفذت ⚠️';
             grid.innerHTML += `
                 <div class="item-card" onclick="addToCart(${item.id})">
@@ -296,16 +342,6 @@
                 </div>
             `;
         });
-
-        // دالة الجمع للآلة الحاسبة السريعة
-        function runQuickCalc() {
-            let inputs = document.querySelectorAll('.quick-calc');
-            let sum = 0;
-            inputs.forEach(input => {
-                sum += parseFloat(input.value) || 0;
-            });
-            document.getElementById('quickCalcResult').innerText = sum;
-        }
 
         function parseNamePhone() {
             let raw = document.getElementById('cNamePhone').value.trim();
@@ -348,7 +384,7 @@
                     list.innerHTML += `<div class="cart-item">
                         <span>${c.name} (x${c.qty})</span>
                         <span><span style="color:var(--pri); font-weight:bold;">${c.sellPrice * c.qty} ج</span>
-                        <span style="cursor:pointer; color:var(--danger); margin-right:10px; font-size: 16px;" onclick="posCart.splice(${index},1); renderCart();">✖</span></span>
+                        <span style="cursor:pointer; color:var(--acc); margin-right:10px; font-size: 16px;" onclick="posCart.splice(${index},1); renderCart();">✖</span></span>
                     </div>`;
                 });
             }
