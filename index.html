@@ -269,4 +269,284 @@
         let allOngoing = [];
         
         const orderIdStr = '#' + Math.floor((Math.random() * 8900) + 100);
-        document.getElementById('prevOrder').innerTex
+        document.getElementById('prevOrder').innerText = orderIdStr;
+        
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('en-GB');
+        document.getElementById('prevDate').innerText = dateStr;
+
+        const nextWeek = new Date(today); 
+        nextWeek.setDate(today.getDate() + 7);
+        const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
+
+        // جلب الإيصالات المعلقة عند فتح الصفحة
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch(GOOGLE_URL + '?action=getOngoing')
+                .then(res => res.json())
+                .then(data => {
+                    allOngoing = data;
+                    renderQueue();
+                }).catch(err => {
+                    document.getElementById('queueContainer').innerHTML = '<span style="color:var(--acc); font-size: 13px;">حدث خطأ في تحميل الكروت، يرجى التحديث.</span>';
+                });
+        });
+
+        function renderQueue() {
+            const container = document.getElementById('queueContainer');
+            container.innerHTML = '';
+            
+            if (allOngoing.length === 0) {
+                container.innerHTML = '<span style="color: gray; font-size: 13px; margin: auto;">لا يوجد أجهزة قيد الانتظار حالياً 🎉</span>';
+                return;
+            }
+            
+            let toDisplay = allOngoing.slice(0, 6);
+            toDisplay.forEach(order => {
+                container.innerHTML += `
+                    <div class="queue-card">
+                        <div>
+                            <div class="order-id">${order.orderId}</div>
+                            <div class="c-name">${order.name}</div>
+                            <div class="c-details">${order.details || 'صيانة'}</div>
+                        </div>
+                        <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ تم التسليم</button>
+                    </div>
+                `;
+            });
+            
+            if (allOngoing.length > 6) {
+                container.innerHTML += `<div style="display:flex; align-items:center; justify-content:center; color:var(--mut); font-size: 14px; padding: 0 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">+${allOngoing.length - 6} في الانتظار</div>`;
+            }
+        }
+
+        function markAsDone(orderId) {
+            // تحديث الواجهة فوراً
+            allOngoing = allOngoing.filter(o => o.orderId !== orderId);
+            renderQueue();
+            
+            // الإرسال للشيت
+            sendToGoogle({ systemType: "UpdateStatus", orderId: orderId, status: "done" }).catch(e => console.log(e));
+        }
+
+        const grid = document.getElementById('accessoriesGrid');
+        accessoriesDB.forEach(item => {
+            let stockColor = 'var(--acc)';
+            let stockText = 'نفذت ⚠️';
+            grid.innerHTML += `
+                <div class="item-card" onclick="addToCart(${item.id})">
+                    <div class="item-name">${item.name}</div>
+                    <div class="price-input-container">
+                        <input type="number" id="price_${item.id}" class="price-input" value="${item.price}" onclick="event.stopPropagation()"> ج
+                    </div>
+                    <div class="item-stock" style="color: ${stockColor}; border: 1px solid ${stockColor};">${stockText}</div>
+                </div>
+            `;
+        });
+
+        function parseNamePhone() {
+            let raw = document.getElementById('cNamePhone').value.trim();
+            let phoneMatch = raw.match(/\d{8,}/); 
+            let phone = phoneMatch ? phoneMatch[0] : "";
+            let name = raw.replace(phone, "").trim();
+            if(!name && !phone) return { name: "", phone: "" };
+            if(!name) name = "عميل";
+            return { name, phone };
+        }
+
+        function syncData() {
+            let parsed = parseNamePhone();
+            let details = document.getElementById('cDetails').value.trim();
+            let priceTxt = document.getElementById('cPricePrint').value.trim();
+            
+            document.getElementById('prevNamePhone').innerText = parsed.name + " " + parsed.phone;
+            document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
+            document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
+            
+            document.getElementById('prevPriceTag').innerText = priceTxt ? `السعر: ${priceTxt}` : '';
+        }
+
+        function addToCart(id) {
+            let item = accessoriesDB.find(i => i.id === id);
+            let currentSellPrice = parseFloat(document.getElementById(`price_${id}`).value) || item.price;
+            
+            let existing = posCart.find(c => c.id === id && c.sellPrice === currentSellPrice);
+            if(existing) { existing.qty += 1; } 
+            else { posCart.push({ ...item, qty: 1, sellPrice: currentSellPrice }); }
+            renderCart();
+        }
+
+        function renderCart() {
+            const list = document.getElementById('posCartList');
+            if(posCart.length === 0) { list.innerHTML = '<p style="text-align:center; color:gray; font-size:12px; margin-top:30px;">لم يتم إضافة إكسسوارات</p>'; } 
+            else {
+                list.innerHTML = '';
+                posCart.forEach((c, index) => {
+                    list.innerHTML += `<div class="cart-item">
+                        <span>${c.name} (x${c.qty})</span>
+                        <span><span style="color:var(--pri); font-weight:bold;">${c.sellPrice * c.qty} ج</span>
+                        <span style="cursor:pointer; color:var(--acc); margin-right:10px; font-size: 16px;" onclick="posCart.splice(${index},1); renderCart();">✖</span></span>
+                    </div>`;
+                });
+            }
+            calcTotals();
+        }
+
+        function calcTotals() {
+            let mRev1 = parseFloat(document.getElementById('maintRev1').value) || 0;
+            let mRev2 = parseFloat(document.getElementById('maintRev2').value) || 0;
+            let mRev3 = parseFloat(document.getElementById('maintRev3').value) || 0;
+            let totalMaintRev = mRev1 + mRev2 + mRev3;
+
+            let gRev = 0; posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
+            
+            document.getElementById('tMaint').innerText = totalMaintRev + " ج";
+            document.getElementById('tGoods').innerText = gRev + " ج";
+            document.getElementById('tFinal').innerText = (totalMaintRev + gRev) + " ج";
+        }
+
+        function sendToGoogle(payload) {
+            const formData = new URLSearchParams();
+            formData.append('data', JSON.stringify(payload));
+            return fetch(GOOGLE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString()
+            });
+        }
+
+        function printLabels() {
+            let parsed = parseNamePhone();
+            let details = document.getElementById('cDetails').value.trim();
+            let priceTxt = document.getElementById('cPricePrint').value.trim();
+            const count = parseInt(document.getElementById('cCount').value) || 1;
+            
+            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
+
+            let btn = document.getElementById('btnPrint');
+            let originalText = btn.innerText;
+            btn.innerText = "⏳ جاري التسجيل في الشيت...";
+            btn.disabled = true;
+
+            sendToGoogle({ systemType: "Receipt", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, deviceCount: count, details: details })
+            .then(response => response.text())
+            .then(() => {
+                btn.innerText = "🖨️ تم التسجيل! جاري الطباعة...";
+                const pa = document.getElementById('printArea');
+                pa.innerHTML = '';
+                
+                let priceHtml = priceTxt ? `<div class="l-price-tag">السعر: ${priceTxt}</div>` : '';
+
+                // 1. طباعة ورقتين متطابقتين لكل جهاز (للزقهم على الجهاز)
+                for(let i = 1; i <= count; i++) {
+                    let deviceLabel = `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div>${priceHtml}<div class="l-device">جهاز ${i} من ${count}</div></div></div>`;
+                    pa.innerHTML += deviceLabel; // النسخة الأولى للجهاز
+                    pa.innerHTML += deviceLabel; // النسخة الثانية المتطابقة للجهاز
+                }
+                
+                // 2. إيصال العميل (متسجل فيه تفاصيل المشكلة/الطلب)
+                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
+                
+                // 3. ورقة التحذيرات للعميل
+                pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br><span style="font-size:10px; color:black;">01555886990 - 01010763503</span><br><br>الأوردر: ${orderIdStr}</div></div>`;
+                
+                window.print();
+                setTimeout(() => { window.location.reload(); }, 1500);
+            }).catch(e => { alert("مشكلة في الاتصال! حاول مرة تانية"); btn.disabled = false; btn.innerText = originalText; });
+        }
+
+        function printQRLabel() {
+            const qrType = document.getElementById('qrConsole').value;
+            let qrImgSrc = qrType === 'Offers' ? 'sale.png' : 'mod.png';
+            let linkTxt = qrType === 'Offers' ? 'bit.ly/lvlupsale' : 'bit.ly/4modps4';
+
+            const pa = document.getElementById('printArea');
+            pa.innerHTML = `
+            <div class="qr-simplest-label">
+                <div class="qr-top-link">${linkTxt}</div>
+                <div class="qr-body-center">
+                    <img src="lvlup.png" alt="Level UP" class="qr-logo-centered">
+                    <img src="${qrImgSrc}" alt="QR Code" class="qr-code-centered">
+                </div>
+            </div>`;
+            setTimeout(() => { window.print(); }, 500);
+        }
+
+        async function processCheckout(sendWA) {
+            let parsed = parseNamePhone();
+            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
+
+            let operations = [];
+            for (let i = 1; i <= 3; i++) {
+                let r = parseFloat(document.getElementById('maintRev'+i).value) || 0;
+                let c = parseFloat(document.getElementById('maintCost'+i).value) || 0;
+                let t = document.getElementById('technician'+i).value;
+                if (r > 0 || c > 0) { operations.push({ rev: r, cost: c, tech: t }); }
+            }
+
+            let gRev = 0, gCost = 0, gTxt = "", itemsForInventory = [];
+            posCart.forEach(c => {
+                gRev += (c.sellPrice * c.qty);
+                gCost += (c.cost * c.qty);
+                gTxt += `- ${c.name} (x${c.qty}) السعر ${c.sellPrice * c.qty}\n`;
+                itemsForInventory.push({ name: c.name, qty: c.qty, sellPrice: c.sellPrice });
+            });
+
+            if(operations.length === 0 && posCart.length > 0) {
+                operations.push({ rev: 0, cost: 0, tech: "المحل" });
+            }
+
+            let totalMaintRev = operations.reduce((sum, op) => sum + op.rev, 0);
+            let totalFinal = totalMaintRev + gRev;
+
+            if(operations.length === 0 && posCart.length === 0 && !document.getElementById('cDetails').value) {
+                return alert("الفاتورة فارغة!");
+            }
+
+            let btnWA = document.getElementById('btnCheckoutWA');
+            let btnSave = document.getElementById('btnCheckoutSave');
+            btnWA.innerText = "⏳ جاري التسجيل...";
+            btnWA.disabled = true; btnSave.disabled = true;
+
+            try {
+                for (let i = 0; i < operations.length; i++) {
+                    let isFirstRow = (i === 0);
+                    let currentOrderId = orderIdStr + (operations.length > 1 ? `-${i+1}` : ''); 
+                    
+                    let payload = {
+                        systemType: "Maintenance", 
+                        orderId: currentOrderId, 
+                        name: parsed.name, 
+                        phone: parsed.phone, 
+                        technician: operations[i].tech,
+                        maintRevenue: operations[i].rev, 
+                        maintCost: operations[i].cost, 
+                        goodsRevenue: isFirstRow ? gRev : 0, 
+                        goodsCost: isFirstRow ? gCost : 0,
+                        purchasesDetails: isFirstRow ? (gTxt || "لا يوجد") : "تابع لنفس الأوردر", 
+                        purchasedItems: isFirstRow ? itemsForInventory : []
+                    };
+                    await sendToGoogle(payload);
+                }
+
+                if (sendWA) {
+                    let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${parsed.name}، تم بحمد الله الانتهاء من طلبك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
+                    if(totalMaintRev > 0) waTxt += `🔧 مصنعية الصيانة: ${totalMaintRev} ج\n`;
+                    if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
+                    waTxt += `\n💰 *الإجمالي المطلوب:* ${totalFinal} جنيه.\n\nنتشرف بزيارتك دائماً!`;
+                    
+                    window.open(`https://wa.me/2${parsed.phone}?text=${encodeURIComponent(waTxt)}`, '_blank');
+                }
+
+                alert("تم تسجيل العملية بنجاح في شيت اليومية!");
+                setTimeout(() => { window.location.reload(); }, 1500);
+
+            } catch(e) {
+                alert("مشكلة في الاتصال! حاول تاني"); 
+                btnWA.innerText = "✅ تسليم وإرسال واتساب (وحفظ باليومية)";
+                btnWA.disabled = false; btnSave.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
+
