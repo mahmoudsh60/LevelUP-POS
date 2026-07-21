@@ -112,7 +112,7 @@
                         <div class="l-details" id="prevDetails">التفاصيل تظهر هنا...</div>
                         <div class="l-footer">
                             <div class="l-date" id="prevDate">--/--/----</div>
-                            <div class="l-device" style="border:none; padding:0;" id="prevPriceTag"></div>
+                            <div class="l-device" style="border:none; padding:0;" id="prevPriceTag">السعر: </div>
                             <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
                         </div>
                     </div>
@@ -362,7 +362,8 @@
             document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
             document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
             
-            document.getElementById('prevPriceTag').innerText = priceTxt ? `السعر: ${priceTxt}` : '';
+            // تعديل خانة السعر لتظهر دائماً
+            document.getElementById('prevPriceTag').innerText = `السعر: ${priceTxt}`;
         }
 
         function addToCart(id) {
@@ -434,16 +435,17 @@
                 const pa = document.getElementById('printArea');
                 pa.innerHTML = '';
                 
-                let priceHtml = priceTxt ? `<div class="l-price-tag">السعر: ${priceTxt}</div>` : '';
-
-                // 1. طباعة ورقتين متطابقتين لكل جهاز (للزقهم على الجهاز)
+                // 1. طباعة الأجهزة بالعدد الطبيعي الذي أدخله المستخدم
                 for(let i = 1; i <= count; i++) {
-                    let deviceLabel = `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div>${priceHtml}<div class="l-device">جهاز ${i} من ${count}</div></div></div>`;
-                    pa.innerHTML += deviceLabel; // النسخة الأولى للجهاز
-                    pa.innerHTML += deviceLabel; // النسخة الثانية المتطابقة للجهاز
+                    let deviceLabel = `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`;
+                    pa.innerHTML += deviceLabel; 
                 }
+
+                // إضافة نسخة واحدة فقط إضافية (مكررة من الجهاز الأول) كما طلبت
+                let extraLabel = `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز 1 من ${count}</div></div></div>`;
+                pa.innerHTML += extraLabel;
                 
-                // 2. إيصال العميل (متسجل فيه تفاصيل المشكلة/الطلب)
+                // 2. إيصال العميل 
                 pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
                 
                 // 3. ورقة التحذيرات للعميل
@@ -549,4 +551,3 @@
     </script>
 </body>
 </html>
-
