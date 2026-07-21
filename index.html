@@ -441,14 +441,26 @@
                     pa.innerHTML += deviceLabel; 
                 }
 
-                // إضافة نسخة واحدة فقط إضافية (مكررة من الجهاز الأول) كما طلبت
-                let extraLabel = `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز 1 من ${count}</div></div></div>`;
+                // 2. إضافة نسخة واحدة للمحل (مميزة بكلمة نسخة المحل وإجمالي الأجهزة)
+                let extraLabel = `
+                <div class="real-label">
+                    <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div>
+                    <div class="l-name-phone">${parsed.name} ${parsed.phone}</div>
+                    <div class="l-details" style="font-size: 10px;">
+                        <span style="background:black; color:white; padding:1px 4px; border-radius:3px; font-weight:bold; margin-bottom:2px; display:inline-block;">نسخة المحل</span><br>${details}
+                    </div>
+                    <div class="l-footer">
+                        <div class="l-date">${dateStr}</div>
+                        <div class="l-price-tag">السعر: ${priceTxt}</div>
+                        <div class="l-device">إجمالي ${count} أجهزة</div>
+                    </div>
+                </div>`;
                 pa.innerHTML += extraLabel;
                 
-                // 2. إيصال العميل 
+                // 3. إيصال العميل 
                 pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
                 
-                // 3. ورقة التحذيرات للعميل
+                // 4. ورقة التحذيرات للعميل
                 pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br><span style="font-size:10px; color:black;">01555886990 - 01010763503</span><br><br>الأوردر: ${orderIdStr}</div></div>`;
                 
                 window.print();
