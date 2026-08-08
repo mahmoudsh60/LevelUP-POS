@@ -84,7 +84,7 @@
             <div class="input-group">
                 <label>بحث برقم الإيصال (للدفع السريع):</label>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="searchOrderCode" placeholder="مثال: #8541">
+                    <input type="text" id="searchOrderCode" placeholder="مثال: 1234 أو #1234">
                     <button type="button" onclick="fetchOrderDetails()" style="width:100px; background:#3b82f6; color:white;">بحث 🔍</button>
                 </div>
             </div>
@@ -193,7 +193,7 @@
                 </div>
             </div>
 
-            <!-- إدارة وقت الموظفين بدل الإكسسوارات -->
+            <!-- إدارة وقت الموظفين -->
             <h4 style="margin: 0 0 10px; color: var(--pri);">👥 إدارة وقت الموظفين:</h4>
             <div style="display:flex; gap:10px; margin-bottom: 10px;">
                 <input type="text" id="newEmpName" placeholder="اكتب اسم الموظف" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
@@ -203,7 +203,7 @@
                 <div style="color:gray; font-size:12px;">جاري تحميل كروت الموظفين...</div>
             </div>
 
-            <!-- قسم المبيعات والإكسسوارات الجديد (Dropdowns) -->
+            <!-- قسم المبيعات والإكسسوارات (Dropdowns) -->
             <h4 style="margin: 0 0 10px; color: var(--pri);">🛒 إضافة إكسسوارات / بضاعة:</h4>
             <div style="display:flex; gap:5px; margin-bottom: 10px;">
                 <select id="accSelect" style="flex:2; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;" onchange="updateAccPrice()">
@@ -366,28 +366,40 @@
             });
         }
 
-        // جلب الإيصال للاستكمال السريع
+        // جلب الإيصال للاستكمال السريع (وتصحيح رقم الإيصال أوتوماتيكياً)
         function fetchOrderDetails() {
-            const oid = document.getElementById('searchOrderCode').value.trim();
+            let oid = document.getElementById('searchOrderCode').value.trim();
             if(!oid) return;
+            
+            // إضافة رمز الشباك لو مش مكتوب
+            if (!oid.startsWith('#')) {
+                oid = '#' + oid;
+            }
+
             const order = allOngoing.find(o => o.orderId === oid);
             if(order) {
                 document.getElementById('cNamePhone').value = order.name + " " + order.phone;
                 document.getElementById('cDetails').value = order.details;
                 syncData();
             } else {
-                alert("لم يتم العثور على الإيصال، تأكد من الرقم (مثال: #1234).");
+                alert("لم يتم العثور على الإيصال، تأكد من الرقم (مثال: 1234 أو #1234).");
             }
         }
 
+        // رسم كروت الانتظار وتجاهل الإيصالات المنتهية من العرض
         function renderQueue() {
             const container = document.getElementById('queueContainer');
             container.innerHTML = '';
-            if (allOngoing.length === 0) {
+            
+            // فلترة علشان نعرض في شريط الانتظار الأجهزة اللي مخلصتش بس (حالتها مش done)
+            let pendingOrders = allOngoing.filter(o => o.status !== 'done');
+            
+            if (pendingOrders.length === 0) {
                 container.innerHTML = '<span style="color: gray; font-size: 13px; margin: auto;">لا يوجد أجهزة قيد الانتظار حالياً 🎉</span>';
                 return;
             }
-            let toDisplay = allOngoing.slice(0, 6);
+            
+            let toDisplay = pendingOrders.slice(0, 6);
             toDisplay.forEach(order => {
                 container.innerHTML += `
                     <div class="queue-card">
@@ -400,6 +412,10 @@
                     </div>
                 `;
             });
+            
+            if (pendingOrders.length > 6) {
+                container.innerHTML += `<div style="display:flex; align-items:center; justify-content:center; color:var(--mut); font-size: 14px; padding: 0 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">+${pendingOrders.length - 6} في الانتظار</div>`;
+            }
         }
 
         function markAsDone(orderId) {
