@@ -20,14 +20,6 @@
         button:hover { opacity: 0.9; }
         .btn-wa { background: #25D366; color: white; margin-top: 15px; }
         .btn-qr { background: #1877F2; color: white; margin-top: 10px; }
-        .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 400px; overflow-y: auto; padding-right: 5px;}
-        .item-card { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; position: relative;}
-        .item-card:hover { border-color: var(--pri); background: #172033; }
-        .item-name { font-size: 13px; font-weight: bold; margin-bottom: 8px; line-height: 1.4;}
-        .price-input-container { margin-bottom: 5px; }
-        .price-input { width: 60px; padding: 2px; text-align: center; font-weight: bold; color: var(--pri); background: transparent; border: 1px solid var(--border); border-radius: 4px; font-family: inherit; }
-        .price-input:focus { outline: none; border-color: var(--pri); }
-        .item-stock { font-size: 11px; padding: 2px 5px; border-radius: 4px; background: rgba(0,0,0,0.5);}
         .cart-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
         .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px dashed var(--border); padding: 5px 0; }
         .totals-box { display: flex; justify-content: space-between; background: #020617; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
@@ -35,7 +27,6 @@
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
         .totals-box h3 { margin: 0; color: white; }
         
-        /* Queue Cards */
         .queue-card { background: #131b2e; border: 1px solid var(--pri); border-radius: 8px; padding: 10px; min-width: 140px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;}
         .queue-card .order-id { font-size: 11px; color: var(--mut); margin-bottom: 2px;}
         .queue-card .c-name { font-weight: bold; font-size: 13px; margin-bottom: 4px;}
@@ -52,6 +43,10 @@
         .label-preview .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto;}
         .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
         .label-preview .l-date { font-size: 12px; font-weight: bold; }
+        
+        .att-card { background: #131b2e; border: 1px solid var(--pri); padding: 10px; border-radius: 8px; }
+        .att-card h4 { margin: 0 0 5px; color: white; }
+        
         #printArea { display: none; }
         @media print {
             body > *:not(#printArea) { display: none !important; }
@@ -81,8 +76,19 @@
 </head>
 <body>
     <div class="dashboard">
+        <!-- قسم الاستلام والطباعة (اليمين) -->
         <div class="panel">
             <h2>📥 استلام وطباعة (Labels)</h2>
+            
+            <!-- زر البحث السريع بكود الإيصال -->
+            <div class="input-group">
+                <label>بحث برقم الإيصال (للدفع السريع):</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="searchOrderCode" placeholder="مثال: #8541">
+                    <button type="button" onclick="fetchOrderDetails()" style="width:100px; background:#3b82f6; color:white;">بحث 🔍</button>
+                </div>
+            </div>
+
             <div class="input-group">
                 <label>الاسم ورقم الموبايل (مسافة بينهم):</label>
                 <input type="text" id="cNamePhone" oninput="syncData()" placeholder="مثال: محمود شوقي 01555886990">
@@ -117,7 +123,7 @@
                         </div>
                     </div>
                 </div>
-                <button id="btnPrint" onclick="printLabels()">🖨️ طباعة ملصقات الصيانة (وتسجيل الاستلام)</button>
+                <button id="btnPrint" onclick="printLabels()">🖨️ طباعة ملصقات الصيانة</button>
             </div>
 
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px;">
@@ -133,6 +139,7 @@
             </div>
         </div>
 
+        <!-- قسم العمليات والحضور (اليسار) -->
         <div class="panel">
             <h2 style="margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; margin-bottom: 10px; color: var(--pri);">🛒 تسليم ومبيعات (Checkout)</h2>
             
@@ -184,31 +191,28 @@
                         </select>
                     </div>
                 </div>
-
-                <div style="display: flex; gap: 10px; margin-bottom: 5px;">
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>صيانة 3 (بيع):</label>
-                        <input type="number" id="maintRev3" value="0" oninput="calcTotals()">
-                    </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>تكلفة 3 (اختياري):</label>
-                        <input type="number" id="maintCost3" value="0" oninput="calcTotals()">
-                    </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>صنايعي 3:</label>
-                        <select id="technician3">
-                            <option value="المحل">المحل</option>
-                            <option value="احمد يسري">احمد يسري</option>
-                            <option value="محمود شوقي">محمود شوقي</option>
-                            <option value="عمر ياسر">عمر ياسر</option>
-                            <option value="مصروفات">مصروفات</option>
-                        </select>
-                    </div>
-                </div>
             </div>
 
-            <h4 style="margin: 0 0 10px; color: var(--pri);">إضافة إكسسوارات (الكميات 0 للخصم بالسالب):</h4>
-            <div class="items-grid" id="accessoriesGrid"></div>
+            <!-- إدارة وقت الموظفين بدل الإكسسوارات -->
+            <h4 style="margin: 0 0 10px; color: var(--pri);">👥 إدارة وقت الموظفين:</h4>
+            <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                <input type="text" id="newEmpName" placeholder="اكتب اسم الموظف" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
+                <button onclick="empAction('start')" style="width:120px; background:#22c55e; color:white;">بدء شيفت 🟢</button>
+            </div>
+            <div id="attendanceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                <div style="color:gray; font-size:12px;">جاري تحميل كروت الموظفين...</div>
+            </div>
+
+            <!-- قسم المبيعات والإكسسوارات الجديد (Dropdowns) -->
+            <h4 style="margin: 0 0 10px; color: var(--pri);">🛒 إضافة إكسسوارات / بضاعة:</h4>
+            <div style="display:flex; gap:5px; margin-bottom: 10px;">
+                <select id="accSelect" style="flex:2; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;" onchange="updateAccPrice()">
+                    <!-- تُملأ بواسطة جافاسكريبت -->
+                </select>
+                <input type="number" id="accQty" value="1" min="1" style="flex:0.5; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
+                <input type="number" id="accPrice" placeholder="السعر" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
+                <button onclick="addDropdownToCart()" style="width:60px; padding:0;">➕</button>
+            </div>
 
             <div class="cart-box" id="posCartList">
                 <p style="text-align:center; color:gray; font-size:12px; margin-top: 30px;">لم يتم إضافة إكسسوارات</p>
@@ -230,43 +234,30 @@
     <div id="printArea"></div>
 
     <script>
-        // ضع رابط السكريبت الجديد هنا
+        // ضع رابط السكريبت الجديد هنا 👇
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
         const accessoriesDB = [
-            { id: 1, name: "جراب 4", price: 150, cost: 90, stock: 0 },
-            { id: 2, name: "جراب 5", price: 150, cost: 90, stock: 0 },
-            { id: 3, name: "جريبس اشكال", price: 30, cost: 20, stock: 0 },
-            { id: 4, name: "جريبس كارتون", price: 30, cost: 15, stock: 0 },
-            { id: 5, name: "دراع 2", price: 180, cost: 150, stock: 0 },
-            { id: 6, name: "دراع 3 اسود", price: 300, cost: 200, stock: 0 },
-            { id: 7, name: "دراع 3 اسود ألوان", price: 350, cost: 200, stock: 0 },
-            { id: 8, name: "دراع اصلي 4 امريكي", price: 1000, cost: 700, stock: 0 },
-            { id: 9, name: "دراع اصلي 4 اوروبي", price: 800, cost: 600, stock: 0 },
-            { id: 10, name: "دراع اصلي 4 برو", price: 1300, cost: 900, stock: 0 },
-            { id: 11, name: "دراع اصلي 5 استعمال", price: 2300, cost: 2000, stock: 0 },
-            { id: 12, name: "دراع اصلي 5 جديد", price: 3850, cost: 3400, stock: 0 },
-            { id: 13, name: "دراع كوبي 4 استعمال", price: 450, cost: 250, stock: 0 },
-            { id: 14, name: "دراع كوبي 4 جديد اول", price: 750, cost: 400, stock: 0 },
-            { id: 15, name: "دراع كوبي 4 جديد ثاني", price: 650, cost: 400, stock: 0 },
-            { id: 16, name: "ستاند شحن 4", price: 250, cost: 70, stock: 0 },
-            { id: 17, name: "ستاند شحن 5", price: 550, cost: 150, stock: 0 },
-            { id: 18, name: "سكبن برو", price: 200, cost: 120, stock: 0 },
-            { id: 19, name: "سكين سليم", price: 200, cost: 120, stock: 0 },
-            { id: 20, name: "سكين فات", price: 200, cost: 120, stock: 0 },
-            { id: 21, name: "شاحن 8 مخرج", price: 550, cost: 500, stock: 0 },
-            { id: 22, name: "شنطه", price: 500, cost: 350, stock: 0 },
-            { id: 23, name: "كابل 5", price: 200, cost: 70, stock: 0 },
-            { id: 24, name: "كابل بوار", price: 100, cost: 40, stock: 0 },
-            { id: 25, name: "كابل شحن 3", price: 70, cost: 40, stock: 0 },
-            { id: 26, name: "كابل شحن 4 اصلي", price: 150, cost: 50, stock: 0 },
-            { id: 27, name: "كابل شحن 4 كوبي", price: 50, cost: 20, stock: 0 },
-            { id: 28, name: "av كابل", price: 50, cost: 25, stock: 0 },
-            { id: 29, name: "hdmi كابل", price: 120, cost: 70, stock: 0 }
+            { id: 1, name: "جراب 4", price: 150, cost: 90 }, { id: 2, name: "جراب 5", price: 150, cost: 90 },
+            { id: 3, name: "جريبس اشكال", price: 30, cost: 20 }, { id: 4, name: "جريبس كارتون", price: 30, cost: 15 },
+            { id: 5, name: "دراع 2", price: 180, cost: 150 }, { id: 6, name: "دراع 3 اسود", price: 300, cost: 200 },
+            { id: 7, name: "دراع 3 اسود ألوان", price: 350, cost: 200 }, { id: 8, name: "دراع اصلي 4 امريكي", price: 1000, cost: 700 },
+            { id: 9, name: "دراع اصلي 4 اوروبي", price: 800, cost: 600 }, { id: 10, name: "دراع اصلي 4 برو", price: 1300, cost: 900 },
+            { id: 11, name: "دراع اصلي 5 استعمال", price: 2300, cost: 2000 }, { id: 12, name: "دراع اصلي 5 جديد", price: 3850, cost: 3400 },
+            { id: 13, name: "دراع كوبي 4 استعمال", price: 450, cost: 250 }, { id: 14, name: "دراع كوبي 4 جديد اول", price: 750, cost: 400 },
+            { id: 15, name: "دراع كوبي 4 جديد ثاني", price: 650, cost: 400 }, { id: 16, name: "ستاند شحن 4", price: 250, cost: 70 },
+            { id: 17, name: "ستاند شحن 5", price: 550, cost: 150 }, { id: 18, name: "سكبن برو", price: 200, cost: 120 },
+            { id: 19, name: "سكين سليم", price: 200, cost: 120 }, { id: 20, name: "سكين فات", price: 200, cost: 120 },
+            { id: 21, name: "شاحن 8 مخرج", price: 550, cost: 500 }, { id: 22, name: "شنطه", price: 500, cost: 350 },
+            { id: 23, name: "كابل 5", price: 200, cost: 70 }, { id: 24, name: "كابل بوار", price: 100, cost: 40 },
+            { id: 25, name: "كابل شحن 3", price: 70, cost: 40 }, { id: 26, name: "كابل شحن 4 اصلي", price: 150, cost: 50 },
+            { id: 27, name: "كابل شحن 4 كوبي", price: 50, cost: 20 }, { id: 28, name: "av كابل", price: 50, cost: 25 },
+            { id: 29, name: "hdmi كابل", price: 120, cost: 70 }
         ];
 
         let posCart = [];
         let allOngoing = [];
+        let activeAttendance = [];
         
         const orderIdStr = '#' + Math.floor((Math.random() * 8900) + 100);
         document.getElementById('prevOrder').innerText = orderIdStr;
@@ -279,27 +270,123 @@
         nextWeek.setDate(today.getDate() + 7);
         const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
 
-        // جلب الإيصالات المعلقة عند فتح الصفحة
+        // تهيئة قائمة البضاعة المنسدلة
+        const accSelect = document.getElementById('accSelect');
+        accessoriesDB.forEach(item => {
+            let opt = document.createElement('option');
+            opt.value = item.id;
+            opt.text = item.name;
+            accSelect.appendChild(opt);
+        });
+
+        function updateAccPrice() {
+            let id = parseInt(document.getElementById('accSelect').value);
+            let item = accessoriesDB.find(i => i.id === id);
+            if(item) { document.getElementById('accPrice').value = item.price; }
+        }
+        updateAccPrice();
+
+        // تحميل البيانات الأولية
         window.addEventListener('DOMContentLoaded', () => {
             fetch(GOOGLE_URL + '?action=getOngoing')
                 .then(res => res.json())
-                .then(data => {
-                    allOngoing = data;
-                    renderQueue();
-                }).catch(err => {
-                    document.getElementById('queueContainer').innerHTML = '<span style="color:var(--acc); font-size: 13px;">حدث خطأ في تحميل الكروت، يرجى التحديث.</span>';
-                });
+                .then(data => { allOngoing = data; renderQueue(); }).catch(e => console.log(e));
+                
+            loadAttendance();
         });
+
+        // دوال نظام الحضور والانصراف
+        function loadAttendance() {
+            fetch(GOOGLE_URL + '?action=getAttendance')
+                .then(res => res.json())
+                .then(data => { activeAttendance = data; renderAttendance(); })
+                .catch(e => console.log(e));
+        }
+
+        function renderAttendance() {
+            const grid = document.getElementById('attendanceGrid');
+            grid.innerHTML = '';
+            if (activeAttendance.length === 0) {
+                grid.innerHTML = '<span style="color:gray; font-size:12px;">لا يوجد موظفين قيد العمل حالياً.</span>';
+                return;
+            }
+            activeAttendance.forEach(emp => {
+                let isPaused = emp.status === 'paused';
+                let statusTxt = isPaused ? '⏸️ متوقف' : '🟢 يعمل';
+                let pauseBtn = isPaused 
+                    ? `<button onclick="empAction('resume', '${emp.name}')" style="background:#22c55e; color:#fff; flex:1; padding:6px; font-size:12px;">استئناف ▶️</button>` 
+                    : `<button onclick="empAction('pause', '${emp.name}')" style="background:#f59e0b; color:#000; flex:1; padding:6px; font-size:12px;">إيقاف ⏸️</button>`;
+
+                grid.innerHTML += `
+                    <div class="att-card">
+                        <h4 style="display:flex; justify-content:space-between; align-items:center;">
+                            ${emp.name} <span style="font-size:10px; font-weight:normal; color:var(--mut);">${statusTxt}</span>
+                        </h4>
+                        <div style="font-size:11px; color:gray; margin-bottom:10px;">دخول: ${emp.checkIn.substring(11, 16) || emp.checkIn}</div>
+                        <div style="display:flex; gap:5px; margin-bottom:10px;">
+                            ${pauseBtn}
+                            <button onclick="empAction('end', '${emp.name}')" style="background:#ef4444; color:#fff; flex:1; padding:6px; font-size:12px;">إنهاء ⏹️</button>
+                        </div>
+                        <div style="border-top:1px dashed var(--border); padding-top:10px; display:flex; flex-direction:column; gap:5px;">
+                            <input type="number" id="w_${emp.name}" placeholder="مبلغ السحب" style="padding:6px; font-size:11px; border-radius:4px; border:none; background:rgba(0,0,0,0.3); color:white;">
+                            <input type="text" id="n_${emp.name}" placeholder="ملاحظات..." style="padding:6px; font-size:11px; border-radius:4px; border:none; background:rgba(0,0,0,0.3); color:white;">
+                            <button onclick="submitEmpFinance('${emp.name}')" style="background:#3b82f6; color:#fff; padding:6px; font-size:11px;">تسجيل 💾</button>
+                        </div>
+                        <div style="font-size:10px; margin-top:5px; color:var(--pri);">إجمالي المسحوبات: ${emp.withdrawals} ج</div>
+                    </div>
+                `;
+            });
+        }
+
+        function empAction(action, empName) {
+            let name = empName || document.getElementById('newEmpName').value.trim();
+            if(!name) return alert('أدخل اسم الموظف');
+            if(action === 'start') {
+                document.getElementById('newEmpName').value = '⏳ جاري...';
+                document.getElementById('newEmpName').disabled = true;
+            }
+            sendToGoogle({ systemType: "Attendance", action: action, empName: name }).then(() => {
+                if(action === 'start') {
+                    document.getElementById('newEmpName').value = '';
+                    document.getElementById('newEmpName').disabled = false;
+                }
+                loadAttendance();
+            });
+        }
+
+        function submitEmpFinance(empName) {
+            let w = document.getElementById(`w_${empName}`).value;
+            let n = document.getElementById(`n_${empName}`).value;
+            if(!w && !n) return;
+            
+            let btn = event.target;
+            btn.innerText = '⏳...';
+            sendToGoogle({ systemType: "Attendance", action: "finance", empName: empName, withdrawal: w, note: n }).then(() => {
+                loadAttendance();
+            });
+        }
+
+        // جلب الإيصال للاستكمال السريع
+        function fetchOrderDetails() {
+            const oid = document.getElementById('searchOrderCode').value.trim();
+            if(!oid) return;
+            const order = allOngoing.find(o => o.orderId === oid);
+            if(order) {
+                document.getElementById('cNamePhone').value = order.name + " " + order.phone;
+                document.getElementById('cDetails').value = order.details;
+                syncData();
+            } else {
+                alert("لم يتم العثور على الإيصال، تأكد من الرقم (مثال: #1234).");
+            }
+        }
 
         function renderQueue() {
             const container = document.getElementById('queueContainer');
             container.innerHTML = '';
-            
             if (allOngoing.length === 0) {
                 container.innerHTML = '<span style="color: gray; font-size: 13px; margin: auto;">لا يوجد أجهزة قيد الانتظار حالياً 🎉</span>';
                 return;
             }
-            
             let toDisplay = allOngoing.slice(0, 6);
             toDisplay.forEach(order => {
                 container.innerHTML += `
@@ -313,35 +400,13 @@
                     </div>
                 `;
             });
-            
-            if (allOngoing.length > 6) {
-                container.innerHTML += `<div style="display:flex; align-items:center; justify-content:center; color:var(--mut); font-size: 14px; padding: 0 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">+${allOngoing.length - 6} في الانتظار</div>`;
-            }
         }
 
         function markAsDone(orderId) {
-            // تحديث الواجهة فوراً
             allOngoing = allOngoing.filter(o => o.orderId !== orderId);
             renderQueue();
-            
-            // الإرسال للشيت
             sendToGoogle({ systemType: "UpdateStatus", orderId: orderId, status: "done" }).catch(e => console.log(e));
         }
-
-        const grid = document.getElementById('accessoriesGrid');
-        accessoriesDB.forEach(item => {
-            let stockColor = 'var(--acc)';
-            let stockText = 'نفذت ⚠️';
-            grid.innerHTML += `
-                <div class="item-card" onclick="addToCart(${item.id})">
-                    <div class="item-name">${item.name}</div>
-                    <div class="price-input-container">
-                        <input type="number" id="price_${item.id}" class="price-input" value="${item.price}" onclick="event.stopPropagation()"> ج
-                    </div>
-                    <div class="item-stock" style="color: ${stockColor}; border: 1px solid ${stockColor};">${stockText}</div>
-                </div>
-            `;
-        });
 
         function parseNamePhone() {
             let raw = document.getElementById('cNamePhone').value.trim();
@@ -361,19 +426,21 @@
             document.getElementById('prevNamePhone').innerText = parsed.name + " " + parsed.phone;
             document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
             document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
-            
-            // تعديل خانة السعر لتظهر دائماً
             document.getElementById('prevPriceTag').innerText = `السعر: ${priceTxt}`;
         }
 
-        function addToCart(id) {
+        function addDropdownToCart() {
+            let id = parseInt(document.getElementById('accSelect').value);
             let item = accessoriesDB.find(i => i.id === id);
-            let currentSellPrice = parseFloat(document.getElementById(`price_${id}`).value) || item.price;
+            let price = parseFloat(document.getElementById('accPrice').value);
+            let qty = parseInt(document.getElementById('accQty').value);
             
-            let existing = posCart.find(c => c.id === id && c.sellPrice === currentSellPrice);
-            if(existing) { existing.qty += 1; } 
-            else { posCart.push({ ...item, qty: 1, sellPrice: currentSellPrice }); }
-            renderCart();
+            if(item && !isNaN(price) && !isNaN(qty) && qty > 0) {
+                let existing = posCart.find(c => c.id === id && c.sellPrice === price);
+                if(existing) { existing.qty += qty; } 
+                else { posCart.push({ ...item, qty: qty, sellPrice: price }); }
+                renderCart();
+            }
         }
 
         function renderCart() {
@@ -395,8 +462,7 @@
         function calcTotals() {
             let mRev1 = parseFloat(document.getElementById('maintRev1').value) || 0;
             let mRev2 = parseFloat(document.getElementById('maintRev2').value) || 0;
-            let mRev3 = parseFloat(document.getElementById('maintRev3').value) || 0;
-            let totalMaintRev = mRev1 + mRev2 + mRev3;
+            let totalMaintRev = mRev1 + mRev2;
 
             let gRev = 0; posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
             
@@ -435,32 +501,14 @@
                 const pa = document.getElementById('printArea');
                 pa.innerHTML = '';
                 
-                // 1. طباعة الأجهزة بالعدد الطبيعي الذي أدخله المستخدم
                 for(let i = 1; i <= count; i++) {
-                    let deviceLabel = `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`;
-                    pa.innerHTML += deviceLabel; 
+                    pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`; 
                 }
 
-                // 2. إضافة نسخة واحدة للمحل (مميزة بكلمة نسخة المحل وإجمالي الأجهزة)
-                let extraLabel = `
-                <div class="real-label">
-                    <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div>
-                    <div class="l-name-phone">${parsed.name} ${parsed.phone}</div>
-                    <div class="l-details" style="font-size: 10px;">
-                        <span style="background:black; color:white; padding:1px 4px; border-radius:3px; font-weight:bold; margin-bottom:2px; display:inline-block;">نسخة المحل</span><br>${details}
-                    </div>
-                    <div class="l-footer">
-                        <div class="l-date">${dateStr}</div>
-                        <div class="l-price-tag">السعر: ${priceTxt}</div>
-                        <div class="l-device">إجمالي ${count} أجهزة</div>
-                    </div>
-                </div>`;
-                pa.innerHTML += extraLabel;
+                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 10px;"><span style="background:black; color:white; padding:1px 4px; border-radius:3px; font-weight:bold; margin-bottom:2px; display:inline-block;">نسخة المحل</span><br>${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">إجمالي ${count} أجهزة</div></div></div>`;
                 
-                // 3. إيصال العميل 
                 pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
                 
-                // 4. ورقة التحذيرات للعميل
                 pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br><span style="font-size:10px; color:black;">01555886990 - 01010763503</span><br><br>الأوردر: ${orderIdStr}</div></div>`;
                 
                 window.print();
@@ -490,7 +538,7 @@
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
             let operations = [];
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 2; i++) {
                 let r = parseFloat(document.getElementById('maintRev'+i).value) || 0;
                 let c = parseFloat(document.getElementById('maintCost'+i).value) || 0;
                 let t = document.getElementById('technician'+i).value;
