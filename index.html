@@ -196,7 +196,12 @@
             <!-- إدارة وقت الموظفين -->
             <h4 style="margin: 0 0 10px; color: var(--pri);">👥 إدارة وقت الموظفين:</h4>
             <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                <input type="text" id="newEmpName" placeholder="اكتب اسم الموظف" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
+                <select id="newEmpName" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
+                    <option value="" disabled selected>اختر الموظف...</option>
+                    <option value="Omer Kilany">Omer Kilany</option>
+                    <option value="Omer Yasser">Omer Yasser</option>
+                    <option value="Adam">Adam</option>
+                </select>
                 <button onclick="empAction('start')" style="width:120px; background:#22c55e; color:white;">بدء شيفت 🟢</button>
             </div>
             <div id="attendanceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px;">
@@ -234,7 +239,6 @@
     <div id="printArea"></div>
 
     <script>
-        // ضع رابط السكريبت الجديد هنا 👇
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
         const accessoriesDB = [
@@ -339,16 +343,16 @@
         }
 
         function empAction(action, empName) {
-            let name = empName || document.getElementById('newEmpName').value.trim();
-            if(!name) return alert('أدخل اسم الموظف');
+            let selectEl = document.getElementById('newEmpName');
+            let name = empName || selectEl.value;
+            if(!name) return alert('أدخل اسم الموظف أو اختره من القائمة');
             if(action === 'start') {
-                document.getElementById('newEmpName').value = '⏳ جاري...';
-                document.getElementById('newEmpName').disabled = true;
+                selectEl.disabled = true;
             }
             sendToGoogle({ systemType: "Attendance", action: action, empName: name }).then(() => {
                 if(action === 'start') {
-                    document.getElementById('newEmpName').value = '';
-                    document.getElementById('newEmpName').disabled = false;
+                    selectEl.disabled = false;
+                    selectEl.value = "";
                 }
                 loadAttendance();
             });
