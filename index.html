@@ -148,46 +148,68 @@
             </div>
             
             <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #131b2e;">
-                <h4 style="margin: 0 0 10px; color: var(--pri);">العمليات (يمكن تسجيل حتى 3 عمليات للعميل):</h4>
+                <h4 style="margin: 0 0 10px; color: var(--pri);">العمليات (يمكن تسجيل حتى عمليتين للعميل):</h4>
                 
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <!-- العملية 1 -->
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <div class="input-group" style="flex: 1.5; margin:0;">
+                        <label>نوع العملية:</label>
+                        <select id="opType1">
+                            <option value="صيانه">صيانه</option>
+                            <option value="اكونتات">اكونتات</option>
+                            <option value="داتا">داتا</option>
+                            <option value="مصروفات">مصروفات</option>
+                            <option value="اكسسوارات">اكسسوارات</option>
+                        </select>
+                    </div>
                     <div class="input-group" style="flex: 1; margin:0;">
-                        <label>صيانة 1 (بيع):</label>
+                        <label>إيراد:</label>
                         <input type="number" id="maintRev1" value="0" oninput="calcTotals()">
                     </div>
                     <div class="input-group" style="flex: 1; margin:0;">
-                        <label>تكلفة 1 (اختياري):</label>
+                        <label>تكلفة:</label>
                         <input type="number" id="maintCost1" value="0" oninput="calcTotals()">
                     </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>صنايعي 1:</label>
-                        <select id="technician1">
-                            <option value="المحل">المحل</option>
+                    <div class="input-group" style="flex: 1.5; margin:0;">
+                        <label>الصنايعي:</label>
+                        <select id="technician1" onchange="localStorage.setItem('savedTech1', this.value)">
                             <option value="احمد يسري">احمد يسري</option>
                             <option value="محمود شوقي">محمود شوقي</option>
                             <option value="عمر ياسر">عمر ياسر</option>
-                            <option value="مصروفات">مصروفات</option>
+                            <option value="عمر كيلاني">عمر كيلاني</option>
+                            <option value="ادم">ادم</option>
                         </select>
                     </div>
                 </div>
 
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <!-- العملية 2 -->
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <div class="input-group" style="flex: 1.5; margin:0;">
+                        <label>نوع العملية:</label>
+                        <select id="opType2">
+                            <option value="صيانه">صيانه</option>
+                            <option value="اكونتات">اكونتات</option>
+                            <option value="داتا">داتا</option>
+                            <option value="مصروفات">مصروفات</option>
+                            <option value="اكسسوارات">اكسسوارات</option>
+                        </select>
+                    </div>
                     <div class="input-group" style="flex: 1; margin:0;">
-                        <label>صيانة 2 (بيع):</label>
+                        <label>إيراد:</label>
                         <input type="number" id="maintRev2" value="0" oninput="calcTotals()">
                     </div>
                     <div class="input-group" style="flex: 1; margin:0;">
-                        <label>تكلفة 2 (اختياري):</label>
+                        <label>تكلفة:</label>
                         <input type="number" id="maintCost2" value="0" oninput="calcTotals()">
                     </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>صنايعي 2:</label>
-                        <select id="technician2">
-                            <option value="المحل">المحل</option>
+                    <div class="input-group" style="flex: 1.5; margin:0;">
+                        <label>الصنايعي:</label>
+                        <select id="technician2" onchange="localStorage.setItem('savedTech2', this.value)">
                             <option value="احمد يسري">احمد يسري</option>
                             <option value="محمود شوقي">محمود شوقي</option>
                             <option value="عمر ياسر">عمر ياسر</option>
-                            <option value="مصروفات">مصروفات</option>
+                            <option value="عمر كيلاني">عمر كيلاني</option>
+                            <option value="ادم">ادم</option>
                         </select>
                     </div>
                 </div>
@@ -224,7 +246,7 @@
             </div>
 
             <div class="totals-box">
-                <div><h4>إجمالي الصيانة</h4><h3 id="tMaint">0 ج</h3></div>
+                <div><h4>إجمالي الإيراد</h4><h3 id="tMaint">0 ج</h3></div>
                 <div><h4>إجمالي المشتريات</h4><h3 id="tGoods">0 ج</h3></div>
                 <div><h4 style="color:var(--pri);">المطلوب من العميل</h4><h3 style="color:var(--pri);" id="tFinal">0 ج</h3></div>
             </div>
@@ -290,8 +312,15 @@
         }
         updateAccPrice();
 
-        // تحميل البيانات الأولية
+        // تحميل البيانات الأولية واسترجاع الأسماء المحفوظة
         window.addEventListener('DOMContentLoaded', () => {
+            // استرجاع أسماء الصنايعية المحفوظة
+            let savedTech1 = localStorage.getItem('savedTech1');
+            if (savedTech1) document.getElementById('technician1').value = savedTech1;
+            
+            let savedTech2 = localStorage.getItem('savedTech2');
+            if (savedTech2) document.getElementById('technician2').value = savedTech2;
+
             fetch(GOOGLE_URL + '?action=getOngoing')
                 .then(res => res.json())
                 .then(data => { allOngoing = data; renderQueue(); }).catch(e => console.log(e));
@@ -370,12 +399,10 @@
             });
         }
 
-        // جلب الإيصال للاستكمال السريع (وتصحيح رقم الإيصال أوتوماتيكياً)
         function fetchOrderDetails() {
             let oid = document.getElementById('searchOrderCode').value.trim();
             if(!oid) return;
             
-            // إضافة رمز الشباك لو مش مكتوب
             if (!oid.startsWith('#')) {
                 oid = '#' + oid;
             }
@@ -390,12 +417,10 @@
             }
         }
 
-        // رسم كروت الانتظار وتجاهل الإيصالات المنتهية من العرض
         function renderQueue() {
             const container = document.getElementById('queueContainer');
             container.innerHTML = '';
             
-            // فلترة علشان نعرض في شريط الانتظار الأجهزة اللي مخلصتش بس (حالتها مش done)
             let pendingOrders = allOngoing.filter(o => o.status !== 'done');
             
             if (pendingOrders.length === 0) {
@@ -559,10 +584,14 @@
 
             let operations = [];
             for (let i = 1; i <= 2; i++) {
+                let opType = document.getElementById('opType'+i).value;
                 let r = parseFloat(document.getElementById('maintRev'+i).value) || 0;
                 let c = parseFloat(document.getElementById('maintCost'+i).value) || 0;
                 let t = document.getElementById('technician'+i).value;
-                if (r > 0 || c > 0) { operations.push({ rev: r, cost: c, tech: t }); }
+                
+                if (r > 0 || c > 0) { 
+                    operations.push({ rev: r, cost: c, tech: t, type: opType }); 
+                }
             }
 
             let gRev = 0, gCost = 0, gTxt = "", itemsForInventory = [];
@@ -574,7 +603,8 @@
             });
 
             if(operations.length === 0 && posCart.length > 0) {
-                operations.push({ rev: 0, cost: 0, tech: "المحل" });
+                // دمج نوع العملية (اكسسوارات) لو الأوردر عبارة عن اكسسوارات بس
+                operations.push({ rev: 0, cost: 0, tech: document.getElementById('technician1').value, type: "اكسسوارات" });
             }
 
             let totalMaintRev = operations.reduce((sum, op) => sum + op.rev, 0);
@@ -594,10 +624,13 @@
                     let isFirstRow = (i === 0);
                     let currentOrderId = orderIdStr + (operations.length > 1 ? `-${i+1}` : ''); 
                     
+                    // هنا بيتم دمج (الاسم / نوع العملية)
+                    let combinedName = parsed.name + " / " + operations[i].type;
+                    
                     let payload = {
                         systemType: "Maintenance", 
                         orderId: currentOrderId, 
-                        name: parsed.name, 
+                        name: combinedName, 
                         phone: parsed.phone, 
                         technician: operations[i].tech,
                         maintRevenue: operations[i].rev, 
