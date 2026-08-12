@@ -6,34 +6,69 @@
     <title>Level UP - لوحة تحكم المحل (POS)</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --pri: #f59e0b; --txt: #f8fafc; --acc: #ef4444; --mut: #94a3b8; --border: #334155; }
+        /* تصميم جديد بطابع حديث وعصري (Tech / Cyberpunk vibe) */
+        :root { 
+            --bg: #0b0f19;       /* أزرق داكن جداً يميل للأسود */
+            --card: #151b2b;     /* لون الكروت */
+            --pri: #06b6d4;      /* سيان ساطع (Cyan) ليكون اللون الأساسي */
+            --pri-hover: #0891b2;
+            --txt: #f8fafc; 
+            --acc: #ef4444;      /* أحمر للمسحوبات والإغلاق */
+            --mut: #94a3b8; 
+            --border: #1e293b; 
+        }
         body { background: var(--bg); color: var(--txt); font-family: 'Tajawal', sans-serif; margin: 0; padding: 20px; }
         .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1400px; margin: auto; }
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
-        .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
-        .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; }
+        
+        .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.4);}
+        .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);}
+        
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--mut); font-weight: bold;}
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: white; font-family: inherit; box-sizing: border-box; }
+        .input-group input, .input-group select, .input-group textarea { 
+            width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); 
+            background: #0f1422; color: white; font-family: inherit; box-sizing: border-box; 
+            transition: all 0.3s ease;
+        }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
+            outline: none; border-color: var(--pri); box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+        }
         .input-group textarea { resize: vertical; }
-        button { background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: bold; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s; }
-        button:hover { opacity: 0.9; }
-        .btn-wa { background: #25D366; color: white; margin-top: 15px; }
-        .btn-qr { background: #1877F2; color: white; margin-top: 10px; }
-        .cart-box { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
-        .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px dashed var(--border); padding: 5px 0; }
-        .totals-box { display: flex; justify-content: space-between; background: #020617; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
+        
+        button { 
+            background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; 
+            font-weight: 900; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; 
+            transition: 0.2s ease-in-out; 
+        }
+        button:hover { background: var(--pri-hover); color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        
+        .btn-wa { background: #10b981; color: #000; margin-top: 15px; } /* أخضر ساطع للواتساب */
+        .btn-wa:hover { background: #059669; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+        .btn-qr { background: #3b82f6; color: white; margin-top: 10px; }
+        
+        .cart-box { background: #0f1422; border: 1px dashed var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
+        .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px solid var(--border); padding: 8px 0; }
+        
+        .totals-box { display: flex; justify-content: space-between; background: #06080e; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
         .totals-box div { text-align: center; }
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
         .totals-box h3 { margin: 0; color: white; }
         
-        .queue-card { background: #131b2e; border: 1px solid var(--pri); border-radius: 8px; padding: 10px; min-width: 140px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;}
-        .queue-card .order-id { font-size: 11px; color: var(--mut); margin-bottom: 2px;}
-        .queue-card .c-name { font-weight: bold; font-size: 13px; margin-bottom: 4px;}
-        .queue-card .c-details { font-size: 11px; margin-bottom: 8px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .btn-done { padding: 4px; font-size: 11px; background: #22c55e; color: white; margin: 0; width: 100%; border-radius: 4px; }
+        .queue-container-wrapper { background: #0f1422; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 20px;}
+        .queue-container-wrapper h4 { margin: 0 0 10px 0; color: var(--pri); font-size: 14px;}
         
-        .preview-wrapper { background: #17171c; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
+        .queue-card { background: #1a2235; border: 1px solid var(--pri); border-radius: 8px; padding: 10px; min-width: 140px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
+        .queue-card .order-id { font-size: 11px; color: var(--mut); margin-bottom: 2px;}
+        .queue-card .c-name { font-weight: bold; font-size: 13px; margin-bottom: 4px; color: var(--pri);}
+        .queue-card .c-details { font-size: 11px; margin-bottom: 8px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        .btn-done { padding: 4px; font-size: 11px; background: #10b981; color: #000; margin: 0; width: 100%; border-radius: 4px; font-weight: bold;}
+        .btn-done:hover { background: #059669; color:white; }
+        
+        .operations-box { background: #0f1422; border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        
+        .preview-wrapper { background: #090c14; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
         .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
         .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
         .label-preview .l-logo { font-weight: 900; font-size: 14px; margin-right: 15px;}
@@ -44,7 +79,7 @@
         .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
         .label-preview .l-date { font-size: 12px; font-weight: bold; }
         
-        .att-card { background: #131b2e; border: 1px solid var(--pri); padding: 10px; border-radius: 8px; }
+        .att-card { background: #151b2b; border: 1px solid var(--border); border-left: 3px solid var(--pri); padding: 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
         .att-card h4 { margin: 0 0 5px; color: white; }
         
         #printArea { display: none; }
@@ -84,7 +119,7 @@
                 <label>بحث برقم الإيصال (للدفع السريع):</label>
                 <div style="display:flex; gap:10px;">
                     <input type="text" id="searchOrderCode" placeholder="مثال: 1234 أو #1234">
-                    <button type="button" onclick="fetchOrderDetails()" style="width:100px; background:#3b82f6; color:white;">بحث 🔍</button>
+                    <button type="button" onclick="fetchOrderDetails()" style="width:100px;">بحث 🔍</button>
                 </div>
             </div>
 
@@ -126,7 +161,7 @@
             </div>
 
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px; color: #1877F2;">2. طباعة ملصق الـ QR لروابط الألعاب</h4>
+                <h4 style="margin: 0 0 10px; color: #3b82f6;">2. طباعة ملصق الـ QR لروابط الألعاب</h4>
                 <div class="input-group" style="margin-bottom: 10px;">
                     <label>توليد ملصق لـ:</label>
                     <select id="qrConsole">
@@ -138,24 +173,28 @@
             </div>
         </div>
 
-        <!-- قسم العمليات والحضور (اليسار) -->
+        <!-- قسم العمليات والمبيعات (اليسار) -->
         <div class="panel">
-            <h2 style="margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; margin-bottom: 10px; color: var(--pri);">🛒 تسليم ومبيعات (Checkout)</h2>
+            <h2 style="margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; margin-bottom: 15px; color: var(--pri);">🛒 تسليم ومبيعات (Checkout)</h2>
             
-            <div id="queueContainer" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;">
-                <div style="color: var(--mut); font-size: 13px;">⏳ جاري تحميل الأجهزة في الانتظار...</div>
+            <!-- الأجهزة في الانتظار تم نقلها للأعلى -->
+            <div class="queue-container-wrapper">
+                <h4>⏳ الأجهزة في الانتظار:</h4>
+                <div id="queueContainer" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
+                    <div style="color: var(--mut); font-size: 13px;">جاري تحميل البيانات...</div>
+                </div>
             </div>
             
-            <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #131b2e;">
-                <h4 style="margin: 0 0 10px; color: var(--pri);">العمليات (يمكن تسجيل حتى 3 عمليات للعميل):</h4>
+            <!-- سطور العمليات الـ 3 (بدون الصنايعي، وبطريقة الدفع) -->
+            <div class="operations-box">
+                <h4 style="margin: 0 0 10px; color: var(--pri);">تسجيل العمليات (حتى 3 عمليات للعميل):</h4>
                 
                 <!-- العملية 1 -->
                 <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
-                    <div class="input-group" style="flex: 1.2; margin:0;">
-                        <label>العملية:</label>
+                    <div class="input-group" style="flex: 1.5; margin:0;">
+                        <label>نوع العملية:</label>
                         <select id="opType1">
                             <option value="صيانه">صيانه</option>
-                            <option value="اكونتات">اكونتات</option>
                             <option value="داتا">داتا</option>
                             <option value="اكسسوارات">اكسسوارات</option>
                             <option value="مصروفات">مصروفات</option>
@@ -171,19 +210,7 @@
                         <label>تكلفة:</label>
                         <input type="number" id="maintCost1" value="0" oninput="calcTotals()">
                     </div>
-                    <div class="input-group" style="flex: 1.2; margin:0;">
-                        <label>الصنايعي:</label>
-                        <select id="technician1" onchange="localStorage.setItem('savedTech1', this.value)">
-                            <option value="إيراد عام">إيراد عام</option>
-                            <option value="المحل">المحل</option>
-                            <option value="عمر ياسر">عمر ياسر</option>
-                            <option value="عمر كيلاني">عمر كيلاني</option>
-                            <option value="ادم">ادم</option>
-                            <option value="مصروفات">مصروفات</option>
-                            <option value="اكونتات">اكونتات</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="flex: 1.2; margin:0;">
+                    <div class="input-group" style="flex: 1.5; margin:0;">
                         <label>الدفع:</label>
                         <select id="payMethod1" onchange="localStorage.setItem('savedPay1', this.value)">
                             <option value="كاش">كاش</option>
@@ -196,11 +223,10 @@
 
                 <!-- العملية 2 -->
                 <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
-                    <div class="input-group" style="flex: 1.2; margin:0;">
-                        <label>العملية:</label>
+                    <div class="input-group" style="flex: 1.5; margin:0;">
+                        <label>نوع العملية:</label>
                         <select id="opType2">
                             <option value="صيانه">صيانه</option>
-                            <option value="اكونتات">اكونتات</option>
                             <option value="داتا">داتا</option>
                             <option value="اكسسوارات">اكسسوارات</option>
                             <option value="مصروفات">مصروفات</option>
@@ -216,19 +242,7 @@
                         <label>تكلفة:</label>
                         <input type="number" id="maintCost2" value="0" oninput="calcTotals()">
                     </div>
-                    <div class="input-group" style="flex: 1.2; margin:0;">
-                        <label>الصنايعي:</label>
-                        <select id="technician2" onchange="localStorage.setItem('savedTech2', this.value)">
-                            <option value="إيراد عام">إيراد عام</option>
-                            <option value="المحل">المحل</option>
-                            <option value="عمر ياسر">عمر ياسر</option>
-                            <option value="عمر كيلاني">عمر كيلاني</option>
-                            <option value="ادم">ادم</option>
-                            <option value="مصروفات">مصروفات</option>
-                            <option value="اكونتات">اكونتات</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="flex: 1.2; margin:0;">
+                    <div class="input-group" style="flex: 1.5; margin:0;">
                         <label>الدفع:</label>
                         <select id="payMethod2" onchange="localStorage.setItem('savedPay2', this.value)">
                             <option value="كاش">كاش</option>
@@ -241,11 +255,10 @@
 
                 <!-- العملية 3 -->
                 <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
-                    <div class="input-group" style="flex: 1.2; margin:0;">
-                        <label>العملية:</label>
+                    <div class="input-group" style="flex: 1.5; margin:0;">
+                        <label>نوع العملية:</label>
                         <select id="opType3">
                             <option value="صيانه">صيانه</option>
-                            <option value="اكونتات">اكونتات</option>
                             <option value="داتا">داتا</option>
                             <option value="اكسسوارات">اكسسوارات</option>
                             <option value="مصروفات">مصروفات</option>
@@ -261,19 +274,7 @@
                         <label>تكلفة:</label>
                         <input type="number" id="maintCost3" value="0" oninput="calcTotals()">
                     </div>
-                    <div class="input-group" style="flex: 1.2; margin:0;">
-                        <label>الصنايعي:</label>
-                        <select id="technician3" onchange="localStorage.setItem('savedTech3', this.value)">
-                            <option value="إيراد عام">إيراد عام</option>
-                            <option value="المحل">المحل</option>
-                            <option value="عمر ياسر">عمر ياسر</option>
-                            <option value="عمر كيلاني">عمر كيلاني</option>
-                            <option value="ادم">ادم</option>
-                            <option value="مصروفات">مصروفات</option>
-                            <option value="اكونتات">اكونتات</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="flex: 1.2; margin:0;">
+                    <div class="input-group" style="flex: 1.5; margin:0;">
                         <label>الدفع:</label>
                         <select id="payMethod3" onchange="localStorage.setItem('savedPay3', this.value)">
                             <option value="كاش">كاش</option>
@@ -285,29 +286,14 @@
                 </div>
             </div>
 
-            <!-- إدارة وقت الموظفين -->
-            <h4 style="margin: 0 0 10px; color: var(--pri);">👥 إدارة وقت الموظفين:</h4>
-            <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                <select id="newEmpName" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
-                    <option value="" disabled selected>اختر الموظف...</option>
-                    <option value="Omer Kilany">Omer Kilany</option>
-                    <option value="Omer Yasser">Omer Yasser</option>
-                    <option value="Adam">Adam</option>
-                </select>
-                <button onclick="empAction('start', null, event)" style="width:120px; background:#22c55e; color:white;">بدء شيفت 🟢</button>
-            </div>
-            <div id="attendanceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px;">
-                <div style="color:gray; font-size:12px;">جاري تحميل كروت الموظفين...</div>
-            </div>
-
             <!-- قسم المبيعات والإكسسوارات -->
-            <h4 style="margin: 0 0 10px; color: var(--pri);">🛒 إضافة إكسسوارات / بضاعة:</h4>
+            <h4 style="margin: 0 0 10px; color: var(--pri);">🛍️ إضافة إكسسوارات / بضاعة إضافية:</h4>
             <div style="display:flex; gap:5px; margin-bottom: 10px;">
-                <select id="accSelect" style="flex:2; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;" onchange="updateAccPrice()">
+                <select id="accSelect" style="flex:2; padding:8px; border-radius:6px; border:1px solid var(--border); background:#0f1422; color:white;" onchange="updateAccPrice()">
                     <!-- تُملأ بواسطة جافاسكريبت -->
                 </select>
-                <input type="number" id="accQty" value="1" min="1" style="flex:0.5; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
-                <input type="number" id="accPrice" placeholder="السعر" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;">
+                <input type="number" id="accQty" value="1" min="1" style="flex:0.5; padding:8px; border-radius:6px; border:1px solid var(--border); background:#0f1422; color:white;">
+                <input type="number" id="accPrice" placeholder="السعر" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border); background:#0f1422; color:white;">
                 <button onclick="addDropdownToCart()" style="width:60px; padding:0;">➕</button>
             </div>
 
@@ -321,10 +307,27 @@
                 <div><h4 style="color:var(--pri);">المطلوب من العميل</h4><h3 style="color:var(--pri);" id="tFinal">0 ج</h3></div>
             </div>
 
-            <div style="display: flex; gap: 10px; margin-top: 15px;">
-                <button id="btnCheckoutWA" class="btn-wa" style="flex: 2; margin-top:0;" onclick="processCheckout(true)">✅ تسليم وإرسال واتساب (وحفظ باليومية)</button>
-                <button id="btnCheckoutSave" style="flex: 1; background: #475569; color: white;" onclick="processCheckout(false)">💾 حفظ باليومية فقط</button>
+            <div style="display: flex; gap: 10px; margin-bottom: 30px;">
+                <button id="btnCheckoutWA" class="btn-wa" style="flex: 2; margin-top:0;" onclick="processCheckout(true)">✅ إرسال واتساب وحفظ باليومية</button>
+                <button id="btnCheckoutSave" style="flex: 1; background: #334155; color: white;" onclick="processCheckout(false)">💾 حفظ باليومية فقط</button>
             </div>
+            
+            <!-- إدارة وقت الموظفين تم نقلها للأسفل -->
+            <hr style="border: 0; border-top: 1px solid var(--border); margin-bottom: 20px;">
+            <h4 style="margin: 0 0 10px; color: var(--mut);">👥 إدارة الحضور والانصراف:</h4>
+            <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                <select id="newEmpName" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:#0f1422; color:white;">
+                    <option value="" disabled selected>اختر الموظف...</option>
+                    <option value="Omar Kilany">Omar Kilany</option>
+                    <option value="Omar Yasser">Omar Yasser</option>
+                    <option value="Adam">Adam</option>
+                </select>
+                <button onclick="empAction('start', null, event)" style="width:120px; background:#10b981; color:#000;">بدء شيفت 🟢</button>
+            </div>
+            <div id="attendanceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px;">
+                <div style="color:gray; font-size:12px;">جاري تحميل كروت الموظفين...</div>
+            </div>
+
         </div>
     </div>
 
@@ -383,9 +386,6 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             for(let i=1; i<=3; i++) {
-                let savedTech = localStorage.getItem('savedTech'+i);
-                if (savedTech) document.getElementById('technician'+i).value = savedTech;
-                
                 let savedPay = localStorage.getItem('savedPay'+i);
                 if (savedPay) document.getElementById('payMethod'+i).value = savedPay;
             }
@@ -415,7 +415,7 @@
                 let isPaused = emp.status === 'paused';
                 let statusTxt = isPaused ? '⏸️ متوقف' : '🟢 يعمل';
                 let pauseBtn = isPaused 
-                    ? `<button onclick="empAction('resume', '${emp.name}', event)" style="background:#22c55e; color:#fff; flex:1; padding:6px; font-size:12px;">استئناف ▶️</button>` 
+                    ? `<button onclick="empAction('resume', '${emp.name}', event)" style="background:#10b981; color:#000; flex:1; padding:6px; font-size:12px;">استئناف ▶️</button>` 
                     : `<button onclick="empAction('pause', '${emp.name}', event)" style="background:#f59e0b; color:#000; flex:1; padding:6px; font-size:12px;">إيقاف ⏸️</button>`;
 
                 grid.innerHTML += `
@@ -426,11 +426,11 @@
                         <div style="font-size:11px; color:gray; margin-bottom:10px;">دخول: ${emp.checkIn.substring(11, 16) || emp.checkIn}</div>
                         <div style="display:flex; gap:5px; margin-bottom:10px;">
                             ${pauseBtn}
-                            <button onclick="empAction('end', '${emp.name}', event)" style="background:#ef4444; color:#fff; flex:1; padding:6px; font-size:12px;">إنهاء ⏹️</button>
+                            <button onclick="empAction('end', '${emp.name}', event)" style="background:var(--acc); color:#fff; flex:1; padding:6px; font-size:12px;">إنهاء ⏹️</button>
                         </div>
                         <div style="border-top:1px dashed var(--border); padding-top:10px; display:flex; flex-direction:column; gap:5px;">
-                            <input type="number" id="w_${emp.name}" placeholder="مبلغ السحب" style="padding:6px; font-size:11px; border-radius:4px; border:none; background:rgba(0,0,0,0.3); color:white;">
-                            <input type="text" id="n_${emp.name}" placeholder="ملاحظات..." style="padding:6px; font-size:11px; border-radius:4px; border:none; background:rgba(0,0,0,0.3); color:white;">
+                            <input type="number" id="w_${emp.name}" placeholder="مبلغ السحب" style="padding:6px; font-size:11px; border-radius:4px; border:1px solid var(--border); background:#090c14; color:white;">
+                            <input type="text" id="n_${emp.name}" placeholder="ملاحظات..." style="padding:6px; font-size:11px; border-radius:4px; border:1px solid var(--border); background:#090c14; color:white;">
                             <button onclick="submitEmpFinance('${emp.name}', event)" style="background:#3b82f6; color:#fff; padding:6px; font-size:11px;">تسجيل 💾</button>
                         </div>
                         <div style="font-size:10px; margin-top:5px; color:var(--pri);">إجمالي المسحوبات: ${emp.withdrawals} ج</div>
@@ -679,11 +679,10 @@
                 let opType = document.getElementById('opType'+i).value;
                 let r = parseFloat(document.getElementById('maintRev'+i).value) || 0;
                 let c = parseFloat(document.getElementById('maintCost'+i).value) || 0;
-                let t = document.getElementById('technician'+i).value;
                 let p = document.getElementById('payMethod'+i).value;
                 
                 if (r > 0 || c > 0) { 
-                    operations.push({ rev: r, cost: c, tech: t, type: opType, payMethod: p }); 
+                    operations.push({ rev: r, cost: c, tech: "-", type: opType, payMethod: p }); 
                 }
             }
 
@@ -696,7 +695,7 @@
             });
 
             if(operations.length === 0 && posCart.length > 0) {
-                operations.push({ rev: 0, cost: 0, tech: document.getElementById('technician1').value, type: "اكسسوارات", payMethod: document.getElementById('payMethod1').value });
+                operations.push({ rev: 0, cost: 0, tech: "-", type: "اكسسوارات", payMethod: document.getElementById('payMethod1').value });
             }
 
             let totalMaintRev = operations.reduce((sum, op) => sum + op.rev, 0);
