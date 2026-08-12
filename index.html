@@ -294,7 +294,7 @@
                     <option value="Omer Yasser">Omer Yasser</option>
                     <option value="Adam">Adam</option>
                 </select>
-                <button onclick="empAction('start')" style="width:120px; background:#22c55e; color:white;">بدء شيفت 🟢</button>
+                <button onclick="empAction('start', null, event)" style="width:120px; background:#22c55e; color:white;">بدء شيفت 🟢</button>
             </div>
             <div id="attendanceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin-bottom: 20px;">
                 <div style="color:gray; font-size:12px;">جاري تحميل كروت الموظفين...</div>
@@ -382,7 +382,6 @@
         updateAccPrice();
 
         window.addEventListener('DOMContentLoaded', () => {
-            // استرجاع الخيارات المحفوظة للصفوف الـ 3
             for(let i=1; i<=3; i++) {
                 let savedTech = localStorage.getItem('savedTech'+i);
                 if (savedTech) document.getElementById('technician'+i).value = savedTech;
@@ -416,8 +415,8 @@
                 let isPaused = emp.status === 'paused';
                 let statusTxt = isPaused ? '⏸️ متوقف' : '🟢 يعمل';
                 let pauseBtn = isPaused 
-                    ? `<button onclick="empAction('resume', '${emp.name}')" style="background:#22c55e; color:#fff; flex:1; padding:6px; font-size:12px;">استئناف ▶️</button>` 
-                    : `<button onclick="empAction('pause', '${emp.name}')" style="background:#f59e0b; color:#000; flex:1; padding:6px; font-size:12px;">إيقاف ⏸️</button>`;
+                    ? `<button onclick="empAction('resume', '${emp.name}', event)" style="background:#22c55e; color:#fff; flex:1; padding:6px; font-size:12px;">استئناف ▶️</button>` 
+                    : `<button onclick="empAction('pause', '${emp.name}', event)" style="background:#f59e0b; color:#000; flex:1; padding:6px; font-size:12px;">إيقاف ⏸️</button>`;
 
                 grid.innerHTML += `
                     <div class="att-card">
@@ -427,12 +426,12 @@
                         <div style="font-size:11px; color:gray; margin-bottom:10px;">دخول: ${emp.checkIn.substring(11, 16) || emp.checkIn}</div>
                         <div style="display:flex; gap:5px; margin-bottom:10px;">
                             ${pauseBtn}
-                            <button onclick="empAction('end', '${emp.name}')" style="background:#ef4444; color:#fff; flex:1; padding:6px; font-size:12px;">إنهاء ⏹️</button>
+                            <button onclick="empAction('end', '${emp.name}', event)" style="background:#ef4444; color:#fff; flex:1; padding:6px; font-size:12px;">إنهاء ⏹️</button>
                         </div>
                         <div style="border-top:1px dashed var(--border); padding-top:10px; display:flex; flex-direction:column; gap:5px;">
                             <input type="number" id="w_${emp.name}" placeholder="مبلغ السحب" style="padding:6px; font-size:11px; border-radius:4px; border:none; background:rgba(0,0,0,0.3); color:white;">
                             <input type="text" id="n_${emp.name}" placeholder="ملاحظات..." style="padding:6px; font-size:11px; border-radius:4px; border:none; background:rgba(0,0,0,0.3); color:white;">
-                            <button onclick="submitEmpFinance('${emp.name}')" style="background:#3b82f6; color:#fff; padding:6px; font-size:11px;">تسجيل 💾</button>
+                            <button onclick="submitEmpFinance('${emp.name}', event)" style="background:#3b82f6; color:#fff; padding:6px; font-size:11px;">تسجيل 💾</button>
                         </div>
                         <div style="font-size:10px; margin-top:5px; color:var(--pri);">إجمالي المسحوبات: ${emp.withdrawals} ج</div>
                     </div>
@@ -440,31 +439,52 @@
             });
         }
 
-        function empAction(action, empName) {
+        function empAction(action, empName, e) {
             let selectEl = document.getElementById('newEmpName');
             let name = empName || selectEl.value;
             if(!name) return alert('أدخل اسم الموظف أو اختره من القائمة');
-            if(action === 'start') {
-                selectEl.disabled = true;
-            }
+            
+            let btn = e.target;
+            let originalText = btn.innerText;
+            btn.disabled = true;
+            btn.innerText = (action === 'start') ? "⏳ جاري التسجيل..." : "⏳...";
+            
+            if(action === 'start') selectEl.disabled = true;
+            
             sendToGoogle({ systemType: "Attendance", action: action, empName: name }).then(() => {
                 if(action === 'start') {
                     selectEl.disabled = false;
                     selectEl.value = "";
+                    alert("✅ تم تسجيل حضور الموظف بنجاح!");
+                } else if (action === 'end') {
+                    alert("⏹️ تم إنهاء الشيفت بنجاح!");
                 }
                 loadAttendance();
+            }).catch(err => {
+                alert("❌ حدث خطأ، يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.");
+                btn.disabled = false;
+                btn.innerText = originalText;
+                if(action === 'start') selectEl.disabled = false;
             });
         }
 
-        function submitEmpFinance(empName) {
+        function submitEmpFinance(empName, e) {
             let w = document.getElementById(`w_${empName}`).value;
             let n = document.getElementById(`n_${empName}`).value;
             if(!w && !n) return;
             
-            let btn = event.target;
+            let btn = e.target;
+            let originalText = btn.innerText;
             btn.innerText = '⏳...';
+            btn.disabled = true;
+            
             sendToGoogle({ systemType: "Attendance", action: "finance", empName: empName, withdrawal: w, note: n }).then(() => {
+                alert("✅ تم تسجيل عملية السحب بنجاح!");
                 loadAttendance();
+            }).catch(err => {
+                alert("❌ حدث خطأ، لم يتم تسجيل السحب، يرجى المحاولة مرة أخرى.");
+                btn.innerText = originalText;
+                btn.disabled = false;
             });
         }
 
@@ -506,7 +526,7 @@
                             <div class="c-name">${order.name}</div>
                             <div class="c-details">${order.details || 'صيانة'}</div>
                         </div>
-                        <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ إنهاء العمليه</button>
+                        <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ إنهاء العملية</button>
                     </div>
                 `;
             });
@@ -688,6 +708,7 @@
 
             let btnWA = document.getElementById('btnCheckoutWA');
             let btnSave = document.getElementById('btnCheckoutSave');
+            let originalWaText = btnWA.innerText;
             btnWA.innerText = "⏳ جاري التسجيل...";
             btnWA.disabled = true; btnSave.disabled = true;
 
@@ -696,10 +717,8 @@
                     let isFirstRow = (i === 0);
                     let currentOrderId = orderIdStr + (operations.length > 1 ? `-${i+1}` : ''); 
                     
-                    // دمج الاسم والرقم في خلية
                     let combinedNamePhone = parsed.name + " " + parsed.phone;
                     
-                    // دمج نوع العملية والوصف في خلية
                     let typeAndDetails = operations[i].type;
                     if (detailsTxt) {
                         typeAndDetails += " / " + detailsTxt;
@@ -735,8 +754,8 @@
                 setTimeout(() => { window.location.reload(); }, 1500);
 
             } catch(e) {
-                alert("مشكلة في الاتصال! حاول تاني"); 
-                btnWA.innerText = "✅ تسليم وإرسال واتساب (وحفظ باليومية)";
+                alert("❌ حدث خطأ، لم يتم تسجيل الفاتورة! حاول مرة تانية."); 
+                btnWA.innerText = originalWaText;
                 btnWA.disabled = false; btnSave.disabled = false;
             }
         }
