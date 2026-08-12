@@ -80,7 +80,6 @@
         <div class="panel">
             <h2>📥 استلام وطباعة (Labels)</h2>
             
-            <!-- زر البحث السريع بكود الإيصال -->
             <div class="input-group">
                 <label>بحث برقم الإيصال (للدفع السريع):</label>
                 <div style="display:flex; gap:10px;">
@@ -148,18 +147,20 @@
             </div>
             
             <div style="border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px; background: #131b2e;">
-                <h4 style="margin: 0 0 10px; color: var(--pri);">العمليات (يمكن تسجيل حتى عمليتين للعميل):</h4>
+                <h4 style="margin: 0 0 10px; color: var(--pri);">العمليات (يمكن تسجيل حتى 3 عمليات للعميل):</h4>
                 
                 <!-- العملية 1 -->
-                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                    <div class="input-group" style="flex: 1.5; margin:0;">
-                        <label>نوع العملية:</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
+                    <div class="input-group" style="flex: 1.2; margin:0;">
+                        <label>العملية:</label>
                         <select id="opType1">
                             <option value="صيانه">صيانه</option>
                             <option value="اكونتات">اكونتات</option>
                             <option value="داتا">داتا</option>
-                            <option value="مصروفات">مصروفات</option>
                             <option value="اكسسوارات">اكسسوارات</option>
+                            <option value="مصروفات">مصروفات</option>
+                            <option value="مسحوبات">مسحوبات</option>
+                            <option value="مرتجع">مرتجع</option>
                         </select>
                     </div>
                     <div class="input-group" style="flex: 1; margin:0;">
@@ -170,28 +171,41 @@
                         <label>تكلفة:</label>
                         <input type="number" id="maintCost1" value="0" oninput="calcTotals()">
                     </div>
-                    <div class="input-group" style="flex: 1.5; margin:0;">
+                    <div class="input-group" style="flex: 1.2; margin:0;">
                         <label>الصنايعي:</label>
                         <select id="technician1" onchange="localStorage.setItem('savedTech1', this.value)">
-                            <option value="احمد يسري">احمد يسري</option>
-                            <option value="محمود شوقي">محمود شوقي</option>
+                            <option value="إيراد عام">إيراد عام</option>
+                            <option value="المحل">المحل</option>
                             <option value="عمر ياسر">عمر ياسر</option>
                             <option value="عمر كيلاني">عمر كيلاني</option>
                             <option value="ادم">ادم</option>
+                            <option value="مصروفات">مصروفات</option>
+                            <option value="اكونتات">اكونتات</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="flex: 1.2; margin:0;">
+                        <label>الدفع:</label>
+                        <select id="payMethod1" onchange="localStorage.setItem('savedPay1', this.value)">
+                            <option value="كاش">كاش</option>
+                            <option value="فودافون كاش">فودافون كاش</option>
+                            <option value="انستا باي">انستا باي</option>
+                            <option value="فيزا">فيزا</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- العملية 2 -->
-                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                    <div class="input-group" style="flex: 1.5; margin:0;">
-                        <label>نوع العملية:</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
+                    <div class="input-group" style="flex: 1.2; margin:0;">
+                        <label>العملية:</label>
                         <select id="opType2">
                             <option value="صيانه">صيانه</option>
                             <option value="اكونتات">اكونتات</option>
                             <option value="داتا">داتا</option>
-                            <option value="مصروفات">مصروفات</option>
                             <option value="اكسسوارات">اكسسوارات</option>
+                            <option value="مصروفات">مصروفات</option>
+                            <option value="مسحوبات">مسحوبات</option>
+                            <option value="مرتجع">مرتجع</option>
                         </select>
                     </div>
                     <div class="input-group" style="flex: 1; margin:0;">
@@ -202,14 +216,70 @@
                         <label>تكلفة:</label>
                         <input type="number" id="maintCost2" value="0" oninput="calcTotals()">
                     </div>
-                    <div class="input-group" style="flex: 1.5; margin:0;">
+                    <div class="input-group" style="flex: 1.2; margin:0;">
                         <label>الصنايعي:</label>
                         <select id="technician2" onchange="localStorage.setItem('savedTech2', this.value)">
-                            <option value="احمد يسري">احمد يسري</option>
-                            <option value="محمود شوقي">محمود شوقي</option>
+                            <option value="إيراد عام">إيراد عام</option>
+                            <option value="المحل">المحل</option>
                             <option value="عمر ياسر">عمر ياسر</option>
                             <option value="عمر كيلاني">عمر كيلاني</option>
                             <option value="ادم">ادم</option>
+                            <option value="مصروفات">مصروفات</option>
+                            <option value="اكونتات">اكونتات</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="flex: 1.2; margin:0;">
+                        <label>الدفع:</label>
+                        <select id="payMethod2" onchange="localStorage.setItem('savedPay2', this.value)">
+                            <option value="كاش">كاش</option>
+                            <option value="فودافون كاش">فودافون كاش</option>
+                            <option value="انستا باي">انستا باي</option>
+                            <option value="فيزا">فيزا</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- العملية 3 -->
+                <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
+                    <div class="input-group" style="flex: 1.2; margin:0;">
+                        <label>العملية:</label>
+                        <select id="opType3">
+                            <option value="صيانه">صيانه</option>
+                            <option value="اكونتات">اكونتات</option>
+                            <option value="داتا">داتا</option>
+                            <option value="اكسسوارات">اكسسوارات</option>
+                            <option value="مصروفات">مصروفات</option>
+                            <option value="مسحوبات">مسحوبات</option>
+                            <option value="مرتجع">مرتجع</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="flex: 1; margin:0;">
+                        <label>إيراد:</label>
+                        <input type="number" id="maintRev3" value="0" oninput="calcTotals()">
+                    </div>
+                    <div class="input-group" style="flex: 1; margin:0;">
+                        <label>تكلفة:</label>
+                        <input type="number" id="maintCost3" value="0" oninput="calcTotals()">
+                    </div>
+                    <div class="input-group" style="flex: 1.2; margin:0;">
+                        <label>الصنايعي:</label>
+                        <select id="technician3" onchange="localStorage.setItem('savedTech3', this.value)">
+                            <option value="إيراد عام">إيراد عام</option>
+                            <option value="المحل">المحل</option>
+                            <option value="عمر ياسر">عمر ياسر</option>
+                            <option value="عمر كيلاني">عمر كيلاني</option>
+                            <option value="ادم">ادم</option>
+                            <option value="مصروفات">مصروفات</option>
+                            <option value="اكونتات">اكونتات</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="flex: 1.2; margin:0;">
+                        <label>الدفع:</label>
+                        <select id="payMethod3" onchange="localStorage.setItem('savedPay3', this.value)">
+                            <option value="كاش">كاش</option>
+                            <option value="فودافون كاش">فودافون كاش</option>
+                            <option value="انستا باي">انستا باي</option>
+                            <option value="فيزا">فيزا</option>
                         </select>
                     </div>
                 </div>
@@ -230,7 +300,7 @@
                 <div style="color:gray; font-size:12px;">جاري تحميل كروت الموظفين...</div>
             </div>
 
-            <!-- قسم المبيعات والإكسسوارات (Dropdowns) -->
+            <!-- قسم المبيعات والإكسسوارات -->
             <h4 style="margin: 0 0 10px; color: var(--pri);">🛒 إضافة إكسسوارات / بضاعة:</h4>
             <div style="display:flex; gap:5px; margin-bottom: 10px;">
                 <select id="accSelect" style="flex:2; padding:8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:white;" onchange="updateAccPrice()">
@@ -296,7 +366,6 @@
         nextWeek.setDate(today.getDate() + 7);
         const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
 
-        // تهيئة قائمة البضاعة المنسدلة
         const accSelect = document.getElementById('accSelect');
         accessoriesDB.forEach(item => {
             let opt = document.createElement('option');
@@ -312,14 +381,15 @@
         }
         updateAccPrice();
 
-        // تحميل البيانات الأولية واسترجاع الأسماء المحفوظة
         window.addEventListener('DOMContentLoaded', () => {
-            // استرجاع أسماء الصنايعية المحفوظة
-            let savedTech1 = localStorage.getItem('savedTech1');
-            if (savedTech1) document.getElementById('technician1').value = savedTech1;
-            
-            let savedTech2 = localStorage.getItem('savedTech2');
-            if (savedTech2) document.getElementById('technician2').value = savedTech2;
+            // استرجاع الخيارات المحفوظة للصفوف الـ 3
+            for(let i=1; i<=3; i++) {
+                let savedTech = localStorage.getItem('savedTech'+i);
+                if (savedTech) document.getElementById('technician'+i).value = savedTech;
+                
+                let savedPay = localStorage.getItem('savedPay'+i);
+                if (savedPay) document.getElementById('payMethod'+i).value = savedPay;
+            }
 
             fetch(GOOGLE_URL + '?action=getOngoing')
                 .then(res => res.json())
@@ -328,7 +398,6 @@
             loadAttendance();
         });
 
-        // دوال نظام الحضور والانصراف
         function loadAttendance() {
             fetch(GOOGLE_URL + '?action=getAttendance')
                 .then(res => res.json())
@@ -437,7 +506,7 @@
                             <div class="c-name">${order.name}</div>
                             <div class="c-details">${order.details || 'صيانة'}</div>
                         </div>
-                        <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ تم التسليم</button>
+                        <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ إنهاء العمليه</button>
                     </div>
                 `;
             });
@@ -507,7 +576,8 @@
         function calcTotals() {
             let mRev1 = parseFloat(document.getElementById('maintRev1').value) || 0;
             let mRev2 = parseFloat(document.getElementById('maintRev2').value) || 0;
-            let totalMaintRev = mRev1 + mRev2;
+            let mRev3 = parseFloat(document.getElementById('maintRev3').value) || 0;
+            let totalMaintRev = mRev1 + mRev2 + mRev3;
 
             let gRev = 0; posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
             
@@ -581,16 +651,19 @@
         async function processCheckout(sendWA) {
             let parsed = parseNamePhone();
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
+            
+            let detailsTxt = document.getElementById('cDetails').value.trim();
 
             let operations = [];
-            for (let i = 1; i <= 2; i++) {
+            for (let i = 1; i <= 3; i++) {
                 let opType = document.getElementById('opType'+i).value;
                 let r = parseFloat(document.getElementById('maintRev'+i).value) || 0;
                 let c = parseFloat(document.getElementById('maintCost'+i).value) || 0;
                 let t = document.getElementById('technician'+i).value;
+                let p = document.getElementById('payMethod'+i).value;
                 
                 if (r > 0 || c > 0) { 
-                    operations.push({ rev: r, cost: c, tech: t, type: opType }); 
+                    operations.push({ rev: r, cost: c, tech: t, type: opType, payMethod: p }); 
                 }
             }
 
@@ -603,14 +676,13 @@
             });
 
             if(operations.length === 0 && posCart.length > 0) {
-                // دمج نوع العملية (اكسسوارات) لو الأوردر عبارة عن اكسسوارات بس
-                operations.push({ rev: 0, cost: 0, tech: document.getElementById('technician1').value, type: "اكسسوارات" });
+                operations.push({ rev: 0, cost: 0, tech: document.getElementById('technician1').value, type: "اكسسوارات", payMethod: document.getElementById('payMethod1').value });
             }
 
             let totalMaintRev = operations.reduce((sum, op) => sum + op.rev, 0);
             let totalFinal = totalMaintRev + gRev;
 
-            if(operations.length === 0 && posCart.length === 0 && !document.getElementById('cDetails').value) {
+            if(operations.length === 0 && posCart.length === 0 && !detailsTxt) {
                 return alert("الفاتورة فارغة!");
             }
 
@@ -624,21 +696,28 @@
                     let isFirstRow = (i === 0);
                     let currentOrderId = orderIdStr + (operations.length > 1 ? `-${i+1}` : ''); 
                     
-                    // هنا بيتم دمج (الاسم / نوع العملية)
-                    let combinedName = parsed.name + " / " + operations[i].type;
+                    // دمج الاسم والرقم في خلية
+                    let combinedNamePhone = parsed.name + " " + parsed.phone;
+                    
+                    // دمج نوع العملية والوصف في خلية
+                    let typeAndDetails = operations[i].type;
+                    if (detailsTxt) {
+                        typeAndDetails += " / " + detailsTxt;
+                    }
                     
                     let payload = {
                         systemType: "Maintenance", 
                         orderId: currentOrderId, 
-                        name: combinedName, 
-                        phone: parsed.phone, 
+                        namePhone: combinedNamePhone, 
+                        typeDetails: typeAndDetails, 
                         technician: operations[i].tech,
                         maintRevenue: operations[i].rev, 
                         maintCost: operations[i].cost, 
                         goodsRevenue: isFirstRow ? gRev : 0, 
                         goodsCost: isFirstRow ? gCost : 0,
                         purchasesDetails: isFirstRow ? (gTxt || "لا يوجد") : "تابع لنفس الأوردر", 
-                        purchasedItems: isFirstRow ? itemsForInventory : []
+                        purchasedItems: isFirstRow ? itemsForInventory : [],
+                        paymentMethod: operations[i].payMethod
                     };
                     await sendToGoogle(payload);
                 }
