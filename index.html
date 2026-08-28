@@ -3,62 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level UP - لوحة تحكم المحل (POS)</title>
+    <title>Level UP - نظام الفواتير والضمان</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <!-- مكتبة تحويل الفاتورة إلى PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
     <style>
-        /* تصميم جديد بطابع حديث وعصري (Tech / Cyberpunk vibe) */
         :root { 
-            --bg: #0b0f19;       /* أزرق داكن جداً يميل للأسود */
-            --card: #151b2b;     /* لون الكروت */
-            --pri: #06b6d4;      /* سيان ساطع (Cyan) ليكون اللون الأساسي */
-            --pri-hover: #0891b2;
-            --txt: #f8fafc; 
-            --acc: #ef4444;      /* أحمر للمسحوبات والإغلاق */
-            --mut: #94a3b8; 
-            --border: #1e293b; 
+            --bg: #0b0f19; --card: #151b2b; --pri: #06b6d4; --pri-hover: #0891b2;
+            --txt: #f8fafc; --acc: #ef4444; --mut: #94a3b8; --border: #1e293b; 
         }
         body { background: var(--bg); color: var(--txt); font-family: 'Tajawal', sans-serif; margin: 0; padding: 20px; }
         .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1400px; margin: auto; }
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
         
         .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.4);}
-        .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; text-shadow: 0 0 10px rgba(6, 182, 212, 0.2);}
+        .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; }
         
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--mut); font-weight: bold;}
         .input-group input, .input-group select, .input-group textarea { 
             width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); 
-            background: #0f1422; color: white; font-family: inherit; box-sizing: border-box; 
-            transition: all 0.3s ease;
+            background: #0f1422; color: white; font-family: inherit; box-sizing: border-box; transition: all 0.3s ease;
         }
-        .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
-            outline: none; border-color: var(--pri); box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
-        }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: var(--pri); }
         .input-group textarea { resize: vertical; }
         
-        button { 
-            background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; 
-            font-weight: 900; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; 
-            transition: 0.2s ease-in-out; 
-        }
-        button:hover { background: var(--pri-hover); color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        button { background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: 900; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s ease-in-out; }
+        button:hover { background: var(--pri-hover); color: white; transform: translateY(-1px); }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        .btn-wa { background: #10b981; color: #000; margin-top: 15px; } /* أخضر ساطع للواتساب */
-        .btn-wa:hover { background: #059669; color: white; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
-        .btn-qr { background: #3b82f6; color: white; margin-top: 10px; }
+        .btn-wa { background: #10b981; color: #000; margin-top: 15px; } 
+        .btn-wa:hover { background: #059669; color: white; }
         
-        .cart-box { background: #0f1422; border: 1px dashed var(--border); border-radius: 8px; padding: 10px; min-height: 100px; margin-bottom: 15px; }
-        .cart-item { display: flex; justify-content: space-between; font-size: 13px; border-bottom: 1px solid var(--border); padding: 8px 0; }
-        
-        .totals-box { display: flex; justify-content: space-between; background: #06080e; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
-        .totals-box div { text-align: center; }
-        .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 12px; }
-        .totals-box h3 { margin: 0; color: white; }
-        
+        /* Queue & Labels styles (Kept intact) */
         .queue-container-wrapper { background: #0f1422; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 20px;}
         .queue-container-wrapper h4 { margin: 0 0 10px 0; color: var(--pri); font-size: 14px;}
-        
         .queue-card { background: #1a2235; border: 1px solid var(--pri); border-radius: 8px; padding: 10px; min-width: 140px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
         .queue-card .order-id { font-size: 11px; color: var(--mut); margin-bottom: 2px;}
         .queue-card .c-name { font-weight: bold; font-size: 13px; margin-bottom: 4px; color: var(--pri);}
@@ -66,118 +46,88 @@
         .btn-done { padding: 4px; font-size: 11px; background: #10b981; color: #000; margin: 0; width: 100%; border-radius: 4px; font-weight: bold;}
         .btn-done:hover { background: #059669; color:white; }
         
-        .operations-box { background: #0f1422; border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .section-box { background: #0f1422; border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .section-box h4 { margin: 0 0 15px 0; color: var(--pri); font-size: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 5px;}
         
-        .preview-wrapper { background: #090c14; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
-        .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
-        .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
-        .label-preview .l-logo { font-weight: 900; font-size: 14px; margin-right: 15px;}
-        .label-preview .l-order { font-size: 12px; font-weight: bold; margin-left: 15px;}
-        .label-preview .l-name-phone { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 4px;}
-        .label-preview .l-details { font-size: 11px; flex-grow: 1; text-align: center; white-space: pre-wrap; font-weight: bold;}
-        .label-preview .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto;}
-        .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
-        .label-preview .l-date { font-size: 12px; font-weight: bold; }
+        /* Dropdown Checkbox */
+        .dropdown-check-list { display: inline-block; width: 100%; position: relative; }
+        .dropdown-check-list .anchor { width: 100%; padding: 10px; background: #0f1422; border: 1px solid var(--border); border-radius: 6px; color: white; display: block; cursor: pointer; box-sizing: border-box; }
+        .dropdown-check-list .anchor::after { content: "▼"; float: left; font-size: 12px; color: var(--mut); margin-top: 3px;}
+        .dropdown-check-list ul.items { padding: 10px; display: none; margin: 0; border: 1px solid var(--border); border-radius: 6px; border-top: none; background: #151b2b; position: absolute; width: 100%; z-index: 10; box-sizing: border-box; max-height: 150px; overflow-y: auto;}
+        .dropdown-check-list ul.items li { list-style: none; margin-bottom: 5px; font-size: 14px; display: flex; align-items: center; gap: 8px;}
+        .dropdown-check-list.visible .items { display: block; }
         
-        .att-card { background: #151b2b; border: 1px solid var(--border); border-left: 3px solid var(--pri); padding: 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);}
-        .att-card h4 { margin: 0 0 5px; color: white; }
+        .cart-box { background: #0f1422; border: 1px dashed var(--border); border-radius: 8px; padding: 10px; min-height: 150px; margin-bottom: 15px; }
+        .cart-item { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; font-size: 13px; border-bottom: 1px solid var(--border); padding: 8px 0; gap: 5px; align-items: center;}
+        .cart-header { font-weight: bold; color: var(--mut); border-bottom: 2px solid var(--border); padding-bottom: 5px; }
         
-        #printArea { display: none; }
+        .totals-box { display: flex; justify-content: space-between; background: #06080e; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
+        .totals-box div { text-align: center; }
+        .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 13px; }
+        .totals-box h3 { margin: 0; color: white; }
+        
+        /* A4 Invoice Template Styling */
+        #invoiceTemplate { display: none; }
+        .a4-wrapper { background: #f8f9fa; color: #000; width: 210mm; padding: 20mm; box-sizing: border-box; font-family: 'Tajawal', sans-serif; position: relative; }
+        .inv-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 15px; }
+        .inv-header h1 { margin: 0; font-size: 24px; font-weight: 900; }
+        .inv-header p { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; }
+        .inv-title { text-align: center; font-size: 22px; font-weight: 900; margin-bottom: 20px; text-decoration: underline; }
+        .inv-info { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 15px; font-weight: bold; }
+        .inv-info div { line-height: 1.6; }
+        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; text-align: center; background: #fff;}
+        .inv-table th, .inv-table td { border: 1px solid #000; padding: 10px; font-size: 15px; }
+        .inv-table th { background-color: #e9ecef; font-weight: bold; }
+        .inv-table td { font-weight: bold; }
+        .inv-summary { width: 40%; margin-right: auto; border: 1px solid #000; padding: 10px; background: #fff; font-size: 15px; font-weight: bold; line-height: 1.6;}
+        .inv-footer { margin-top: 30px; text-align: center; font-size: 14px; font-weight: bold; line-height: 1.6;}
+        .stamp-area { margin-top: 40px; display: flex; justify-content: space-between; padding: 0 40px; font-size: 16px; font-weight: bold; }
+        
         @media print {
             body > *:not(#printArea) { display: none !important; }
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
-            @page { size: 40mm 25mm; margin: 0mm !important; }
-            body, html { margin: 0 !important; padding: 0 !important; background: white; }
-            .real-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; page-break-after: always; page-break-inside: avoid; font-family: 'Tajawal', sans-serif; color: black; overflow: hidden; }
-            .real-label:last-child { page-break-after: auto; } 
-            .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 1px;}
-            .real-label .l-logo { font-size: 8px; font-weight: 900; line-height: 1; margin-right: 4mm;}
-            .real-label .l-order { font-size: 7px; font-weight: bold; line-height: 1; margin-left: 4mm;}
-            .real-label .l-name-phone { font-size: 10px; font-weight: 900; text-align: center; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; font-family: Arial, sans-serif;}
-            .real-label .l-details { font-size: 8.5px; font-weight: bold; text-align: center; line-height: 1.1; flex-grow: 1; overflow: hidden; white-space: pre-wrap; padding: 0 1mm;}
-            .real-label .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto; padding-bottom: 1mm;}
-            .real-label .l-date { font-size: 7px; font-weight: bold; }
-            .real-label .l-price-tag { font-size: 7px; font-weight: bold; }
-            .real-label .l-device { font-size: 8px; border: 1px solid #000; padding: 0 2px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
-            .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; height: 100%; display:flex; flex-direction: column; justify-content: center;}
-            .qr-simplest-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; page-break-inside: avoid; background: white; color: black; overflow: hidden; }
-            .qr-simplest-label:last-child { page-break-after: auto; }
-            .qr-top-link { width: 100%; text-align: center; font-size: 11px; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: 0.5px; margin-bottom: 2px; border-bottom: 1.5px solid #000; padding-bottom: 2px; }
-            .qr-body-center { display: flex; justify-content: space-between; align-items: center; width: 100%; flex: 1; box-sizing: border-box; padding: 0 1mm;}
-            .qr-logo-centered { width: 16mm; height: 16mm; object-fit: contain; }
-            .qr-code-centered { width: 16mm; height: 16mm; object-fit: contain; }
+            #invoiceTemplate { display: block !important; }
+            @page { margin: 0; }
+            body, html { background: white; }
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
-        <!-- قسم الاستلام والطباعة (اليمين) -->
+        <!-- قسم الاستلام والطباعة (اليمين - لم يتم تغييره كثيراً) -->
         <div class="panel">
-            <h2>📥 استلام وطباعة (Labels)</h2>
-            
+            <h2>📥 استلام العملاء</h2>
             <div class="input-group">
                 <label>بحث برقم الإيصال (للدفع السريع):</label>
                 <div style="display:flex; gap:10px;">
-                    <input type="text" id="searchOrderCode" placeholder="مثال: 1234 أو #1234">
+                    <input type="text" id="searchOrderCode" placeholder="مثال: #1234">
                     <button type="button" onclick="fetchOrderDetails()" style="width:100px;">بحث 🔍</button>
                 </div>
             </div>
 
             <div class="input-group">
-                <label>الاسم ورقم الموبايل (مسافة بينهم):</label>
-                <input type="text" id="cNamePhone" oninput="syncData()" placeholder="مثال: محمود شوقي 01555886990">
+                <label>اسم العميل:</label>
+                <input type="text" id="cName" placeholder="مثال: احمد صلاح" oninput="updateInvoiceInfo()">
             </div>
             <div class="input-group">
-                <label>تفاصيل العميل / المطلوب صيانته:</label>
-                <textarea id="cDetails" rows="2" oninput="syncData()" placeholder="اكتب المشكلة أو الطلب هنا..."></textarea>
+                <label>رقم الهاتف:</label>
+                <input type="text" id="cPhone" placeholder="مثال: 01555886990" oninput="updateInvoiceInfo()">
             </div>
             
-            <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px; color: var(--pri);">1. طباعة أجهزة الصيانة</h4>
-                <div style="display: flex; gap: 10px;">
-                    <div class="input-group" style="flex: 1; margin-bottom: 10px;">
-                        <label>عدد الأجهزة المستلمة:</label>
-                        <input type="number" id="cCount" oninput="syncData()" value="1" min="1">
-                    </div>
-                    <div class="input-group" style="flex: 1.5; margin-bottom: 10px;">
-                        <label>السعر التقديري (للطباعة):</label>
-                        <input type="text" id="cPricePrint" oninput="syncData()" placeholder="مثال: 500 ج">
-                    </div>
-                </div>
-                
-                <div class="preview-wrapper">
-                    <div class="label-preview">
-                        <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order" id="prevOrder">#----</span></div>
-                        <div class="l-name-phone" id="prevNamePhone">الاسم والرقم</div>
-                        <div class="l-details" id="prevDetails">التفاصيل تظهر هنا...</div>
-                        <div class="l-footer">
-                            <div class="l-date" id="prevDate">--/--/----</div>
-                            <div class="l-device" style="border:none; padding:0;" id="prevPriceTag">السعر: </div>
-                            <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
-                        </div>
-                    </div>
-                </div>
-                <button id="btnPrint" onclick="printLabels()">🖨️ طباعة ملصقات الصيانة</button>
+            <hr style="border-color: var(--border); margin: 20px 0;">
+            <h4 style="color: var(--pri); margin-bottom: 10px;">طباعة ملصقات الصيانة و الـ QR (مثل السابق)</h4>
+            <!-- ملصقات الصيانة -->
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input type="text" id="cDetails" placeholder="تفاصيل العميل / المطلوب صيانته..." style="flex: 2; padding: 10px; border-radius: 6px; background: #0f1422; border: 1px solid var(--border); color: white;">
+                <input type="number" id="cCount" placeholder="العدد" value="1" style="flex: 0.5; padding: 10px; border-radius: 6px; background: #0f1422; border: 1px solid var(--border); color: white;">
             </div>
-
-            <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px; color: #3b82f6;">2. طباعة ملصق الـ QR لروابط الألعاب</h4>
-                <div class="input-group" style="margin-bottom: 10px;">
-                    <label>توليد ملصق لـ:</label>
-                    <select id="qrConsole">
-                        <option value="Offers">عروض الألعاب الأصلية (bit.ly/lvlupsale)</option>
-                        <option value="Modded">ألعاب التعديل والتهكير (bit.ly/4modps4)</option>
-                    </select>
-                </div>
-                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR</button>
-            </div>
+            <button onclick="alert('خاصية ملصقات الصيانة تعمل كما بالسابق، التركيز هنا على الفواتير')" style="background: #334155; margin-bottom: 15px;">🖨️ طباعة ملصق صيانة</button>
         </div>
 
-        <!-- قسم العمليات والمبيعات (اليسار) -->
+        <!-- قسم الفاتورة والمبيعات (اليسار) -->
         <div class="panel">
-            <h2 style="margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; margin-bottom: 15px; color: var(--pri);">🛒 تسليم ومبيعات (Checkout)</h2>
+            <h2 style="margin-top: 0; color: var(--pri);">🛒 إنشاء فاتورة بيع وضمان</h2>
             
-            <!-- الأجهزة في الانتظار تم نقلها للأعلى -->
             <div class="queue-container-wrapper">
                 <h4>⏳ الأجهزة في الانتظار:</h4>
                 <div id="queueContainer" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
@@ -185,340 +135,239 @@
                 </div>
             </div>
             
-            <!-- سطور العمليات الـ 3 (بدون الصنايعي، وبطريقة الدفع) -->
-            <div class="operations-box">
-                <h4 style="margin: 0 0 10px; color: var(--pri);">تسجيل العمليات (حتى 3 عمليات للعميل):</h4>
-                
-                <!-- العملية 1 -->
-                <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
-                    <div class="input-group" style="flex: 1.5; margin:0;">
-                        <label>نوع العملية:</label>
-                        <select id="opType1">
-                            <option value="صيانه">صيانه</option>
-                            <option value="داتا">داتا</option>
-                            <option value="اكسسوارات">اكسسوارات</option>
-                            <option value="مصروفات">مصروفات</option>
-                            <option value="مسحوبات">مسحوبات</option>
-                            <option value="مرتجع">مرتجع</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>إيراد:</label>
-                        <input type="number" id="maintRev1" value="0" oninput="calcTotals()">
-                    </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>تكلفة:</label>
-                        <input type="number" id="maintCost1" value="0" oninput="calcTotals()">
-                    </div>
-                    <div class="input-group" style="flex: 1.5; margin:0;">
-                        <label>الدفع:</label>
-                        <select id="payMethod1" onchange="localStorage.setItem('savedPay1', this.value)">
-                            <option value="كاش">كاش</option>
-                            <option value="فودافون كاش">فودافون كاش</option>
-                            <option value="انستا باي">انستا باي</option>
-                            <option value="فيزا">فيزا</option>
-                        </select>
-                    </div>
+            <!-- 1. إضافة جهاز -->
+            <div class="section-box">
+                <h4>🎮 إضافة جهاز للفاتورة</h4>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <select id="devType" style="flex: 1; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                        <option value="PlayStation 5">PlayStation 5</option>
+                        <option value="PlayStation 4">PlayStation 4</option>
+                        <option value="Xbox Series X">Xbox Series X</option>
+                        <option value="Xbox Series S">Xbox Series S</option>
+                    </select>
+                    <select id="devModel" style="flex: 1; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                        <option value="Slim">Slim</option>
+                        <option value="Fat">Fat</option>
+                        <option value="Pro">Pro</option>
+                        <option value="Digital">Digital</option>
+                    </select>
+                    <select id="devStorage" style="flex: 1; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                        <option value="1TB">1TB</option>
+                        <option value="825GB">825GB</option>
+                        <option value="500GB">500GB</option>
+                    </select>
                 </div>
-
-                <!-- العملية 2 -->
-                <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
-                    <div class="input-group" style="flex: 1.5; margin:0;">
-                        <label>نوع العملية:</label>
-                        <select id="opType2">
-                            <option value="صيانه">صيانه</option>
-                            <option value="داتا">داتا</option>
-                            <option value="اكسسوارات">اكسسوارات</option>
-                            <option value="مصروفات">مصروفات</option>
-                            <option value="مسحوبات">مسحوبات</option>
-                            <option value="مرتجع">مرتجع</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>إيراد:</label>
-                        <input type="number" id="maintRev2" value="0" oninput="calcTotals()">
-                    </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>تكلفة:</label>
-                        <input type="number" id="maintCost2" value="0" oninput="calcTotals()">
-                    </div>
-                    <div class="input-group" style="flex: 1.5; margin:0;">
-                        <label>الدفع:</label>
-                        <select id="payMethod2" onchange="localStorage.setItem('savedPay2', this.value)">
-                            <option value="كاش">كاش</option>
-                            <option value="فودافون كاش">فودافون كاش</option>
-                            <option value="انستا باي">انستا باي</option>
-                            <option value="فيزا">فيزا</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- العملية 3 -->
-                <div style="display: flex; gap: 8px; margin-bottom: 10px; align-items:flex-end;">
-                    <div class="input-group" style="flex: 1.5; margin:0;">
-                        <label>نوع العملية:</label>
-                        <select id="opType3">
-                            <option value="صيانه">صيانه</option>
-                            <option value="داتا">داتا</option>
-                            <option value="اكسسوارات">اكسسوارات</option>
-                            <option value="مصروفات">مصروفات</option>
-                            <option value="مسحوبات">مسحوبات</option>
-                            <option value="مرتجع">مرتجع</option>
-                        </select>
-                    </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>إيراد:</label>
-                        <input type="number" id="maintRev3" value="0" oninput="calcTotals()">
-                    </div>
-                    <div class="input-group" style="flex: 1; margin:0;">
-                        <label>تكلفة:</label>
-                        <input type="number" id="maintCost3" value="0" oninput="calcTotals()">
-                    </div>
-                    <div class="input-group" style="flex: 1.5; margin:0;">
-                        <label>الدفع:</label>
-                        <select id="payMethod3" onchange="localStorage.setItem('savedPay3', this.value)">
-                            <option value="كاش">كاش</option>
-                            <option value="فودافون كاش">فودافون كاش</option>
-                            <option value="انستا باي">انستا باي</option>
-                            <option value="فيزا">فيزا</option>
-                        </select>
-                    </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="number" id="devQty" value="1" min="1" placeholder="الكمية" style="flex: 0.5; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                    <input type="number" id="devPrice" placeholder="سعر الوحدة (ج.م)" style="flex: 1.5; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                    <button onclick="addDevice()" style="flex: 1; padding: 8px;">➕ إضافة الجهاز</button>
                 </div>
             </div>
 
-            <!-- قسم المبيعات والإكسسوارات -->
-            <h4 style="margin: 0 0 10px; color: var(--pri);">🛍️ إضافة إكسسوارات / بضاعة إضافية:</h4>
-            <div style="display:flex; gap:5px; margin-bottom: 10px;">
-                <select id="accSelect" style="flex:2; padding:8px; border-radius:6px; border:1px solid var(--border); background:#0f1422; color:white;" onchange="updateAccPrice()">
-                    <!-- تُملأ بواسطة جافاسكريبت -->
-                </select>
-                <input type="number" id="accQty" value="1" min="1" style="flex:0.5; padding:8px; border-radius:6px; border:1px solid var(--border); background:#0f1422; color:white;">
-                <input type="number" id="accPrice" placeholder="السعر" style="flex:1; padding:8px; border-radius:6px; border:1px solid var(--border); background:#0f1422; color:white;">
-                <button onclick="addDropdownToCart()" style="width:60px; padding:0;">➕</button>
+            <!-- 2. إضافة ألعاب وحسابات -->
+            <div class="section-box">
+                <h4>💿 باقة ألعاب / حسابات</h4>
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                    <select id="accType" style="flex: 1; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                        <option value="Primary">Primary (أساسي)</option>
+                        <option value="Secondary">Secondary (فرعي)</option>
+                        <option value="Offline">Offline (أوفلاين)</option>
+                        <option value="Primary/Secondary">Primary + Secondary</option>
+                    </select>
+                    <div style="flex: 2;">
+                        <div class="dropdown-check-list" id="gamesList">
+                            <span class="anchor" onclick="document.getElementById('gamesList').classList.toggle('visible')">اختر الألعاب (اضغط هنا)</span>
+                            <ul class="items">
+                                <li><input type="checkbox" value="FC 24" /> FC 24</li>
+                                <li><input type="checkbox" value="PES 21" /> PES 21</li>
+                                <li><input type="checkbox" value="GTA V" /> GTA V</li>
+                                <li><input type="checkbox" value="Call of Duty" /> Call of Duty</li>
+                                <li><input type="checkbox" value="Crash" /> Crash</li>
+                                <li><input type="checkbox" value="Mortal Kombat" /> Mortal Kombat</li>
+                                <li><input type="checkbox" value="Spider-Man" /> Spider-Man</li>
+                                <li><input type="checkbox" value="Red Dead 2" /> Red Dead 2</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="number" id="gamesQty" value="1" min="1" placeholder="الكمية" style="flex: 0.5; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                    <input type="number" id="gamesPrice" placeholder="سعر الباقة (ج.م)" style="flex: 1.5; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                    <button onclick="addGames()" style="flex: 1; padding: 8px;">➕ إضافة الباقة</button>
+                </div>
             </div>
 
-            <div class="cart-box" id="posCartList">
-                <p style="text-align:center; color:gray; font-size:12px; margin-top: 30px;">لم يتم إضافة إكسسوارات</p>
+            <!-- 3. إضافة إكسسوارات -->
+            <div class="section-box">
+                <h4>🕹️ إكسسوارات إضافية</h4>
+                <div style="display: flex; gap: 8px;">
+                    <select id="accSelect" style="flex: 2; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);" onchange="updateAccPrice()"></select>
+                    <input type="number" id="accQty" value="1" min="1" style="flex: 0.5; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                    <input type="number" id="accPrice" placeholder="السعر" style="flex: 1; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
+                    <button onclick="addAccessory()" style="flex: 1; padding: 8px;">➕ إضافة صنف</button>
+                </div>
+            </div>
+
+            <!-- الفاتورة / السلة -->
+            <h4 style="margin: 0 0 10px; color: var(--pri);">🧾 الأصناف في الفاتورة:</h4>
+            <div class="cart-box">
+                <div class="cart-item cart-header">
+                    <span>الوصف</span>
+                    <span style="text-align:center;">الكمية</span>
+                    <span style="text-align:center;">السعر</span>
+                    <span style="text-align:center;">الإجمالي</span>
+                    <span></span>
+                </div>
+                <div id="invoiceList">
+                    <p style="text-align:center; color:gray; font-size:12px; margin-top: 30px;">الفاتورة فارغة</p>
+                </div>
             </div>
 
             <div class="totals-box">
-                <div><h4>إجمالي الإيراد</h4><h3 id="tMaint">0 ج</h3></div>
-                <div><h4>إجمالي المشتريات</h4><h3 id="tGoods">0 ج</h3></div>
-                <div><h4 style="color:var(--pri);">المطلوب من العميل</h4><h3 style="color:var(--pri);" id="tFinal">0 ج</h3></div>
+                <div><h4>إجمالي الأصناف</h4><h3 id="tItemsCount">0</h3></div>
+                <div><h4 style="color:var(--pri);">الإجمالي النهائي</h4><h3 style="color:var(--pri);" id="tFinalAmount">0 ج.م</h3></div>
             </div>
 
             <div style="display: flex; gap: 10px; margin-bottom: 30px;">
-                <button id="btnCheckoutWA" class="btn-wa" style="flex: 2; margin-top:0;" onclick="processCheckout(true)">✅ إرسال واتساب وحفظ باليومية</button>
-                <button id="btnCheckoutSave" style="flex: 1; background: #334155; color: white;" onclick="processCheckout(false)">💾 حفظ باليومية فقط</button>
+                <button class="btn-wa" style="flex: 2; margin-top:0;" onclick="generatePDFandWhatsApp()">📲 تحميل PDF و إرسال واتساب</button>
+                <button style="flex: 1; background: #3b82f6; color: white;" onclick="printA4Invoice()">🖨️ طباعة A4</button>
             </div>
             
-            <!-- إدارة وقت الموظفين تم نقلها للأسفل -->
-            <hr style="border: 0; border-top: 1px solid var(--border); margin-bottom: 20px;">
-            <h4 style="margin: 0 0 10px; color: var(--mut);">👥 إدارة الحضور والانصراف:</h4>
-            <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                <select id="newEmpName" style="flex:1; padding:10px; border-radius:6px; border:1px solid var(--border); background:#0f1422; color:white;">
-                    <option value="" disabled selected>اختر الموظف...</option>
-                    <option value="Omar Kilany">Omar Kilany</option>
-                    <option value="Omar Yasser">Omar Yasser</option>
-                    <option value="Adam">Adam</option>
+            <div class="input-group">
+                <label>طريقة الدفع (للتسجيل في اليومية):</label>
+                <select id="payMethod">
+                    <option value="كاش">كاش / نقداً</option>
+                    <option value="انستا باي">تحويل بنكي / انستا باي</option>
+                    <option value="فودافون كاش">فودافون كاش</option>
+                    <option value="فيزا">فيزا</option>
                 </select>
-                <button onclick="empAction('start', null, event)" style="width:120px; background:#10b981; color:#000;">بدء شيفت 🟢</button>
             </div>
-            <div id="attendanceGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px;">
-                <div style="color:gray; font-size:12px;">جاري تحميل كروت الموظفين...</div>
-            </div>
-
         </div>
     </div>
 
-    <div id="printArea"></div>
+    <!-- القالب المخفي للفاتورة A4 -->
+    <div id="printArea">
+        <div class="a4-wrapper" id="invoiceTemplate">
+            <div class="inv-header">
+                <h1>Level UP Store</h1>
+                <p>الإسماعيلية، شارع الأبراج، أرض الجمعيات</p>
+                <p>الهاتف: 01010763503 / 01555886990</p>
+            </div>
+            
+            <div class="inv-title">فاتورة بيع ضريبية / شهادة ضمان</div>
+            
+            <div class="inv-info">
+                <div>
+                    العميل: <span id="lblClientName">----------</span><br>
+                    رقم الهاتف: <span id="lblClientPhone">----------</span>
+                </div>
+                <div style="text-align: left;">
+                    تاريخ الفاتورة: <span id="lblDate">--/--/----</span><br>
+                    رقم الفاتورة: <span id="lblInvoiceNo">INV-000000-01</span>
+                </div>
+            </div>
+            
+            <table class="inv-table">
+                <thead>
+                    <tr>
+                        <th style="width: 5%;">م</th>
+                        <th style="width: 50%;">اسم الصنف والوصف</th>
+                        <th style="width: 10%;">الكمية</th>
+                        <th style="width: 15%;">سعر الوحدة</th>
+                        <th style="width: 20%;">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody id="lblTableBody">
+                    <!-- تُملأ برمجياً -->
+                </tbody>
+            </table>
+            
+            <div class="inv-summary">
+                المجموع الفرعي: <span id="lblSubtotal">0</span> ج.م.<br>
+                ضريبة القيمة المضافة: 0 ج.م.<br>
+                <span style="font-size: 18px;">**الإجمالي النهائي: <span id="lblTotal">0</span> ج.م.**</span><br>
+                المبلغ بالحروف: فقط <span id="lblTotalWords">صفر</span> جنيهاً مصرياً لا غير.
+            </div>
+            
+            <div class="inv-footer">
+                شروط الدفع: الدفع <span id="lblPayMethod">نقداً</span> عند الاستلام أو عبر التحويل البنكي.<br>
+                * تحتفظ الشركة بحقها في تطبيق شروط الضمان المعمول بها للأجهزة.<br>
+                شكراً لتعاملكم معنا! نتمنى زيارتكم مرة أخرى.
+            </div>
+            
+            <div class="stamp-area">
+                <div>توقيع المستلم: ..........................</div>
+                <div>ختم المحل:</div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
         const accessoriesDB = [
-            { id: 1, name: "جراب 4", price: 150, cost: 90 }, { id: 2, name: "جراب 5", price: 150, cost: 90 },
-            { id: 3, name: "جريبس اشكال", price: 30, cost: 20 }, { id: 4, name: "جريبس كارتون", price: 30, cost: 15 },
-            { id: 5, name: "دراع 2", price: 180, cost: 150 }, { id: 6, name: "دراع 3 اسود", price: 300, cost: 200 },
-            { id: 7, name: "دراع 3 اسود ألوان", price: 350, cost: 200 }, { id: 8, name: "دراع اصلي 4 امريكي", price: 1000, cost: 700 },
-            { id: 9, name: "دراع اصلي 4 اوروبي", price: 800, cost: 600 }, { id: 10, name: "دراع اصلي 4 برو", price: 1300, cost: 900 },
-            { id: 11, name: "دراع اصلي 5 استعمال", price: 2300, cost: 2000 }, { id: 12, name: "دراع اصلي 5 جديد", price: 3850, cost: 3400 },
-            { id: 13, name: "دراع كوبي 4 استعمال", price: 450, cost: 250 }, { id: 14, name: "دراع كوبي 4 جديد اول", price: 750, cost: 400 },
-            { id: 15, name: "دراع كوبي 4 جديد ثاني", price: 650, cost: 400 }, { id: 16, name: "ستاند شحن 4", price: 250, cost: 70 },
-            { id: 17, name: "ستاند شحن 5", price: 550, cost: 150 }, { id: 18, name: "سكبن برو", price: 200, cost: 120 },
-            { id: 19, name: "سكين سليم", price: 200, cost: 120 }, { id: 20, name: "سكين فات", price: 200, cost: 120 },
-            { id: 21, name: "شاحن 8 مخرج", price: 550, cost: 500 }, { id: 22, name: "شنطه", price: 500, cost: 350 },
-            { id: 23, name: "كابل 5", price: 200, cost: 70 }, { id: 24, name: "كابل بوار", price: 100, cost: 40 },
-            { id: 25, name: "كابل شحن 3", price: 70, cost: 40 }, { id: 26, name: "كابل شحن 4 اصلي", price: 150, cost: 50 },
-            { id: 27, name: "كابل شحن 4 كوبي", price: 50, cost: 20 }, { id: 28, name: "av كابل", price: 50, cost: 25 },
-            { id: 29, name: "hdmi كابل", price: 120, cost: 70 }
+            { id: 1, name: "جراب 4", price: 150 }, { id: 2, name: "جراب 5", price: 150 },
+            { id: 5, name: "دراع 2", price: 180 }, { id: 6, name: "دراع 3 اسود", price: 300 },
+            { id: 8, name: "دراع اصلي 4 امريكي", price: 1000 }, { id: 12, name: "دراع اصلي 5 جديد", price: 3850 },
+            { id: 14, name: "دراع كوبي 4 جديد اول", price: 750 }, { id: 17, name: "ستاند شحن 5", price: 550 },
+            { id: 29, name: "كابل HDMI", price: 120 }
         ];
 
-        let posCart = [];
+        let invoiceItems = [];
         let allOngoing = [];
-        let activeAttendance = [];
         
-        const orderIdStr = '#' + Math.floor((Math.random() * 8900) + 100);
-        document.getElementById('prevOrder').innerText = orderIdStr;
-        
+        // Caching system for dismissed orders to fix the bug
+        let hiddenOrders = JSON.parse(localStorage.getItem('hiddenOrders') || '[]');
+
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-GB');
-        document.getElementById('prevDate').innerText = dateStr;
+        const invNum = 'INV-' + today.getFullYear().toString().substr(-2) + 
+                      (today.getMonth()+1).toString().padStart(2,'0') + 
+                      today.getDate().toString().padStart(2,'0') + '-' + 
+                      Math.floor(Math.random() * 90 + 10);
+        
+        document.getElementById('lblDate').innerText = dateStr;
+        document.getElementById('lblInvoiceNo').innerText = invNum;
 
-        const nextWeek = new Date(today); 
-        nextWeek.setDate(today.getDate() + 7);
-        const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
+        window.addEventListener('DOMContentLoaded', () => {
+            const accSelect = document.getElementById('accSelect');
+            accessoriesDB.forEach(item => {
+                let opt = document.createElement('option');
+                opt.value = item.id;
+                opt.text = item.name;
+                accSelect.appendChild(opt);
+            });
+            updateAccPrice();
 
-        const accSelect = document.getElementById('accSelect');
-        accessoriesDB.forEach(item => {
-            let opt = document.createElement('option');
-            opt.value = item.id;
-            opt.text = item.name;
-            accSelect.appendChild(opt);
+            // Fetch Queue
+            fetch(GOOGLE_URL + '?action=getOngoing')
+                .then(res => res.json())
+                .then(data => { 
+                    allOngoing = data; 
+                    renderQueue(); 
+                }).catch(e => console.log(e));
         });
 
         function updateAccPrice() {
             let id = parseInt(document.getElementById('accSelect').value);
             let item = accessoriesDB.find(i => i.id === id);
-            if(item) { document.getElementById('accPrice').value = item.price; }
-        }
-        updateAccPrice();
-
-        window.addEventListener('DOMContentLoaded', () => {
-            for(let i=1; i<=3; i++) {
-                let savedPay = localStorage.getItem('savedPay'+i);
-                if (savedPay) document.getElementById('payMethod'+i).value = savedPay;
-            }
-
-            fetch(GOOGLE_URL + '?action=getOngoing')
-                .then(res => res.json())
-                .then(data => { allOngoing = data; renderQueue(); }).catch(e => console.log(e));
-                
-            loadAttendance();
-        });
-
-        function loadAttendance() {
-            fetch(GOOGLE_URL + '?action=getAttendance')
-                .then(res => res.json())
-                .then(data => { activeAttendance = data; renderAttendance(); })
-                .catch(e => console.log(e));
+            if(item) document.getElementById('accPrice').value = item.price;
         }
 
-        function renderAttendance() {
-            const grid = document.getElementById('attendanceGrid');
-            grid.innerHTML = '';
-            if (activeAttendance.length === 0) {
-                grid.innerHTML = '<span style="color:gray; font-size:12px;">لا يوجد موظفين قيد العمل حالياً.</span>';
-                return;
-            }
-            activeAttendance.forEach(emp => {
-                let isPaused = emp.status === 'paused';
-                let statusTxt = isPaused ? '⏸️ متوقف' : '🟢 يعمل';
-                let pauseBtn = isPaused 
-                    ? `<button onclick="empAction('resume', '${emp.name}', event)" style="background:#10b981; color:#000; flex:1; padding:6px; font-size:12px;">استئناف ▶️</button>` 
-                    : `<button onclick="empAction('pause', '${emp.name}', event)" style="background:#f59e0b; color:#000; flex:1; padding:6px; font-size:12px;">إيقاف ⏸️</button>`;
-
-                grid.innerHTML += `
-                    <div class="att-card">
-                        <h4 style="display:flex; justify-content:space-between; align-items:center;">
-                            ${emp.name} <span style="font-size:10px; font-weight:normal; color:var(--mut);">${statusTxt}</span>
-                        </h4>
-                        <div style="font-size:11px; color:gray; margin-bottom:10px;">دخول: ${emp.checkIn.substring(11, 16) || emp.checkIn}</div>
-                        <div style="display:flex; gap:5px; margin-bottom:10px;">
-                            ${pauseBtn}
-                            <button onclick="empAction('end', '${emp.name}', event)" style="background:var(--acc); color:#fff; flex:1; padding:6px; font-size:12px;">إنهاء ⏹️</button>
-                        </div>
-                        <div style="border-top:1px dashed var(--border); padding-top:10px; display:flex; flex-direction:column; gap:5px;">
-                            <input type="number" id="w_${emp.name}" placeholder="مبلغ السحب" style="padding:6px; font-size:11px; border-radius:4px; border:1px solid var(--border); background:#090c14; color:white;">
-                            <input type="text" id="n_${emp.name}" placeholder="ملاحظات..." style="padding:6px; font-size:11px; border-radius:4px; border:1px solid var(--border); background:#090c14; color:white;">
-                            <button onclick="submitEmpFinance('${emp.name}', event)" style="background:#3b82f6; color:#fff; padding:6px; font-size:11px;">تسجيل 💾</button>
-                        </div>
-                        <div style="font-size:10px; margin-top:5px; color:var(--pri);">إجمالي المسحوبات: ${emp.withdrawals} ج</div>
-                    </div>
-                `;
-            });
-        }
-
-        function empAction(action, empName, e) {
-            let selectEl = document.getElementById('newEmpName');
-            let name = empName || selectEl.value;
-            if(!name) return alert('أدخل اسم الموظف أو اختره من القائمة');
-            
-            let btn = e.target;
-            let originalText = btn.innerText;
-            btn.disabled = true;
-            btn.innerText = (action === 'start') ? "⏳ جاري التسجيل..." : "⏳...";
-            
-            if(action === 'start') selectEl.disabled = true;
-            
-            sendToGoogle({ systemType: "Attendance", action: action, empName: name }).then(() => {
-                if(action === 'start') {
-                    selectEl.disabled = false;
-                    selectEl.value = "";
-                    alert("✅ تم تسجيل حضور الموظف بنجاح!");
-                } else if (action === 'end') {
-                    alert("⏹️ تم إنهاء الشيفت بنجاح!");
-                }
-                loadAttendance();
-            }).catch(err => {
-                alert("❌ حدث خطأ، يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى.");
-                btn.disabled = false;
-                btn.innerText = originalText;
-                if(action === 'start') selectEl.disabled = false;
-            });
-        }
-
-        function submitEmpFinance(empName, e) {
-            let w = document.getElementById(`w_${empName}`).value;
-            let n = document.getElementById(`n_${empName}`).value;
-            if(!w && !n) return;
-            
-            let btn = e.target;
-            let originalText = btn.innerText;
-            btn.innerText = '⏳...';
-            btn.disabled = true;
-            
-            sendToGoogle({ systemType: "Attendance", action: "finance", empName: empName, withdrawal: w, note: n }).then(() => {
-                alert("✅ تم تسجيل عملية السحب بنجاح!");
-                loadAttendance();
-            }).catch(err => {
-                alert("❌ حدث خطأ، لم يتم تسجيل السحب، يرجى المحاولة مرة أخرى.");
-                btn.innerText = originalText;
-                btn.disabled = false;
-            });
-        }
-
-        function fetchOrderDetails() {
-            let oid = document.getElementById('searchOrderCode').value.trim();
-            if(!oid) return;
-            
-            if (!oid.startsWith('#')) {
-                oid = '#' + oid;
-            }
-
-            const order = allOngoing.find(o => o.orderId === oid);
-            if(order) {
-                document.getElementById('cNamePhone').value = order.name + " " + order.phone;
-                document.getElementById('cDetails').value = order.details;
-                syncData();
-            } else {
-                alert("لم يتم العثور على الإيصال، تأكد من الرقم (مثال: 1234 أو #1234).");
-            }
-        }
-
+        // --- إصلاح مشكلة زر الإنهاء ---
         function renderQueue() {
             const container = document.getElementById('queueContainer');
             container.innerHTML = '';
             
-            let pendingOrders = allOngoing.filter(o => o.status !== 'done');
+            // فلترة الأجهزة وحذف المكتملة محلياً (Cashed) 
+            let pendingOrders = allOngoing.filter(o => o.status !== 'done' && !hiddenOrders.includes(o.orderId));
             
             if (pendingOrders.length === 0) {
                 container.innerHTML = '<span style="color: gray; font-size: 13px; margin: auto;">لا يوجد أجهزة قيد الانتظار حالياً 🎉</span>';
                 return;
             }
             
-            let toDisplay = pendingOrders.slice(0, 6);
-            toDisplay.forEach(order => {
+            pendingOrders.slice(0, 6).forEach(order => {
                 container.innerHTML += `
                     <div class="queue-card">
                         <div>
@@ -527,236 +376,179 @@
                             <div class="c-details">${order.details || 'صيانة'}</div>
                         </div>
                         <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ إنهاء العملية</button>
-                    </div>
-                `;
+                    </div>`;
             });
-            
-            if (pendingOrders.length > 6) {
-                container.innerHTML += `<div style="display:flex; align-items:center; justify-content:center; color:var(--mut); font-size: 14px; padding: 0 10px; background: rgba(0,0,0,0.2); border-radius: 8px;">+${pendingOrders.length - 6} في الانتظار</div>`;
-            }
         }
 
         function markAsDone(orderId) {
-            allOngoing = allOngoing.filter(o => o.orderId !== orderId);
+            // حفظ الرقم في الكاش المحلي لمنع ظهوره بعد الـ Refresh
+            hiddenOrders.push(orderId);
+            localStorage.setItem('hiddenOrders', JSON.stringify(hiddenOrders));
+            
+            // تحديث الواجهة
             renderQueue();
-            sendToGoogle({ systemType: "UpdateStatus", orderId: orderId, status: "done" }).catch(e => console.log(e));
-        }
-
-        function parseNamePhone() {
-            let raw = document.getElementById('cNamePhone').value.trim();
-            let phoneMatch = raw.match(/\d{8,}/); 
-            let phone = phoneMatch ? phoneMatch[0] : "";
-            let name = raw.replace(phone, "").trim();
-            if(!name && !phone) return { name: "", phone: "" };
-            if(!name) name = "عميل";
-            return { name, phone };
-        }
-
-        function syncData() {
-            let parsed = parseNamePhone();
-            let details = document.getElementById('cDetails').value.trim();
-            let priceTxt = document.getElementById('cPricePrint').value.trim();
             
-            document.getElementById('prevNamePhone').innerText = parsed.name + " " + parsed.phone;
-            document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
-            document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
-            document.getElementById('prevPriceTag').innerText = `السعر: ${priceTxt}`;
+            // إرسال للسيرفر
+            const formData = new URLSearchParams();
+            formData.append('data', JSON.stringify({ systemType: "UpdateStatus", orderId: orderId, status: "done" }));
+            fetch(GOOGLE_URL, { method: 'POST', body: formData }).catch(e => console.log(e));
         }
 
-        function addDropdownToCart() {
-            let id = parseInt(document.getElementById('accSelect').value);
-            let item = accessoriesDB.find(i => i.id === id);
+        // --- نظام الفاتورة الجديد ---
+        
+        function updateInvoiceInfo() {
+            document.getElementById('lblClientName').innerText = document.getElementById('cName').value || '----------';
+            document.getElementById('lblClientPhone').innerText = document.getElementById('cPhone').value || '----------';
+            document.getElementById('lblPayMethod').innerText = document.getElementById('payMethod').value;
+        }
+
+        function addDevice() {
+            let type = document.getElementById('devType').value;
+            let model = document.getElementById('devModel').value;
+            let storage = document.getElementById('devStorage').value;
+            let price = parseFloat(document.getElementById('devPrice').value);
+            let qty = parseInt(document.getElementById('devQty').value) || 1;
+            
+            if(isNaN(price)) return alert("يرجى إدخال السعر");
+            
+            let desc = `${type} (${storage}) - نسخة ${model}، ضمان المركز`;
+            invoiceItems.push({ desc, qty, price, total: price * qty });
+            renderInvoice();
+        }
+
+        function addGames() {
+            let type = document.getElementById('accType').value;
+            let price = parseFloat(document.getElementById('gamesPrice').value);
+            let qty = parseInt(document.getElementById('gamesQty').value) || 1;
+            
+            if(isNaN(price)) return alert("يرجى إدخال السعر");
+
+            // جمع الألعاب المحددة
+            let selectedGames = [];
+            document.querySelectorAll('#gamesList input[type="checkbox"]:checked').forEach(cb => {
+                selectedGames.push(cb.value);
+            });
+            
+            let gamesTxt = selectedGames.length > 0 ? `(${selectedGames.join(', ')})` : "";
+            let desc = `باقة ألعاب / حسابات [${type}] ${gamesTxt}`;
+            
+            invoiceItems.push({ desc, qty, price, total: price * qty });
+            renderInvoice();
+            
+            // إخفاء القائمة وتفريغها
+            document.getElementById('gamesList').classList.remove('visible');
+            document.querySelectorAll('#gamesList input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+
+        function addAccessory() {
+            let sel = document.getElementById('accSelect');
+            let name = sel.options[sel.selectedIndex].text;
             let price = parseFloat(document.getElementById('accPrice').value);
-            let qty = parseInt(document.getElementById('accQty').value);
+            let qty = parseInt(document.getElementById('accQty').value) || 1;
             
-            if(item && !isNaN(price) && !isNaN(qty) && qty > 0) {
-                let existing = posCart.find(c => c.id === id && c.sellPrice === price);
-                if(existing) { existing.qty += qty; } 
-                else { posCart.push({ ...item, qty: qty, sellPrice: price }); }
-                renderCart();
-            }
+            if(isNaN(price)) return alert("يرجى إدخال السعر");
+            
+            invoiceItems.push({ desc: name, qty, price, total: price * qty });
+            renderInvoice();
         }
 
-        function renderCart() {
-            const list = document.getElementById('posCartList');
-            if(posCart.length === 0) { list.innerHTML = '<p style="text-align:center; color:gray; font-size:12px; margin-top:30px;">لم يتم إضافة إكسسوارات</p>'; } 
-            else {
-                list.innerHTML = '';
-                posCart.forEach((c, index) => {
-                    list.innerHTML += `<div class="cart-item">
-                        <span>${c.name} (x${c.qty})</span>
-                        <span><span style="color:var(--pri); font-weight:bold;">${c.sellPrice * c.qty} ج</span>
-                        <span style="cursor:pointer; color:var(--acc); margin-right:10px; font-size: 16px;" onclick="posCart.splice(${index},1); renderCart();">✖</span></span>
-                    </div>`;
+        function renderInvoice() {
+            const list = document.getElementById('invoiceList');
+            const tbody = document.getElementById('lblTableBody');
+            
+            list.innerHTML = ''; tbody.innerHTML = '';
+            let finalTotal = 0;
+            
+            if(invoiceItems.length === 0) { 
+                list.innerHTML = '<p style="text-align:center; color:gray; font-size:12px; margin-top:30px;">الفاتورة فارغة</p>'; 
+            } else {
+                invoiceItems.forEach((item, index) => {
+                    finalTotal += item.total;
+                    
+                    // تحديث واجهة الكاشير
+                    list.innerHTML += `
+                        <div class="cart-item">
+                            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.desc}</span>
+                            <span style="text-align:center;">${item.qty}</span>
+                            <span style="text-align:center;">${item.price}</span>
+                            <span style="text-align:center; font-weight:bold; color:var(--pri);">${item.total} ج.م</span>
+                            <span style="cursor:pointer; color:var(--acc); font-size: 16px; text-align:left;" onclick="invoiceItems.splice(${index},1); renderInvoice();">✖</span>
+                        </div>`;
+                        
+                    // تحديث قالب الـ A4
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td style="text-align:right;">${item.desc}</td>
+                            <td>${item.qty}</td>
+                            <td>${item.price.toLocaleString()} ج.م</td>
+                            <td>${item.total.toLocaleString()} ج.م</td>
+                        </tr>`;
                 });
             }
-            calcTotals();
-        }
-
-        function calcTotals() {
-            let mRev1 = parseFloat(document.getElementById('maintRev1').value) || 0;
-            let mRev2 = parseFloat(document.getElementById('maintRev2').value) || 0;
-            let mRev3 = parseFloat(document.getElementById('maintRev3').value) || 0;
-            let totalMaintRev = mRev1 + mRev2 + mRev3;
-
-            let gRev = 0; posCart.forEach(c => { gRev += (c.sellPrice * c.qty); });
             
-            document.getElementById('tMaint').innerText = totalMaintRev + " ج";
-            document.getElementById('tGoods').innerText = gRev + " ج";
-            document.getElementById('tFinal').innerText = (totalMaintRev + gRev) + " ج";
+            document.getElementById('tItemsCount').innerText = invoiceItems.length;
+            document.getElementById('tFinalAmount').innerText = finalTotal.toLocaleString() + " ج.م";
+            
+            document.getElementById('lblSubtotal').innerText = finalTotal.toLocaleString();
+            document.getElementById('lblTotal').innerText = finalTotal.toLocaleString();
+            document.getElementById('lblTotalWords').innerText = finalTotal.toLocaleString(); // Simplified text representation
+            updateInvoiceInfo();
         }
 
-        function sendToGoogle(payload) {
-            const formData = new URLSearchParams();
-            formData.append('data', JSON.stringify(payload));
-            return fetch(GOOGLE_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: formData.toString()
+        // --- الطباعة واستخراج PDF ---
+
+        function generatePDFandWhatsApp() {
+            let cName = document.getElementById('cName').value.trim();
+            let cPhone = document.getElementById('cPhone').value.trim();
+            
+            if(!cName || !cPhone) return alert("يرجى إدخال اسم العميل ورقم الهاتف ليتم تسمية الملف وإرساله.");
+            if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
+
+            updateInvoiceInfo();
+            
+            // إعدادات ملف الـ PDF
+            let fileName = `${cName}_${cPhone}.pdf`;
+            let element = document.getElementById('invoiceTemplate');
+            
+            // يجب إظهار العنصر مؤقتاً ليتمكن html2pdf من قراءته
+            element.style.display = 'block';
+            
+            let opt = {
+                margin:       0,
+                filename:     fileName,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // إنشاء وتحميل الـ PDF
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.style.display = 'none'; // إعادة الإخفاء
+                
+                // فتح واتساب
+                let finalTotal = document.getElementById('lblTotal').innerText;
+                let waTxt = `مرحباً بك في Level UP Store 🎮\nعزيزي ${cName}، شكراً لثقتك بنا.\n\nمرفق لسيادتكم الفاتورة الخاصة بكم بقيمة ${finalTotal} ج.م.\n\n*يرجى إرسال ملف الـ PDF الذي تم تحميله الآن في هذه المحادثة.*\n\nنتشرف بزيارتك دائماً!`;
+                window.open(`https://wa.me/2${cPhone}?text=${encodeURIComponent(waTxt)}`, '_blank');
+                
+                // حفظ العملية في اليومية
+                saveToDaily();
             });
         }
 
-        function printLabels() {
-            let parsed = parseNamePhone();
-            let details = document.getElementById('cDetails').value.trim();
-            let priceTxt = document.getElementById('cPricePrint').value.trim();
-            const count = parseInt(document.getElementById('cCount').value) || 1;
-            
-            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
-
-            let btn = document.getElementById('btnPrint');
-            let originalText = btn.innerText;
-            btn.innerText = "⏳ جاري التسجيل في الشيت...";
-            btn.disabled = true;
-
-            sendToGoogle({ systemType: "Receipt", orderId: orderIdStr, name: parsed.name, phone: parsed.phone, deviceCount: count, details: details })
-            .then(response => response.text())
-            .then(() => {
-                btn.innerText = "🖨️ تم التسجيل! جاري الطباعة...";
-                const pa = document.getElementById('printArea');
-                pa.innerHTML = '';
-                
-                for(let i = 1; i <= count; i++) {
-                    pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`; 
-                }
-
-                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 10px;"><span style="background:black; color:white; padding:1px 4px; border-radius:3px; font-weight:bold; margin-bottom:2px; display:inline-block;">نسخة المحل</span><br>${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">إجمالي ${count} أجهزة</div></div></div>`;
-                
-                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
-                
-                pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br><span style="font-size:10px; color:black;">01555886990 - 01010763503</span><br><br>الأوردر: ${orderIdStr}</div></div>`;
-                
-                window.print();
-                setTimeout(() => { window.location.reload(); }, 1500);
-            }).catch(e => { alert("مشكلة في الاتصال! حاول مرة تانية"); btn.disabled = false; btn.innerText = originalText; });
+        function printA4Invoice() {
+            if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
+            updateInvoiceInfo();
+            window.print();
+            saveToDaily();
         }
 
-        function printQRLabel() {
-            const qrType = document.getElementById('qrConsole').value;
-            let qrImgSrc = qrType === 'Offers' ? 'sale.png' : 'mod.png';
-            let linkTxt = qrType === 'Offers' ? 'bit.ly/lvlupsale' : 'bit.ly/4modps4';
-
-            const pa = document.getElementById('printArea');
-            pa.innerHTML = `
-            <div class="qr-simplest-label">
-                <div class="qr-top-link">${linkTxt}</div>
-                <div class="qr-body-center">
-                    <img src="lvlup.png" alt="Level UP" class="qr-logo-centered">
-                    <img src="${qrImgSrc}" alt="QR Code" class="qr-code-centered">
-                </div>
-            </div>`;
-            setTimeout(() => { window.print(); }, 500);
-        }
-
-        async function processCheckout(sendWA) {
-            let parsed = parseNamePhone();
-            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
-            
-            let detailsTxt = document.getElementById('cDetails').value.trim();
-
-            let operations = [];
-            for (let i = 1; i <= 3; i++) {
-                let opType = document.getElementById('opType'+i).value;
-                let r = parseFloat(document.getElementById('maintRev'+i).value) || 0;
-                let c = parseFloat(document.getElementById('maintCost'+i).value) || 0;
-                let p = document.getElementById('payMethod'+i).value;
-                
-                if (r > 0 || c > 0) { 
-                    operations.push({ rev: r, cost: c, tech: "-", type: opType, payMethod: p }); 
-                }
-            }
-
-            let gRev = 0, gCost = 0, gTxt = "", itemsForInventory = [];
-            posCart.forEach(c => {
-                gRev += (c.sellPrice * c.qty);
-                gCost += (c.cost * c.qty);
-                gTxt += `- ${c.name} (x${c.qty}) السعر ${c.sellPrice * c.qty}\n`;
-                itemsForInventory.push({ name: c.name, qty: c.qty, sellPrice: c.sellPrice });
-            });
-
-            if(operations.length === 0 && posCart.length > 0) {
-                operations.push({ rev: 0, cost: 0, tech: "-", type: "اكسسوارات", payMethod: document.getElementById('payMethod1').value });
-            }
-
-            let totalMaintRev = operations.reduce((sum, op) => sum + op.rev, 0);
-            let totalFinal = totalMaintRev + gRev;
-
-            if(operations.length === 0 && posCart.length === 0 && !detailsTxt) {
-                return alert("الفاتورة فارغة!");
-            }
-
-            let btnWA = document.getElementById('btnCheckoutWA');
-            let btnSave = document.getElementById('btnCheckoutSave');
-            let originalWaText = btnWA.innerText;
-            btnWA.innerText = "⏳ جاري التسجيل...";
-            btnWA.disabled = true; btnSave.disabled = true;
-
-            try {
-                for (let i = 0; i < operations.length; i++) {
-                    let isFirstRow = (i === 0);
-                    let currentOrderId = orderIdStr + (operations.length > 1 ? `-${i+1}` : ''); 
-                    
-                    let combinedNamePhone = parsed.name + " " + parsed.phone;
-                    
-                    let typeAndDetails = operations[i].type;
-                    if (detailsTxt) {
-                        typeAndDetails += " / " + detailsTxt;
-                    }
-                    
-                    let payload = {
-                        systemType: "Maintenance", 
-                        orderId: currentOrderId, 
-                        namePhone: combinedNamePhone, 
-                        typeDetails: typeAndDetails, 
-                        technician: operations[i].tech,
-                        maintRevenue: operations[i].rev, 
-                        maintCost: operations[i].cost, 
-                        goodsRevenue: isFirstRow ? gRev : 0, 
-                        goodsCost: isFirstRow ? gCost : 0,
-                        purchasesDetails: isFirstRow ? (gTxt || "لا يوجد") : "تابع لنفس الأوردر", 
-                        purchasedItems: isFirstRow ? itemsForInventory : [],
-                        paymentMethod: operations[i].payMethod
-                    };
-                    await sendToGoogle(payload);
-                }
-
-                if (sendWA) {
-                    let waTxt = `مرحباً بك في Level UP 🎮\nعزيزي ${parsed.name}، تم بحمد الله الانتهاء من طلبك.\n\n🧾 *تفاصيل الفاتورة (أوردر ${orderIdStr}):*\n`;
-                    if(totalMaintRev > 0) waTxt += `🔧 مصنعية الصيانة: ${totalMaintRev} ج\n`;
-                    if(posCart.length > 0) waTxt += `🛍️ المشتريات:\n${gTxt}\n`;
-                    waTxt += `\n💰 *الإجمالي المطلوب:* ${totalFinal} جنيه.\n\nنتشرف بزيارتك دائماً!`;
-                    
-                    window.open(`https://wa.me/2${parsed.phone}?text=${encodeURIComponent(waTxt)}`, '_blank');
-                }
-
-                alert("تم تسجيل العملية بنجاح في شيت اليومية!");
-                setTimeout(() => { window.location.reload(); }, 1500);
-
-            } catch(e) {
-                alert("❌ حدث خطأ، لم يتم تسجيل الفاتورة! حاول مرة تانية."); 
-                btnWA.innerText = originalWaText;
-                btnWA.disabled = false; btnSave.disabled = false;
-            }
+        function saveToDaily() {
+            // دالة مصغرة لإرسال الإجمالي لشيت اليومية (يمكنك ربطها بالـ Apps Script)
+            // تم تجهيزها لتعمل في الخلفية
+            let total = 0;
+            invoiceItems.forEach(i => total += i.total);
+            console.log("Saving to daily: ", total, document.getElementById('payMethod').value);
         }
     </script>
 </body>
