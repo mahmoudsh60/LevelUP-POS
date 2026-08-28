@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level UP - نظام الفواتير والضمان</title>
+    <title>Level UP - نظام الفواتير والضمان والاستلام</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-    <!-- مكتبة تحويل الفاتورة إلى PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
@@ -35,8 +34,21 @@
         
         .btn-wa { background: #10b981; color: #000; margin-top: 15px; } 
         .btn-wa:hover { background: #059669; color: white; }
+        .btn-qr { background: #3b82f6; color: white; margin-top: 10px; }
+
+        /* Labels Preview Styles */
+        .preview-wrapper { background: #090c14; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
+        .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
+        .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
+        .label-preview .l-logo { font-weight: 900; font-size: 14px; margin-right: 15px;}
+        .label-preview .l-order { font-size: 12px; font-weight: bold; margin-left: 15px;}
+        .label-preview .l-name-phone { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 4px;}
+        .label-preview .l-details { font-size: 11px; flex-grow: 1; text-align: center; white-space: pre-wrap; font-weight: bold;}
+        .label-preview .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto;}
+        .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
+        .label-preview .l-date { font-size: 12px; font-weight: bold; }
         
-        /* Queue & Labels styles (Kept intact) */
+        /* Queue Styles */
         .queue-container-wrapper { background: #0f1422; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 20px;}
         .queue-container-wrapper h4 { margin: 0 0 10px 0; color: var(--pri); font-size: 14px;}
         .queue-card { background: #1a2235; border: 1px solid var(--pri); border-radius: 8px; padding: 10px; min-width: 140px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
@@ -53,7 +65,7 @@
         .dropdown-check-list { display: inline-block; width: 100%; position: relative; }
         .dropdown-check-list .anchor { width: 100%; padding: 10px; background: #0f1422; border: 1px solid var(--border); border-radius: 6px; color: white; display: block; cursor: pointer; box-sizing: border-box; }
         .dropdown-check-list .anchor::after { content: "▼"; float: left; font-size: 12px; color: var(--mut); margin-top: 3px;}
-        .dropdown-check-list ul.items { padding: 10px; display: none; margin: 0; border: 1px solid var(--border); border-radius: 6px; border-top: none; background: #151b2b; position: absolute; width: 100%; z-index: 10; box-sizing: border-box; max-height: 150px; overflow-y: auto;}
+        .dropdown-check-list ul.items { padding: 10px; display: none; margin: 0; border: 1px solid var(--border); border-radius: 6px; border-top: none; background: #151b2b; position: absolute; width: 100%; z-index: 10; box-sizing: border-box; max-height: 250px; overflow-y: auto;}
         .dropdown-check-list ul.items li { list-style: none; margin-bottom: 5px; font-size: 14px; display: flex; align-items: center; gap: 8px;}
         .dropdown-check-list.visible .items { display: block; }
         
@@ -67,7 +79,7 @@
         .totals-box h3 { margin: 0; color: white; }
         
         /* A4 Invoice Template Styling */
-        #invoiceTemplate { display: none; }
+        #printArea { display: none; }
         .a4-wrapper { background: #f8f9fa; color: #000; width: 210mm; padding: 20mm; box-sizing: border-box; font-family: 'Tajawal', sans-serif; position: relative; }
         .inv-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 15px; }
         .inv-header h1 { margin: 0; font-size: 24px; font-weight: 900; }
@@ -83,20 +95,40 @@
         .inv-footer { margin-top: 30px; text-align: center; font-size: 14px; font-weight: bold; line-height: 1.6;}
         .stamp-area { margin-top: 40px; display: flex; justify-content: space-between; padding: 0 40px; font-size: 16px; font-weight: bold; }
         
+        /* General Print Mode Base */
         @media print {
             body > *:not(#printArea) { display: none !important; }
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
-            #invoiceTemplate { display: block !important; }
-            @page { margin: 0; }
-            body, html { background: white; }
+            body, html { background: white; margin: 0 !important; padding: 0 !important;}
+            
+            /* Label specific styles (only active when dynamically injected) */
+            .real-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; page-break-after: always; page-break-inside: avoid; font-family: 'Tajawal', sans-serif; color: black; overflow: hidden; background: white;}
+            .real-label:last-child { page-break-after: auto; } 
+            .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 1px;}
+            .real-label .l-logo { font-size: 8px; font-weight: 900; line-height: 1; margin-right: 4mm;}
+            .real-label .l-order { font-size: 7px; font-weight: bold; line-height: 1; margin-left: 4mm;}
+            .real-label .l-name-phone { font-size: 10px; font-weight: 900; text-align: center; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; font-family: Arial, sans-serif;}
+            .real-label .l-details { font-size: 8.5px; font-weight: bold; text-align: center; line-height: 1.1; flex-grow: 1; overflow: hidden; white-space: pre-wrap; padding: 0 1mm;}
+            .real-label .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto; padding-bottom: 1mm;}
+            .real-label .l-date { font-size: 7px; font-weight: bold; }
+            .real-label .l-price-tag { font-size: 7px; font-weight: bold; }
+            .real-label .l-device { font-size: 8px; border: 1px solid #000; padding: 0 2px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
+            .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; height: 100%; display:flex; flex-direction: column; justify-content: center;}
+            
+            .qr-simplest-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; page-break-inside: avoid; background: white; color: black; overflow: hidden; }
+            .qr-simplest-label:last-child { page-break-after: auto; }
+            .qr-top-link { width: 100%; text-align: center; font-size: 11px; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: 0.5px; margin-bottom: 2px; border-bottom: 1.5px solid #000; padding-bottom: 2px; }
+            .qr-body-center { display: flex; justify-content: space-between; align-items: center; width: 100%; flex: 1; box-sizing: border-box; padding: 0 1mm;}
+            .qr-logo-centered { width: 16mm; height: 16mm; object-fit: contain; }
+            .qr-code-centered { width: 16mm; height: 16mm; object-fit: contain; }
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
-        <!-- قسم الاستلام والطباعة (اليمين - لم يتم تغييره كثيراً) -->
+        <!-- قسم الاستلام والطباعة (اليمين) -->
         <div class="panel">
-            <h2>📥 استلام العملاء</h2>
+            <h2>📥 استلام وطباعة (Labels)</h2>
             <div class="input-group">
                 <label>بحث برقم الإيصال (للدفع السريع):</label>
                 <div style="display:flex; gap:10px;">
@@ -106,22 +138,53 @@
             </div>
 
             <div class="input-group">
-                <label>اسم العميل:</label>
-                <input type="text" id="cName" placeholder="مثال: احمد صلاح" oninput="updateInvoiceInfo()">
-            </div>
-            <div class="input-group">
-                <label>رقم الهاتف:</label>
-                <input type="text" id="cPhone" placeholder="مثال: 01555886990" oninput="updateInvoiceInfo()">
+                <label>الاسم ورقم الموبايل (مسافة بينهم):</label>
+                <input type="text" id="cNamePhone" oninput="syncData()" placeholder="مثال: احمد صلاح 01555886990">
             </div>
             
-            <hr style="border-color: var(--border); margin: 20px 0;">
-            <h4 style="color: var(--pri); margin-bottom: 10px;">طباعة ملصقات الصيانة و الـ QR (مثل السابق)</h4>
-            <!-- ملصقات الصيانة -->
-            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                <input type="text" id="cDetails" placeholder="تفاصيل العميل / المطلوب صيانته..." style="flex: 2; padding: 10px; border-radius: 6px; background: #0f1422; border: 1px solid var(--border); color: white;">
-                <input type="number" id="cCount" placeholder="العدد" value="1" style="flex: 0.5; padding: 10px; border-radius: 6px; background: #0f1422; border: 1px solid var(--border); color: white;">
+            <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                <h4 style="margin: 0 0 10px; color: var(--pri);">1. طباعة أجهزة الصيانة / الاستلام</h4>
+                <div class="input-group">
+                    <label>تفاصيل العميل / المطلوب:</label>
+                    <textarea id="cDetails" rows="2" oninput="syncData()" placeholder="اكتب المشكلة أو الطلب هنا..."></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex: 1; margin-bottom: 10px;">
+                        <label>عدد الأجهزة:</label>
+                        <input type="number" id="cCount" oninput="syncData()" value="1" min="1">
+                    </div>
+                    <div class="input-group" style="flex: 1.5; margin-bottom: 10px;">
+                        <label>السعر (للطباعة):</label>
+                        <input type="text" id="cPricePrint" oninput="syncData()" placeholder="مثال: 500 ج">
+                    </div>
+                </div>
+                
+                <div class="preview-wrapper">
+                    <div class="label-preview">
+                        <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order" id="prevOrder">#----</span></div>
+                        <div class="l-name-phone" id="prevNamePhone">الاسم والرقم</div>
+                        <div class="l-details" id="prevDetails">التفاصيل تظهر هنا...</div>
+                        <div class="l-footer">
+                            <div class="l-date" id="prevDate">--/--/----</div>
+                            <div class="l-device" style="border:none; padding:0;" id="prevPriceTag">السعر: </div>
+                            <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
+                        </div>
+                    </div>
+                </div>
+                <button id="btnPrintLabels" onclick="printLabels()">🖨️ طباعة ملصقات الصيانة</button>
             </div>
-            <button onclick="alert('خاصية ملصقات الصيانة تعمل كما بالسابق، التركيز هنا على الفواتير')" style="background: #334155; margin-bottom: 15px;">🖨️ طباعة ملصق صيانة</button>
+
+            <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px;">
+                <h4 style="margin: 0 0 10px; color: #3b82f6;">2. طباعة ملصق الـ QR لروابط الألعاب</h4>
+                <div class="input-group" style="margin-bottom: 10px;">
+                    <label>توليد ملصق لـ:</label>
+                    <select id="qrConsole">
+                        <option value="Offers">عروض الألعاب الأصلية (bit.ly/lvlupsale)</option>
+                        <option value="Modded">ألعاب التعديل والتهكير (bit.ly/4modps4)</option>
+                    </select>
+                </div>
+                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR</button>
+            </div>
         </div>
 
         <!-- قسم الفاتورة والمبيعات (اليسار) -->
@@ -142,6 +205,8 @@
                     <select id="devType" style="flex: 1; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
                         <option value="PlayStation 5">PlayStation 5</option>
                         <option value="PlayStation 4">PlayStation 4</option>
+                        <option value="PlayStation 3">PlayStation 3</option>
+                        <option value="PlayStation 2">PlayStation 2</option>
                         <option value="Xbox Series X">Xbox Series X</option>
                         <option value="Xbox Series S">Xbox Series S</option>
                     </select>
@@ -152,9 +217,11 @@
                         <option value="Digital">Digital</option>
                     </select>
                     <select id="devStorage" style="flex: 1; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
-                        <option value="1TB">1TB</option>
-                        <option value="825GB">825GB</option>
+                        <option value="250GB">250GB</option>
+                        <option value="320GB">320GB</option>
                         <option value="500GB">500GB</option>
+                        <option value="825GB">825GB</option>
+                        <option value="1TB">1TB</option>
                     </select>
                 </div>
                 <div style="display: flex; gap: 8px;">
@@ -177,15 +244,8 @@
                     <div style="flex: 2;">
                         <div class="dropdown-check-list" id="gamesList">
                             <span class="anchor" onclick="document.getElementById('gamesList').classList.toggle('visible')">اختر الألعاب (اضغط هنا)</span>
-                            <ul class="items">
-                                <li><input type="checkbox" value="FC 24" /> FC 24</li>
-                                <li><input type="checkbox" value="PES 21" /> PES 21</li>
-                                <li><input type="checkbox" value="GTA V" /> GTA V</li>
-                                <li><input type="checkbox" value="Call of Duty" /> Call of Duty</li>
-                                <li><input type="checkbox" value="Crash" /> Crash</li>
-                                <li><input type="checkbox" value="Mortal Kombat" /> Mortal Kombat</li>
-                                <li><input type="checkbox" value="Spider-Man" /> Spider-Man</li>
-                                <li><input type="checkbox" value="Red Dead 2" /> Red Dead 2</li>
+                            <ul class="items" id="gamesUl">
+                                <!-- سيتم ملؤها بالجافاسكريبت -->
                             </ul>
                         </div>
                     </div>
@@ -245,65 +305,37 @@
         </div>
     </div>
 
-    <!-- القالب المخفي للفاتورة A4 -->
-    <div id="printArea">
-        <div class="a4-wrapper" id="invoiceTemplate">
-            <div class="inv-header">
-                <h1>Level UP Store</h1>
-                <p>الإسماعيلية، شارع الأبراج، أرض الجمعيات</p>
-                <p>الهاتف: 01010763503 / 01555886990</p>
-            </div>
-            
-            <div class="inv-title">فاتورة بيع ضريبية / شهادة ضمان</div>
-            
-            <div class="inv-info">
-                <div>
-                    العميل: <span id="lblClientName">----------</span><br>
-                    رقم الهاتف: <span id="lblClientPhone">----------</span>
-                </div>
-                <div style="text-align: left;">
-                    تاريخ الفاتورة: <span id="lblDate">--/--/----</span><br>
-                    رقم الفاتورة: <span id="lblInvoiceNo">INV-000000-01</span>
-                </div>
-            </div>
-            
-            <table class="inv-table">
-                <thead>
-                    <tr>
-                        <th style="width: 5%;">م</th>
-                        <th style="width: 50%;">اسم الصنف والوصف</th>
-                        <th style="width: 10%;">الكمية</th>
-                        <th style="width: 15%;">سعر الوحدة</th>
-                        <th style="width: 20%;">الإجمالي</th>
-                    </tr>
-                </thead>
-                <tbody id="lblTableBody">
-                    <!-- تُملأ برمجياً -->
-                </tbody>
-            </table>
-            
-            <div class="inv-summary">
-                المجموع الفرعي: <span id="lblSubtotal">0</span> ج.م.<br>
-                ضريبة القيمة المضافة: 0 ج.م.<br>
-                <span style="font-size: 18px;">**الإجمالي النهائي: <span id="lblTotal">0</span> ج.م.**</span><br>
-                المبلغ بالحروف: فقط <span id="lblTotalWords">صفر</span> جنيهاً مصرياً لا غير.
-            </div>
-            
-            <div class="inv-footer">
-                شروط الدفع: الدفع <span id="lblPayMethod">نقداً</span> عند الاستلام أو عبر التحويل البنكي.<br>
-                * تحتفظ الشركة بحقها في تطبيق شروط الضمان المعمول بها للأجهزة.<br>
-                شكراً لتعاملكم معنا! نتمنى زيارتكم مرة أخرى.
-            </div>
-            
-            <div class="stamp-area">
-                <div>توقيع المستلم: ..........................</div>
-                <div>ختم المحل:</div>
-            </div>
-        </div>
-    </div>
+    <!-- المساحة المخصصة للطباعة -->
+    <div id="printArea"></div>
 
     <script>
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
+
+        // قائمة الألعاب المطلوبة
+        const fullGamesList = [
+            "A way out", "AC Unity", "Affected the minor UK", "Alan Wake Remastered", "Assassin's Creed Mirage", "Assassin's Creed Odyssey", 
+            "Assassin's Creed Origins", "Assassin's Creed® Valhalla", "Astro Bot", "Baja: Edge of Control HD", "Batman Arkham knight", 
+            "Battlefield 4™ Premium Edition", "Battlefield™ V", "Beat Saber", "Bendy and the Dark Revival", "Black Ops 4", "Black Ops III", 
+            "blood and Truth VR", "Burnout Paradise", "Call of duty Vanguard", "Call of Duty WWII Gold Edition", "Car Mechanic Sim", 
+            "cho cho Charles", "Control Ultimate Edition", "Crash Racing", "Creed: Rise to Glory", "Cyberpunk", "Days Gone", 
+            "Demon Slayer - Kimetsu no Yaiba", "Detroit Become Human", "Devil May Cry 5", "Dragon Ball FighterZ", "Dragon Ball Z Kakarot", 
+            "Dragonball Sparking Z", "Dying Light", "ea family bundle", "Far Cry 3", "Far Cry 6", "FC 2024", "FC 2025", "FC 2026", 
+            "FIFA 2022", "FIFA 2023", "Forza Horizon PS5", "Friday The 13th", "Gang Beasts", "Ghost of Tsushima", "God of War", 
+            "God of War Ragnarok", "Gotham Knights", "Gran Turismo Sports", "Grand Theft Auto V", "Hello Neighbor Bundle", "Hitman 3", 
+            "Hogwarts Legacy", "Horizon Forbidden West", "Human fall flat", "Injustice 2", "It Takes Two", "Just Cause 4 Reloaded", 
+            "L.A Noire USA", "lego 2k drive", "LEGO Marvel Collection", "Little Nightmares 1", "Mafia Trilogy", "Marvel Avengers", 
+            "Marvel Spiderman 2", "Marvel Super Heros 2", "marvel's spider-man miles morales", "Marvel's Spider-Man Remastered", 
+            "Minecraft", "Mortal Kombat 11", "Mortal Kombat™ 1", "Mortal XL", "MotoGP 22 PS4 & PS5", "Naruto Storm 4 RTB", "NBA 2K25", 
+            "need for speed 2015", "Need for speed heat", "NFS Hot Pursuit Remastered", "NFS Payback", "NFS Unbound", "OffRoad b.atv.moto", 
+            "Olympic Games Tokyo 2020", "Outlast Trinity", "Overcooked Bundle", "Pes 19", "Pes 21", "Ratchet", "Ratchet & HOrizon", 
+            "Ratchet & HOrizon & vr", "Rayman Legends", "Red Dead Redemption 2", "Resident Evil 4", "resident evil 4 2005", "Resident Evil 7", 
+            "Resident Evil Racoon city", "Resident Evil Village", "Ride", "Rise of the Tomb Raider", "Road Redemtion", "Rubber Bandits", 
+            "SackBoy", "Saints Row", "Saints Row PS4&PS5", "Sekiro", "Silent Hill 2 Remake", "sonic forces/marvel 1.2", "Sonic Frontiers", 
+            "Split Fiction", "Tekken 7", "The Crew 2", "The Crew Motofest", "The Evil Within", "The Evil Within 2", "the last of us 2", 
+            "The Last of Us Remastered", "the witcher", "Tomb Raider DE", "Tomb Raider Trilogy", "TOP Spin 2K 2025", "UFC 4 deluxe edition", 
+            "Uncharted Bundle", "Unravel 2", "V Rally", "Vr worlds", "WATCH DOGS 2", "Watch dogs legion", "WWE 2k20", "WWE 2k23", 
+            "WWE 2K24", "WWE 2K25", "Zombie Army 4"
+        ];
 
         const accessoriesDB = [
             { id: 1, name: "جراب 4", price: 150 }, { id: 2, name: "جراب 5", price: 150 },
@@ -315,26 +347,29 @@
 
         let invoiceItems = [];
         let allOngoing = [];
-        
-        // Caching system for dismissed orders to fix the bug
         let hiddenOrders = JSON.parse(localStorage.getItem('hiddenOrders') || '[]');
 
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-GB');
-        const invNum = 'INV-' + today.getFullYear().toString().substr(-2) + 
-                      (today.getMonth()+1).toString().padStart(2,'0') + 
-                      today.getDate().toString().padStart(2,'0') + '-' + 
-                      Math.floor(Math.random() * 90 + 10);
-        
-        document.getElementById('lblDate').innerText = dateStr;
-        document.getElementById('lblInvoiceNo').innerText = invNum;
+        const nextWeek = new Date(today); nextWeek.setDate(today.getDate() + 7);
+        const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
+        const orderIdStr = '#' + Math.floor((Math.random() * 8900) + 100);
+        const invNum = 'INV-' + today.getFullYear().toString().substr(-2) + (today.getMonth()+1).toString().padStart(2,'0') + today.getDate().toString().padStart(2,'0') + '-' + Math.floor(Math.random() * 90 + 10);
+
+        document.getElementById('prevOrder').innerText = orderIdStr;
+        document.getElementById('prevDate').innerText = dateStr;
 
         window.addEventListener('DOMContentLoaded', () => {
+            // توليد قائمة الألعاب في الـ HTML
+            const gamesUl = document.getElementById('gamesUl');
+            fullGamesList.forEach(game => {
+                gamesUl.innerHTML += `<li><input type="checkbox" value="${game}" /> ${game}</li>`;
+            });
+
+            // توليد قائمة الإكسسوارات
             const accSelect = document.getElementById('accSelect');
             accessoriesDB.forEach(item => {
-                let opt = document.createElement('option');
-                opt.value = item.id;
-                opt.text = item.name;
+                let opt = document.createElement('option'); opt.value = item.id; opt.text = item.name;
                 accSelect.appendChild(opt);
             });
             updateAccPrice();
@@ -342,213 +377,209 @@
             // Fetch Queue
             fetch(GOOGLE_URL + '?action=getOngoing')
                 .then(res => res.json())
-                .then(data => { 
-                    allOngoing = data; 
-                    renderQueue(); 
-                }).catch(e => console.log(e));
+                .then(data => { allOngoing = data; renderQueue(); })
+                .catch(e => console.log(e));
         });
 
+        // ------------------ قسم المبيعات والفاتورة ------------------
         function updateAccPrice() {
             let id = parseInt(document.getElementById('accSelect').value);
             let item = accessoriesDB.find(i => i.id === id);
             if(item) document.getElementById('accPrice').value = item.price;
         }
 
-        // --- إصلاح مشكلة زر الإنهاء ---
         function renderQueue() {
             const container = document.getElementById('queueContainer');
             container.innerHTML = '';
-            
-            // فلترة الأجهزة وحذف المكتملة محلياً (Cashed) 
             let pendingOrders = allOngoing.filter(o => o.status !== 'done' && !hiddenOrders.includes(o.orderId));
             
             if (pendingOrders.length === 0) {
-                container.innerHTML = '<span style="color: gray; font-size: 13px; margin: auto;">لا يوجد أجهزة قيد الانتظار حالياً 🎉</span>';
-                return;
+                container.innerHTML = '<span style="color: gray; font-size: 13px; margin: auto;">لا يوجد أجهزة قيد الانتظار حالياً 🎉</span>'; return;
             }
-            
             pendingOrders.slice(0, 6).forEach(order => {
                 container.innerHTML += `
                     <div class="queue-card">
-                        <div>
-                            <div class="order-id">${order.orderId}</div>
-                            <div class="c-name">${order.name}</div>
-                            <div class="c-details">${order.details || 'صيانة'}</div>
-                        </div>
+                        <div><div class="order-id">${order.orderId}</div><div class="c-name">${order.name}</div><div class="c-details">${order.details || 'صيانة'}</div></div>
                         <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ إنهاء العملية</button>
                     </div>`;
             });
         }
 
         function markAsDone(orderId) {
-            // حفظ الرقم في الكاش المحلي لمنع ظهوره بعد الـ Refresh
-            hiddenOrders.push(orderId);
-            localStorage.setItem('hiddenOrders', JSON.stringify(hiddenOrders));
-            
-            // تحديث الواجهة
+            hiddenOrders.push(orderId); localStorage.setItem('hiddenOrders', JSON.stringify(hiddenOrders));
             renderQueue();
-            
-            // إرسال للسيرفر
-            const formData = new URLSearchParams();
-            formData.append('data', JSON.stringify({ systemType: "UpdateStatus", orderId: orderId, status: "done" }));
+            const formData = new URLSearchParams(); formData.append('data', JSON.stringify({ systemType: "UpdateStatus", orderId: orderId, status: "done" }));
             fetch(GOOGLE_URL, { method: 'POST', body: formData }).catch(e => console.log(e));
         }
 
-        // --- نظام الفاتورة الجديد ---
-        
-        function updateInvoiceInfo() {
-            document.getElementById('lblClientName').innerText = document.getElementById('cName').value || '----------';
-            document.getElementById('lblClientPhone').innerText = document.getElementById('cPhone').value || '----------';
-            document.getElementById('lblPayMethod').innerText = document.getElementById('payMethod').value;
-        }
-
         function addDevice() {
-            let type = document.getElementById('devType').value;
-            let model = document.getElementById('devModel').value;
-            let storage = document.getElementById('devStorage').value;
-            let price = parseFloat(document.getElementById('devPrice').value);
+            let type = document.getElementById('devType').value; let model = document.getElementById('devModel').value;
+            let storage = document.getElementById('devStorage').value; let price = parseFloat(document.getElementById('devPrice').value);
             let qty = parseInt(document.getElementById('devQty').value) || 1;
-            
             if(isNaN(price)) return alert("يرجى إدخال السعر");
-            
-            let desc = `${type} (${storage}) - نسخة ${model}، ضمان المركز`;
-            invoiceItems.push({ desc, qty, price, total: price * qty });
+            invoiceItems.push({ desc: `${type} (${storage}) - نسخة ${model}، ضمان المركز`, qty, price, total: price * qty });
             renderInvoice();
         }
 
         function addGames() {
-            let type = document.getElementById('accType').value;
-            let price = parseFloat(document.getElementById('gamesPrice').value);
+            let type = document.getElementById('accType').value; let price = parseFloat(document.getElementById('gamesPrice').value);
             let qty = parseInt(document.getElementById('gamesQty').value) || 1;
-            
             if(isNaN(price)) return alert("يرجى إدخال السعر");
 
-            // جمع الألعاب المحددة
-            let selectedGames = [];
-            document.querySelectorAll('#gamesList input[type="checkbox"]:checked').forEach(cb => {
-                selectedGames.push(cb.value);
-            });
-            
+            let selectedGames = []; document.querySelectorAll('#gamesList input[type="checkbox"]:checked').forEach(cb => selectedGames.push(cb.value));
             let gamesTxt = selectedGames.length > 0 ? `(${selectedGames.join(', ')})` : "";
-            let desc = `باقة ألعاب / حسابات [${type}] ${gamesTxt}`;
             
-            invoiceItems.push({ desc, qty, price, total: price * qty });
+            invoiceItems.push({ desc: `باقة ألعاب/حسابات [${type}] ${gamesTxt}`, qty, price, total: price * qty });
             renderInvoice();
             
-            // إخفاء القائمة وتفريغها
             document.getElementById('gamesList').classList.remove('visible');
             document.querySelectorAll('#gamesList input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
 
         function addAccessory() {
-            let sel = document.getElementById('accSelect');
-            let name = sel.options[sel.selectedIndex].text;
-            let price = parseFloat(document.getElementById('accPrice').value);
-            let qty = parseInt(document.getElementById('accQty').value) || 1;
-            
+            let sel = document.getElementById('accSelect'); let name = sel.options[sel.selectedIndex].text;
+            let price = parseFloat(document.getElementById('accPrice').value); let qty = parseInt(document.getElementById('accQty').value) || 1;
             if(isNaN(price)) return alert("يرجى إدخال السعر");
-            
             invoiceItems.push({ desc: name, qty, price, total: price * qty });
             renderInvoice();
         }
 
         function renderInvoice() {
-            const list = document.getElementById('invoiceList');
-            const tbody = document.getElementById('lblTableBody');
-            
-            list.innerHTML = ''; tbody.innerHTML = '';
+            const list = document.getElementById('invoiceList'); list.innerHTML = '';
             let finalTotal = 0;
             
-            if(invoiceItems.length === 0) { 
-                list.innerHTML = '<p style="text-align:center; color:gray; font-size:12px; margin-top:30px;">الفاتورة فارغة</p>'; 
-            } else {
+            if(invoiceItems.length === 0) { list.innerHTML = '<p style="text-align:center; color:gray; font-size:12px; margin-top:30px;">الفاتورة فارغة</p>'; } 
+            else {
                 invoiceItems.forEach((item, index) => {
                     finalTotal += item.total;
-                    
-                    // تحديث واجهة الكاشير
                     list.innerHTML += `
                         <div class="cart-item">
                             <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.desc}</span>
-                            <span style="text-align:center;">${item.qty}</span>
-                            <span style="text-align:center;">${item.price}</span>
-                            <span style="text-align:center; font-weight:bold; color:var(--pri);">${item.total} ج.م</span>
+                            <span style="text-align:center;">${item.qty}</span><span style="text-align:center;">${item.price}</span>
+                            <span style="text-align:center; font-weight:bold; color:var(--pri);">${item.total} ج</span>
                             <span style="cursor:pointer; color:var(--acc); font-size: 16px; text-align:left;" onclick="invoiceItems.splice(${index},1); renderInvoice();">✖</span>
                         </div>`;
-                        
-                    // تحديث قالب الـ A4
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td style="text-align:right;">${item.desc}</td>
-                            <td>${item.qty}</td>
-                            <td>${item.price.toLocaleString()} ج.م</td>
-                            <td>${item.total.toLocaleString()} ج.م</td>
-                        </tr>`;
                 });
             }
-            
             document.getElementById('tItemsCount').innerText = invoiceItems.length;
             document.getElementById('tFinalAmount').innerText = finalTotal.toLocaleString() + " ج.م";
-            
-            document.getElementById('lblSubtotal').innerText = finalTotal.toLocaleString();
-            document.getElementById('lblTotal').innerText = finalTotal.toLocaleString();
-            document.getElementById('lblTotalWords').innerText = finalTotal.toLocaleString(); // Simplified text representation
-            updateInvoiceInfo();
         }
 
-        // --- الطباعة واستخراج PDF ---
+        // ------------------ قسم الطباعة والـ Labels ------------------
+        
+        function setPrintStyle(mode) {
+            let style = document.getElementById('dynamicPrintStyle');
+            if(!style) { style = document.createElement('style'); style.id = 'dynamicPrintStyle'; document.head.appendChild(style); }
+            if (mode === 'label') {
+                style.innerHTML = '@media print { @page { size: 40mm 25mm; margin: 0mm !important; } }';
+            } else {
+                style.innerHTML = '@media print { @page { size: A4 portrait; margin: 0 !important; } }';
+            }
+        }
 
-        function generatePDFandWhatsApp() {
-            let cName = document.getElementById('cName').value.trim();
-            let cPhone = document.getElementById('cPhone').value.trim();
-            
-            if(!cName || !cPhone) return alert("يرجى إدخال اسم العميل ورقم الهاتف ليتم تسمية الملف وإرساله.");
-            if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
+        function parseNamePhone() {
+            let raw = document.getElementById('cNamePhone').value.trim();
+            let phoneMatch = raw.match(/\d{8,}/); let phone = phoneMatch ? phoneMatch[0] : "";
+            let name = raw.replace(phone, "").trim();
+            if(!name && !phone) return { name: "", phone: "" };
+            if(!name) name = "عميل";
+            return { name, phone };
+        }
 
-            updateInvoiceInfo();
+        function syncData() {
+            let parsed = parseNamePhone();
+            let details = document.getElementById('cDetails').value.trim();
+            let priceTxt = document.getElementById('cPricePrint').value.trim();
             
-            // إعدادات ملف الـ PDF
-            let fileName = `${cName}_${cPhone}.pdf`;
-            let element = document.getElementById('invoiceTemplate');
-            
-            // يجب إظهار العنصر مؤقتاً ليتمكن html2pdf من قراءته
-            element.style.display = 'block';
-            
-            let opt = {
-                margin:       0,
-                filename:     fileName,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            document.getElementById('prevNamePhone').innerText = parsed.name + " " + parsed.phone;
+            document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
+            document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
+            document.getElementById('prevPriceTag').innerText = `السعر: ${priceTxt}`;
+        }
 
-            // إنشاء وتحميل الـ PDF
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.style.display = 'none'; // إعادة الإخفاء
-                
-                // فتح واتساب
-                let finalTotal = document.getElementById('lblTotal').innerText;
-                let waTxt = `مرحباً بك في Level UP Store 🎮\nعزيزي ${cName}، شكراً لثقتك بنا.\n\nمرفق لسيادتكم الفاتورة الخاصة بكم بقيمة ${finalTotal} ج.م.\n\n*يرجى إرسال ملف الـ PDF الذي تم تحميله الآن في هذه المحادثة.*\n\nنتشرف بزيارتك دائماً!`;
-                window.open(`https://wa.me/2${cPhone}?text=${encodeURIComponent(waTxt)}`, '_blank');
-                
-                // حفظ العملية في اليومية
-                saveToDaily();
-            });
+        function printLabels() {
+            let parsed = parseNamePhone(); let details = document.getElementById('cDetails').value.trim(); let priceTxt = document.getElementById('cPricePrint').value.trim();
+            const count = parseInt(document.getElementById('cCount').value) || 1;
+            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
+
+            setPrintStyle('label');
+            const pa = document.getElementById('printArea'); pa.innerHTML = '';
+            
+            for(let i = 1; i <= count; i++) {
+                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`; 
+            }
+            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 10px;"><span style="background:black; color:white; padding:1px 4px; border-radius:3px; font-weight:bold; margin-bottom:2px; display:inline-block;">نسخة المحل</span><br>${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">إجمالي ${count} أجهزة</div></div></div>`;
+            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
+            pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br><span style="font-size:10px; color:black;">01555886990 - 01010763503</span><br><br>الأوردر: ${orderIdStr}</div></div>`;
+            
+            setTimeout(() => { window.print(); }, 500);
+        }
+
+        function printQRLabel() {
+            const qrType = document.getElementById('qrConsole').value;
+            let qrImgSrc = qrType === 'Offers' ? 'sale.png' : 'mod.png'; let linkTxt = qrType === 'Offers' ? 'bit.ly/lvlupsale' : 'bit.ly/4modps4';
+            setPrintStyle('label');
+            const pa = document.getElementById('printArea');
+            pa.innerHTML = `<div class="qr-simplest-label"><div class="qr-top-link">${linkTxt}</div><div class="qr-body-center"><img src="lvlup.png" alt="Level UP" class="qr-logo-centered"><img src="${qrImgSrc}" alt="QR Code" class="qr-code-centered"></div></div>`;
+            setTimeout(() => { window.print(); }, 500);
+        }
+
+        function generateInvoiceA4HTML(cName, cPhone) {
+            let total = 0;
+            let tbody = invoiceItems.map((item, index) => {
+                total += item.total;
+                return `<tr><td>${index + 1}</td><td style="text-align:right;">${item.desc}</td><td>${item.qty}</td><td>${item.price.toLocaleString()} ج.م</td><td>${item.total.toLocaleString()} ج.م</td></tr>`;
+            }).join('');
+
+            return `
+            <div class="a4-wrapper" id="invoiceTemplate">
+                <div class="inv-header"><h1>Level UP Store</h1><p>الإسماعيلية، شارع الأبراج، أرض الجمعيات</p><p>الهاتف: 01010763503 / 01555886990</p></div>
+                <div class="inv-title">فاتورة بيع ضريبية / شهادة ضمان</div>
+                <div class="inv-info">
+                    <div>العميل: ${cName}<br>رقم الهاتف: ${cPhone}</div>
+                    <div style="text-align: left;">تاريخ الفاتورة: ${dateStr}<br>رقم الفاتورة: ${invNum}</div>
+                </div>
+                <table class="inv-table">
+                    <thead><tr><th style="width: 5%;">م</th><th style="width: 50%;">اسم الصنف والوصف</th><th style="width: 10%;">الكمية</th><th style="width: 15%;">سعر الوحدة</th><th style="width: 20%;">الإجمالي</th></tr></thead>
+                    <tbody>${tbody}</tbody>
+                </table>
+                <div class="inv-summary">المجموع الفرعي: ${total.toLocaleString()} ج.م.<br>ضريبة القيمة المضافة: 0 ج.م.<br><span style="font-size: 18px;">**الإجمالي النهائي: ${total.toLocaleString()} ج.م.**</span></div>
+                <div class="inv-footer">شروط الدفع: الدفع ${document.getElementById('payMethod').value} عند الاستلام أو عبر التحويل البنكي.<br>* تحتفظ الشركة بحقها في تطبيق شروط الضمان المعمول بها للأجهزة.<br>شكراً لتعاملكم معنا! نتمنى زيارتكم مرة أخرى.</div>
+                <div class="stamp-area"><div>توقيع المستلم: ..........................</div><div>ختم المحل:</div></div>
+            </div>`;
         }
 
         function printA4Invoice() {
             if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
-            updateInvoiceInfo();
-            window.print();
-            saveToDaily();
+            let parsed = parseNamePhone();
+            let cName = parsed.name || "----------"; let cPhone = parsed.phone || "----------";
+            
+            setPrintStyle('a4');
+            document.getElementById('printArea').innerHTML = generateInvoiceA4HTML(cName, cPhone);
+            setTimeout(() => { window.print(); }, 500);
         }
 
-        function saveToDaily() {
-            // دالة مصغرة لإرسال الإجمالي لشيت اليومية (يمكنك ربطها بالـ Apps Script)
-            // تم تجهيزها لتعمل في الخلفية
-            let total = 0;
-            invoiceItems.forEach(i => total += i.total);
-            console.log("Saving to daily: ", total, document.getElementById('payMethod').value);
+        function generatePDFandWhatsApp() {
+            if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
+            let parsed = parseNamePhone();
+            let cName = parsed.name; let cPhone = parsed.phone;
+            
+            if(!cName || !cPhone) return alert("يرجى إدخال اسم العميل ورقم الموبايل في الأعلى ليتم تسمية الملف وإرساله.");
+
+            const pa = document.getElementById('printArea');
+            pa.innerHTML = generateInvoiceA4HTML(cName, cPhone);
+            pa.style.display = 'block'; // مؤقت للاستخراج
+            
+            let fileName = `${cName}_${cPhone}.pdf`;
+            let opt = { margin: 0, filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+
+            html2pdf().set(opt).from(pa.firstElementChild).save().then(() => {
+                pa.style.display = 'none'; pa.innerHTML = '';
+                
+                let finalTotal = document.getElementById('tFinalAmount').innerText;
+                let waTxt = `مرحباً بك في Level UP Store 🎮\nعزيزي ${cName}، شكراً لثقتك بنا.\n\nمرفق لسيادتكم الفاتورة / شهادة الضمان بقيمة ${finalTotal}.\n\n*يرجى إرسال ملف الـ PDF الذي تم تحميله الآن في هذه المحادثة.*\n\nنتشرف بزيارتك دائماً!`;
+                window.open(`https://wa.me/2${cPhone}?text=${encodeURIComponent(waTxt)}`, '_blank');
+            });
         }
     </script>
 </body>
