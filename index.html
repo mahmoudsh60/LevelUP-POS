@@ -78,22 +78,34 @@
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 13px; }
         .totals-box h3 { margin: 0; color: white; }
         
-        /* A4 Invoice Template Styling */
+        /* Landscape Invoice Template Styling */
         #printArea { display: none; }
-        .a4-wrapper { background: #f8f9fa; color: #000; width: 210mm; padding: 20mm; box-sizing: border-box; font-family: 'Tajawal', sans-serif; position: relative; }
-        .inv-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 15px; }
-        .inv-header h1 { margin: 0; font-size: 24px; font-weight: 900; }
-        .inv-header p { margin: 5px 0 0 0; font-size: 14px; font-weight: bold; }
-        .inv-title { text-align: center; font-size: 22px; font-weight: 900; margin-bottom: 20px; text-decoration: underline; }
-        .inv-info { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 15px; font-weight: bold; }
-        .inv-info div { line-height: 1.6; }
+        .a4-wrapper { 
+            background: #f8f9fa; color: #000; width: 297mm; /* مقاس Landscape بالعرض */
+            min-height: 210mm; padding: 15mm; box-sizing: border-box; 
+            font-family: 'Tajawal', sans-serif; position: relative; direction: rtl;
+        }
+        .inv-header-box {
+            background: #f3f2ef; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center;
+        }
+        .inv-header-box h1 { margin: 0; font-size: 26px; font-weight: 900; color: #000;}
+        .inv-header-box p { margin: 5px 0 0 0; font-size: 16px; font-weight: bold; color: #333;}
+        
+        .inv-title { text-align: center; font-size: 26px; font-weight: 900; margin-bottom: 20px; }
+        
+        .inv-info { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 18px; font-weight: bold; padding: 0 10px;}
+        
         .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; text-align: center; background: #fff;}
-        .inv-table th, .inv-table td { border: 1px solid #000; padding: 10px; font-size: 15px; }
-        .inv-table th { background-color: #e9ecef; font-weight: bold; }
+        .inv-table th, .inv-table td { border: 1px solid #000; padding: 14px 10px; font-size: 18px; }
+        .inv-table th { background-color: #d9c4b1; font-weight: 900; color: #000;}
         .inv-table td { font-weight: bold; }
-        .inv-summary { width: 40%; margin-right: auto; border: 1px solid #000; padding: 10px; background: #fff; font-size: 15px; font-weight: bold; line-height: 1.6;}
-        .inv-footer { margin-top: 30px; text-align: center; font-size: 14px; font-weight: bold; line-height: 1.6;}
-        .stamp-area { margin-top: 40px; display: flex; justify-content: space-between; padding: 0 40px; font-size: 16px; font-weight: bold; }
+        
+        .inv-summary-container { display: flex; justify-content: flex-start; width: 100%; margin-bottom: 20px; }
+        .inv-summary { width: 100%; border: 1px solid #000; padding: 15px; background: #fff; font-size: 18px; font-weight: bold; line-height: 1.8; text-align: right;}
+        
+        .inv-footer { margin-top: 30px; text-align: center; font-size: 16px; font-weight: bold; line-height: 1.6;}
+        
+        .stamp-area { margin-top: 40px; display: flex; justify-content: space-between; padding: 0 40px; font-size: 18px; font-weight: bold; }
         
         /* General Print Mode Base */
         @media print {
@@ -101,7 +113,7 @@
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
             body, html { background: white; margin: 0 !important; padding: 0 !important;}
             
-            /* Label specific styles (only active when dynamically injected) */
+            /* Label specific styles */
             .real-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; page-break-after: always; page-break-inside: avoid; font-family: 'Tajawal', sans-serif; color: black; overflow: hidden; background: white;}
             .real-label:last-child { page-break-after: auto; } 
             .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 1px;}
@@ -126,7 +138,7 @@
 </head>
 <body>
     <div class="dashboard">
-        <!-- قسم الاستلام والطباعة (اليمين) -->
+        <!-- قسم الاستلام والطباعة -->
         <div class="panel">
             <h2>📥 استلام وطباعة (Labels)</h2>
             <div class="input-group">
@@ -187,7 +199,7 @@
             </div>
         </div>
 
-        <!-- قسم الفاتورة والمبيعات (اليسار) -->
+        <!-- قسم الفاتورة والمبيعات -->
         <div class="panel">
             <h2 style="margin-top: 0; color: var(--pri);">🛒 إنشاء فاتورة بيع وضمان</h2>
             
@@ -311,7 +323,6 @@
     <script>
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
-        // قائمة الألعاب المطلوبة
         const fullGamesList = [
             "A way out", "AC Unity", "Affected the minor UK", "Alan Wake Remastered", "Assassin's Creed Mirage", "Assassin's Creed Odyssey", 
             "Assassin's Creed Origins", "Assassin's Creed® Valhalla", "Astro Bot", "Baja: Edge of Control HD", "Batman Arkham knight", 
@@ -360,13 +371,11 @@
         document.getElementById('prevDate').innerText = dateStr;
 
         window.addEventListener('DOMContentLoaded', () => {
-            // توليد قائمة الألعاب في الـ HTML
             const gamesUl = document.getElementById('gamesUl');
             fullGamesList.forEach(game => {
                 gamesUl.innerHTML += `<li><input type="checkbox" value="${game}" /> ${game}</li>`;
             });
 
-            // توليد قائمة الإكسسوارات
             const accSelect = document.getElementById('accSelect');
             accessoriesDB.forEach(item => {
                 let opt = document.createElement('option'); opt.value = item.id; opt.text = item.name;
@@ -374,14 +383,12 @@
             });
             updateAccPrice();
 
-            // Fetch Queue
             fetch(GOOGLE_URL + '?action=getOngoing')
                 .then(res => res.json())
                 .then(data => { allOngoing = data; renderQueue(); })
                 .catch(e => console.log(e));
         });
 
-        // ------------------ قسم المبيعات والفاتورة ------------------
         function updateAccPrice() {
             let id = parseInt(document.getElementById('accSelect').value);
             let item = accessoriesDB.find(i => i.id === id);
@@ -464,8 +471,6 @@
             document.getElementById('tItemsCount').innerText = invoiceItems.length;
             document.getElementById('tFinalAmount').innerText = finalTotal.toLocaleString() + " ج.م";
         }
-
-        // ------------------ قسم الطباعة والـ Labels ------------------
         
         function setPrintStyle(mode) {
             let style = document.getElementById('dynamicPrintStyle');
@@ -473,7 +478,7 @@
             if (mode === 'label') {
                 style.innerHTML = '@media print { @page { size: 40mm 25mm; margin: 0mm !important; } }';
             } else {
-                style.innerHTML = '@media print { @page { size: A4 portrait; margin: 0 !important; } }';
+                style.innerHTML = '@media print { @page { size: A4 landscape; margin: 0 !important; } }';
             }
         }
 
@@ -524,28 +529,59 @@
             setTimeout(() => { window.print(); }, 500);
         }
 
+        // --- مولد قالب الفاتورة بتصميم Landscape الواسع ---
         function generateInvoiceA4HTML(cName, cPhone) {
             let total = 0;
             let tbody = invoiceItems.map((item, index) => {
                 total += item.total;
-                return `<tr><td>${index + 1}</td><td style="text-align:right;">${item.desc}</td><td>${item.qty}</td><td>${item.price.toLocaleString()} ج.م</td><td>${item.total.toLocaleString()} ج.م</td></tr>`;
+                return `<tr><td>${index + 1}</td><td style="text-align:right; white-space: pre-wrap; word-wrap: break-word; line-height: 1.5;">${item.desc}</td><td>${item.qty}</td><td>${item.price.toLocaleString()} ج.م</td><td>${item.total.toLocaleString()} ج.م</td></tr>`;
             }).join('');
 
             return `
             <div class="a4-wrapper" id="invoiceTemplate">
-                <div class="inv-header"><h1>Level UP Store</h1><p>الإسماعيلية، شارع الأبراج، أرض الجمعيات</p><p>الهاتف: 01010763503 / 01555886990</p></div>
+                <div class="inv-header-box">
+                    <h1>Level UP Store</h1>
+                    <p>الإسماعيلية، شارع الأبراج، أرض الجمعيات<br>الهاتف: 01010763503 / 01555886990</p>
+                </div>
+                
                 <div class="inv-title">فاتورة بيع ضريبية / شهادة ضمان</div>
+                
                 <div class="inv-info">
-                    <div>العميل: ${cName}<br>رقم الهاتف: ${cPhone}</div>
+                    <div style="text-align: right;">العميل: ${cName}<br>رقم الهاتف: ${cPhone}</div>
                     <div style="text-align: left;">تاريخ الفاتورة: ${dateStr}<br>رقم الفاتورة: ${invNum}</div>
                 </div>
+                
                 <table class="inv-table">
-                    <thead><tr><th style="width: 5%;">م</th><th style="width: 50%;">اسم الصنف والوصف</th><th style="width: 10%;">الكمية</th><th style="width: 15%;">سعر الوحدة</th><th style="width: 20%;">الإجمالي</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">م</th>
+                            <th style="width: 55%;">اسم الصنف والوصف</th>
+                            <th style="width: 10%;">الكمية</th>
+                            <th style="width: 15%;">سعر الوحدة</th>
+                            <th style="width: 15%;">الإجمالي</th>
+                        </tr>
+                    </thead>
                     <tbody>${tbody}</tbody>
                 </table>
-                <div class="inv-summary">المجموع الفرعي: ${total.toLocaleString()} ج.م.<br>ضريبة القيمة المضافة: 0 ج.م.<br><span style="font-size: 18px;">**الإجمالي النهائي: ${total.toLocaleString()} ج.م.**</span></div>
-                <div class="inv-footer">شروط الدفع: الدفع ${document.getElementById('payMethod').value} عند الاستلام أو عبر التحويل البنكي.<br>* تحتفظ الشركة بحقها في تطبيق شروط الضمان المعمول بها للأجهزة.<br>شكراً لتعاملكم معنا! نتمنى زيارتكم مرة أخرى.</div>
-                <div class="stamp-area"><div>توقيع المستلم: ..........................</div><div>ختم المحل:</div></div>
+                
+                <div class="inv-summary-container">
+                    <div class="inv-summary">
+                        المجموع الفرعي: ${total.toLocaleString()} ج.م.<br>
+                        ضريبة القيمة المضافة: 0 ج.م.<br>
+                        <span style="font-size: 22px;">**الإجمالي النهائي: ${total.toLocaleString()} ج.م.**</span>
+                    </div>
+                </div>
+                
+                <div class="inv-footer">
+                    شروط الدفع: الدفع ${document.getElementById('payMethod').value} عند الاستلام أو عبر التحويل البنكي.<br>
+                    * تحتفظ الشركة بحقها في تطبيق شروط الضمان المعمول بها للأجهزة.<br>
+                    شكراً لتعاملكم معنا! نتمنى زيارتكم مرة أخرى.
+                </div>
+                
+                <div class="stamp-area">
+                    <div>توقيع المستلم: ..........................</div>
+                    <div>ختم المحل:</div>
+                </div>
             </div>`;
         }
 
@@ -568,16 +604,26 @@
 
             const pa = document.getElementById('printArea');
             pa.innerHTML = generateInvoiceA4HTML(cName, cPhone);
-            pa.style.display = 'block'; // مؤقت للاستخراج
+            pa.style.display = 'block'; 
             
             let fileName = `${cName}_${cPhone}.pdf`;
-            let opt = { margin: 0, filename: fileName, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            
+            // تم تغيير orientation إلى landscape هنا
+            let opt = { 
+                margin: 0, 
+                filename: fileName, 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2 }, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } 
+            };
 
             html2pdf().set(opt).from(pa.firstElementChild).save().then(() => {
                 pa.style.display = 'none'; pa.innerHTML = '';
                 
                 let finalTotal = document.getElementById('tFinalAmount').innerText;
-                let waTxt = `مرحباً بك في Level UP Store 🎮\nعزيزي ${cName}، شكراً لثقتك بنا.\n\nمرفق لسيادتكم الفاتورة / شهادة الضمان بقيمة ${finalTotal}.\n\n*يرجى إرسال ملف الـ PDF الذي تم تحميله الآن في هذه المحادثة.*\n\nنتشرف بزيارتك دائماً!`;
+                
+                // تم تعديل رسالة الواتساب حسب المطلوب
+                let waTxt = `مرحباً بك في Level UP Store 🎮\nعزيزي ${cName}، شكراً لثقتك بنا.\n\nمرفق لسيادتكم الفاتورة / شهادة الضمان بقيمة ${finalTotal}.\n\nسيتم إرفاق الفاتورة في رسالة منفصلة.\n\nنتشرف بزيارتك دائماً!`;
                 window.open(`https://wa.me/2${cPhone}?text=${encodeURIComponent(waTxt)}`, '_blank');
             });
         }
