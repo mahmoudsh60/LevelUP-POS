@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Level UP - نظام الفواتير والضمان والاستلام</title>
+    <title>Level UP - نظام الفواتير والضمان</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
@@ -36,18 +36,6 @@
         .btn-wa:hover { background: #059669; color: white; }
         .btn-qr { background: #3b82f6; color: white; margin-top: 10px; }
 
-        /* Labels Preview Styles */
-        .preview-wrapper { background: #090c14; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
-        .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
-        .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
-        .label-preview .l-logo { font-weight: 900; font-size: 14px; margin-right: 15px;}
-        .label-preview .l-order { font-size: 12px; font-weight: bold; margin-left: 15px;}
-        .label-preview .l-name-phone { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 4px;}
-        .label-preview .l-details { font-size: 11px; flex-grow: 1; text-align: center; white-space: pre-wrap; font-weight: bold;}
-        .label-preview .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto;}
-        .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
-        .label-preview .l-date { font-size: 12px; font-weight: bold; }
-        
         /* Queue Styles */
         .queue-container-wrapper { background: #0f1422; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 20px;}
         .queue-container-wrapper h4 { margin: 0 0 10px 0; color: var(--pri); font-size: 14px;}
@@ -70,7 +58,7 @@
         .dropdown-check-list.visible .items { display: block; }
         
         .cart-box { background: #0f1422; border: 1px dashed var(--border); border-radius: 8px; padding: 10px; min-height: 150px; margin-bottom: 15px; }
-        .cart-item { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; font-size: 13px; border-bottom: 1px solid var(--border); padding: 8px 0; gap: 5px; align-items: center;}
+        .cart-item { display: grid; grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr auto; font-size: 13px; border-bottom: 1px solid var(--border); padding: 8px 0; gap: 5px; align-items: center;}
         .cart-header { font-weight: bold; color: var(--mut); border-bottom: 2px solid var(--border); padding-bottom: 5px; }
         
         .totals-box { display: flex; justify-content: space-between; background: #06080e; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 15px; }
@@ -78,19 +66,20 @@
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 13px; }
         .totals-box h3 { margin: 0; color: white; }
         
-        /* --- تحديث تصميم الفاتورة A4 Landscape --- */
+        /* --- تحديث الفاتورة A4 Landscape --- */
         #printArea { display: none; }
         .a4-wrapper { 
             background: #ffffff; color: #000000; 
-            width: 297mm; /* مقاس Landscape بالعرض */
-            height: 210mm; /* إجبار الارتفاع ليكون صفحة واحدة فقط */
+            width: 297mm; /* مقاس عرضي دقيق */
+            height: 210mm; /* مقاس طولي دقيق لصفحة واحدة */
             padding: 10mm 15mm; 
             box-sizing: border-box; 
-            /* تغيير الخط إلى Arial ليقرأه محول الـ PDF بدون أخطاء التقطيع */
-            font-family: Arial, Tahoma, sans-serif; 
-            position: relative; direction: rtl;
-            overflow: hidden; /* لمنع ظهور صفحة ثانية فارغة */
+            font-family: Arial, Tahoma, sans-serif; /* الخط الأمثل للتحويل إلى PDF */
+            margin: 0 auto; /* توسيط الفاتورة */
+            direction: rtl;
+            overflow: hidden; 
         }
+        
         .inv-header-box {
             background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #e5e7eb;
         }
@@ -99,10 +88,12 @@
         
         .inv-title { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 15px; text-decoration: underline;}
         
-        .inv-info { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 16px; font-weight: bold; padding: 0 10px;}
+        /* الجدول العلوي للمعلومات لمنع الانعكاس */
+        .info-table { width: 100%; border: none; margin-bottom: 15px; font-size: 16px; font-weight: bold; }
+        .info-table td { padding: 4px 10px; border: none; }
         
         .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; text-align: center; background: #fff;}
-        .inv-table th, .inv-table td { border: 1px solid #000; padding: 8px 10px; font-size: 15px; line-height: 1.4;}
+        .inv-table th, .inv-table td { border: 1px solid #000; padding: 10px; font-size: 16px; line-height: 1.4;}
         .inv-table th { background-color: #f1f5f9; font-weight: bold; color: #000;}
         .inv-table td { font-weight: bold; }
         
@@ -118,35 +109,14 @@
             body > *:not(#printArea) { display: none !important; }
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
             body, html { background: white; margin: 0 !important; padding: 0 !important;}
-            
-            /* Label specific styles */
-            .real-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; page-break-after: always; page-break-inside: avoid; font-family: 'Tajawal', sans-serif; color: black; overflow: hidden; background: white;}
-            .real-label:last-child { page-break-after: auto; } 
-            .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 1px;}
-            .real-label .l-logo { font-size: 8px; font-weight: 900; line-height: 1; margin-right: 4mm;}
-            .real-label .l-order { font-size: 7px; font-weight: bold; line-height: 1; margin-left: 4mm;}
-            .real-label .l-name-phone { font-size: 10px; font-weight: 900; text-align: center; line-height: 1.2; width: 100%; white-space: nowrap; overflow: hidden; font-family: Arial, sans-serif;}
-            .real-label .l-details { font-size: 8.5px; font-weight: bold; text-align: center; line-height: 1.1; flex-grow: 1; overflow: hidden; white-space: pre-wrap; padding: 0 1mm;}
-            .real-label .l-footer { display: flex; justify-content: space-evenly; align-items: center; width: 100%; margin-top: auto; padding-bottom: 1mm;}
-            .real-label .l-date { font-size: 7px; font-weight: bold; }
-            .real-label .l-price-tag { font-size: 7px; font-weight: bold; }
-            .real-label .l-device { font-size: 8px; border: 1px solid #000; padding: 0 2px; font-weight: bold; border-radius: 2px; line-height: 1.2; }
-            .real-label .warning-text { font-size: 7.5px; text-align: center; font-weight: bold; line-height: 1.3; height: 100%; display:flex; flex-direction: column; justify-content: center;}
-            
-            .qr-simplest-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always; page-break-inside: avoid; background: white; color: black; overflow: hidden; }
-            .qr-simplest-label:last-child { page-break-after: auto; }
-            .qr-top-link { width: 100%; text-align: center; font-size: 11px; font-weight: 900; font-family: Arial, sans-serif; letter-spacing: 0.5px; margin-bottom: 2px; border-bottom: 1.5px solid #000; padding-bottom: 2px; }
-            .qr-body-center { display: flex; justify-content: space-between; align-items: center; width: 100%; flex: 1; box-sizing: border-box; padding: 0 1mm;}
-            .qr-logo-centered { width: 16mm; height: 16mm; object-fit: contain; }
-            .qr-code-centered { width: 16mm; height: 16mm; object-fit: contain; }
         }
     </style>
 </head>
 <body>
     <div class="dashboard">
-        <!-- قسم الاستلام والطباعة -->
+        <!-- قسم الاستلام والبيانات الشخصية -->
         <div class="panel">
-            <h2>📥 استلام وطباعة (Labels)</h2>
+            <h2>📥 بيانات العميل والإيصال</h2>
             <div class="input-group">
                 <label>بحث برقم الإيصال (للدفع السريع):</label>
                 <div style="display:flex; gap:10px;">
@@ -156,53 +126,16 @@
             </div>
 
             <div class="input-group">
-                <label>الاسم ورقم الموبايل (مسافة بينهم):</label>
-                <input type="text" id="cNamePhone" oninput="syncData()" placeholder="مثال: احمد صلاح 01555886990">
+                <label>اسم العميل:</label>
+                <input type="text" id="cName" placeholder="مثال: احمد صلاح">
+            </div>
+            <div class="input-group">
+                <label>رقم الهاتف:</label>
+                <input type="text" id="cPhone" placeholder="مثال: 01555886990">
             </div>
             
-            <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                <h4 style="margin: 0 0 10px; color: var(--pri);">1. طباعة أجهزة الصيانة / الاستلام</h4>
-                <div class="input-group">
-                    <label>تفاصيل العميل / المطلوب:</label>
-                    <textarea id="cDetails" rows="2" oninput="syncData()" placeholder="اكتب المشكلة أو الطلب هنا..."></textarea>
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <div class="input-group" style="flex: 1; margin-bottom: 10px;">
-                        <label>عدد الأجهزة:</label>
-                        <input type="number" id="cCount" oninput="syncData()" value="1" min="1">
-                    </div>
-                    <div class="input-group" style="flex: 1.5; margin-bottom: 10px;">
-                        <label>السعر (للطباعة):</label>
-                        <input type="text" id="cPricePrint" oninput="syncData()" placeholder="مثال: 500 ج">
-                    </div>
-                </div>
-                
-                <div class="preview-wrapper">
-                    <div class="label-preview">
-                        <div class="l-header"><span class="l-logo">Level UP</span><span class="l-order" id="prevOrder">#----</span></div>
-                        <div class="l-name-phone" id="prevNamePhone">الاسم والرقم</div>
-                        <div class="l-details" id="prevDetails">التفاصيل تظهر هنا...</div>
-                        <div class="l-footer">
-                            <div class="l-date" id="prevDate">--/--/----</div>
-                            <div class="l-device" style="border:none; padding:0;" id="prevPriceTag">السعر: </div>
-                            <div class="l-device">جهاز 1 من <span id="prevCount">1</span></div>
-                        </div>
-                    </div>
-                </div>
-                <button id="btnPrintLabels" onclick="printLabels()">🖨️ طباعة ملصقات الصيانة</button>
-            </div>
-
-            <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px; color: #3b82f6;">2. طباعة ملصق الـ QR لروابط الألعاب</h4>
-                <div class="input-group" style="margin-bottom: 10px;">
-                    <label>توليد ملصق لـ:</label>
-                    <select id="qrConsole">
-                        <option value="Offers">عروض الألعاب الأصلية (bit.ly/lvlupsale)</option>
-                        <option value="Modded">ألعاب التعديل والتهكير (bit.ly/4modps4)</option>
-                    </select>
-                </div>
-                <button class="btn-qr" onclick="printQRLabel()">🖨️ طباعة ملصق الـ QR</button>
-            </div>
+            <hr style="border-color: var(--border); margin: 20px 0;">
+            <p style="color: var(--mut); font-size: 13px;">ملاحظة: لطباعة ملصقات الصيانة و الـ QR، يتم تجهيزها عند استلام الجهاز في اليومية كالمعتاد، هنا قسم التركيز على الفاتورة البيعية النهائية.</p>
         </div>
 
         <!-- قسم الفاتورة والمبيعات -->
@@ -254,10 +187,10 @@
                 <h4>💿 باقة ألعاب / حسابات</h4>
                 <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                     <select id="accType" style="flex: 1; padding: 8px; border-radius: 6px; background: #151b2b; color: white; border: 1px solid var(--border);">
-                        <option value="Primary">Primary (أساسي)</option>
-                        <option value="Secondary">Secondary (فرعي)</option>
-                        <option value="Offline">Offline (أوفلاين)</option>
-                        <option value="Primary/Secondary">Primary + Secondary</option>
+                        <option value="Primary">Primary</option>
+                        <option value="Secondary">Secondary</option>
+                        <option value="Offline">Offline</option>
+                        <option value="Primary/Secondary">Primary/Secondary</option>
                     </select>
                     <div style="flex: 2;">
                         <div class="dropdown-check-list" id="gamesList">
@@ -290,6 +223,7 @@
             <h4 style="margin: 0 0 10px; color: var(--pri);">🧾 الأصناف في الفاتورة:</h4>
             <div class="cart-box">
                 <div class="cart-item cart-header">
+                    <span>النوع</span>
                     <span>الوصف</span>
                     <span style="text-align:center;">الكمية</span>
                     <span style="text-align:center;">السعر</span>
@@ -329,8 +263,9 @@
     <script>
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
+        // إضافة اختبار و ألعاب تهكير في أول القائمة
         const fullGamesList = [
-            "A way out", "AC Unity", "Affected the minor UK", "Alan Wake Remastered", "Assassin's Creed Mirage", "Assassin's Creed Odyssey", 
+            "اختبار", "ألعاب تهكير", "A way out", "AC Unity", "Affected the minor UK", "Alan Wake Remastered", "Assassin's Creed Mirage", "Assassin's Creed Odyssey", 
             "Assassin's Creed Origins", "Assassin's Creed® Valhalla", "Astro Bot", "Baja: Edge of Control HD", "Batman Arkham knight", 
             "Battlefield 4™ Premium Edition", "Battlefield™ V", "Beat Saber", "Bendy and the Dark Revival", "Black Ops 4", "Black Ops III", 
             "blood and Truth VR", "Burnout Paradise", "Call of duty Vanguard", "Call of Duty WWII Gold Edition", "Car Mechanic Sim", 
@@ -354,12 +289,13 @@
             "WWE 2K24", "WWE 2K25", "Zombie Army 4"
         ];
 
+        // تم إضافة حقل Cost ليتوافق مع شيت اليومية
         const accessoriesDB = [
-            { id: 1, name: "جراب 4", price: 150 }, { id: 2, name: "جراب 5", price: 150 },
-            { id: 5, name: "دراع 2", price: 180 }, { id: 6, name: "دراع 3 اسود", price: 300 },
-            { id: 8, name: "دراع اصلي 4 امريكي", price: 1000 }, { id: 12, name: "دراع اصلي 5 جديد", price: 3850 },
-            { id: 14, name: "دراع كوبي 4 جديد اول", price: 750 }, { id: 17, name: "ستاند شحن 5", price: 550 },
-            { id: 29, name: "كابل HDMI", price: 120 }
+            { id: 1, name: "جراب 4", price: 150, cost: 90 }, { id: 2, name: "جراب 5", price: 150, cost: 90 },
+            { id: 5, name: "دراع 2", price: 180, cost: 150 }, { id: 6, name: "دراع 3 اسود", price: 300, cost: 200 },
+            { id: 8, name: "دراع اصلي 4 امريكي", price: 1000, cost: 700 }, { id: 12, name: "دراع اصلي 5 جديد", price: 3850, cost: 3400 },
+            { id: 14, name: "دراع كوبي 4 جديد اول", price: 750, cost: 400 }, { id: 17, name: "ستاند شحن 5", price: 550, cost: 150 },
+            { id: 29, name: "كابل HDMI", price: 120, cost: 70 }
         ];
 
         let invoiceItems = [];
@@ -368,13 +304,7 @@
 
         const today = new Date();
         const dateStr = today.toLocaleDateString('en-GB');
-        const nextWeek = new Date(today); nextWeek.setDate(today.getDate() + 7);
-        const nextWeekStr = nextWeek.toLocaleDateString('en-GB');
-        const orderIdStr = '#' + Math.floor((Math.random() * 8900) + 100);
         const invNum = 'INV-' + today.getFullYear().toString().substr(-2) + (today.getMonth()+1).toString().padStart(2,'0') + today.getDate().toString().padStart(2,'0') + '-' + Math.floor(Math.random() * 90 + 10);
-
-        document.getElementById('prevOrder').innerText = orderIdStr;
-        document.getElementById('prevDate').innerText = dateStr;
 
         window.addEventListener('DOMContentLoaded', () => {
             const gamesUl = document.getElementById('gamesUl');
@@ -394,6 +324,21 @@
                 .then(data => { allOngoing = data; renderQueue(); })
                 .catch(e => console.log(e));
         });
+
+        function fetchOrderDetails() {
+            let oid = document.getElementById('searchOrderCode').value.trim();
+            if(!oid) return;
+            if (!oid.startsWith('#')) oid = '#' + oid;
+
+            const order = allOngoing.find(o => o.orderId === oid);
+            if(order) {
+                let parts = order.name.split(' ');
+                document.getElementById('cName').value = order.name; 
+                document.getElementById('cPhone').value = order.phone || "";
+            } else {
+                alert("لم يتم العثور على الإيصال.");
+            }
+        }
 
         function updateAccPrice() {
             let id = parseInt(document.getElementById('accSelect').value);
@@ -430,7 +375,9 @@
             let storage = document.getElementById('devStorage').value; let price = parseFloat(document.getElementById('devPrice').value);
             let qty = parseInt(document.getElementById('devQty').value) || 1;
             if(isNaN(price)) return alert("يرجى إدخال السعر");
-            invoiceItems.push({ desc: `${type} (${storage}) - نسخة ${model}، ضمان المركز`, qty, price, total: price * qty });
+            
+            // وصف إنجليزي فقط لمنع تداخل الحروف
+            invoiceItems.push({ category: "الجهاز", desc: `${type} ${model} ${storage}`, qty, price, total: price * qty, cost: "" });
             renderInvoice();
         }
 
@@ -442,7 +389,8 @@
             let selectedGames = []; document.querySelectorAll('#gamesList input[type="checkbox"]:checked').forEach(cb => selectedGames.push(cb.value));
             let gamesTxt = selectedGames.length > 0 ? `(${selectedGames.join(', ')})` : "";
             
-            invoiceItems.push({ desc: `باقة ألعاب/حسابات [${type}] ${gamesTxt}`, qty, price, total: price * qty });
+            // وصف إنجليزي بدون العناوين العربية
+            invoiceItems.push({ category: "الألعاب", desc: `[${type}] ${gamesTxt}`, qty, price, total: price * qty, cost: "" });
             renderInvoice();
             
             document.getElementById('gamesList').classList.remove('visible');
@@ -450,10 +398,17 @@
         }
 
         function addAccessory() {
-            let sel = document.getElementById('accSelect'); let name = sel.options[sel.selectedIndex].text;
-            let price = parseFloat(document.getElementById('accPrice').value); let qty = parseInt(document.getElementById('accQty').value) || 1;
+            let sel = document.getElementById('accSelect'); 
+            let name = sel.options[sel.selectedIndex].text;
+            let id = parseInt(sel.value);
+            let price = parseFloat(document.getElementById('accPrice').value); 
+            let qty = parseInt(document.getElementById('accQty').value) || 1;
+            
+            let itemData = accessoriesDB.find(i => i.id === id);
+            let itemCost = itemData ? itemData.cost : "";
+            
             if(isNaN(price)) return alert("يرجى إدخال السعر");
-            invoiceItems.push({ desc: name, qty, price, total: price * qty });
+            invoiceItems.push({ category: "الإكسسوارات", desc: name, qty, price, total: price * qty, cost: itemCost });
             renderInvoice();
         }
 
@@ -467,7 +422,8 @@
                     finalTotal += item.total;
                     list.innerHTML += `
                         <div class="cart-item">
-                            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.desc}</span>
+                            <span style="font-weight:bold; color:var(--pri);">${item.category}</span>
+                            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left;" dir="ltr">${item.desc}</span>
                             <span style="text-align:center;">${item.qty}</span><span style="text-align:center;">${item.price}</span>
                             <span style="text-align:center; font-weight:bold; color:var(--pri);">${item.total} ج</span>
                             <span style="cursor:pointer; color:var(--acc); font-size: 16px; text-align:left;" onclick="invoiceItems.splice(${index},1); renderInvoice();">✖</span>
@@ -478,71 +434,28 @@
             document.getElementById('tFinalAmount').innerText = finalTotal.toLocaleString() + " ج.م";
         }
         
-        function setPrintStyle(mode) {
+        function setPrintStyle() {
             let style = document.getElementById('dynamicPrintStyle');
             if(!style) { style = document.createElement('style'); style.id = 'dynamicPrintStyle'; document.head.appendChild(style); }
-            if (mode === 'label') {
-                style.innerHTML = '@media print { @page { size: 40mm 25mm; margin: 0mm !important; } }';
-            } else {
-                style.innerHTML = '@media print { @page { size: A4 landscape; margin: 0 !important; } }';
-            }
+            style.innerHTML = '@media print { @page { size: A4 landscape; margin: 0 !important; } }';
         }
 
-        function parseNamePhone() {
-            let raw = document.getElementById('cNamePhone').value.trim();
-            let phoneMatch = raw.match(/\d{8,}/); let phone = phoneMatch ? phoneMatch[0] : "";
-            let name = raw.replace(phone, "").trim();
-            if(!name && !phone) return { name: "", phone: "" };
-            if(!name) name = "عميل";
-            return { name, phone };
-        }
-
-        function syncData() {
-            let parsed = parseNamePhone();
-            let details = document.getElementById('cDetails').value.trim();
-            let priceTxt = document.getElementById('cPricePrint').value.trim();
-            
-            document.getElementById('prevNamePhone').innerText = parsed.name + " " + parsed.phone;
-            document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
-            document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
-            document.getElementById('prevPriceTag').innerText = `السعر: ${priceTxt}`;
-        }
-
-        function printLabels() {
-            let parsed = parseNamePhone(); let details = document.getElementById('cDetails').value.trim(); let priceTxt = document.getElementById('cPricePrint').value.trim();
-            const count = parseInt(document.getElementById('cCount').value) || 1;
-            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
-
-            setPrintStyle('label');
-            const pa = document.getElementById('printArea'); pa.innerHTML = '';
-            
-            for(let i = 1; i <= count; i++) {
-                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`; 
-            }
-            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 10px;"><span style="background:black; color:white; padding:1px 4px; border-radius:3px; font-weight:bold; margin-bottom:2px; display:inline-block;">نسخة المحل</span><br>${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">إجمالي ${count} أجهزة</div></div></div>`;
-            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
-            pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br><span style="font-size:10px; color:black;">01555886990 - 01010763503</span><br><br>الأوردر: ${orderIdStr}</div></div>`;
-            
-            setTimeout(() => { window.print(); }, 500);
-        }
-
-        function printQRLabel() {
-            const qrType = document.getElementById('qrConsole').value;
-            let qrImgSrc = qrType === 'Offers' ? 'sale.png' : 'mod.png'; let linkTxt = qrType === 'Offers' ? 'bit.ly/lvlupsale' : 'bit.ly/4modps4';
-            setPrintStyle('label');
-            const pa = document.getElementById('printArea');
-            pa.innerHTML = `<div class="qr-simplest-label"><div class="qr-top-link">${linkTxt}</div><div class="qr-body-center"><img src="lvlup.png" alt="Level UP" class="qr-logo-centered"><img src="${qrImgSrc}" alt="QR Code" class="qr-code-centered"></div></div>`;
-            setTimeout(() => { window.print(); }, 500);
-        }
-
-        // --- مولد قالب الفاتورة بصيغة صفحة واحدة مخصصة للطباعة أو تحويل PDF ---
+        // --- مولد الفاتورة ---
         function generateInvoiceA4HTML(cName, cPhone) {
             let total = 0;
-            let tbody = invoiceItems.map((item, index) => {
+            let tbody = invoiceItems.map((item) => {
                 total += item.total;
-                return `<tr><td>${index + 1}</td><td style="text-align:right;">${item.desc}</td><td>${item.qty}</td><td>${item.price.toLocaleString()} ج.م</td><td>${item.total.toLocaleString()} ج.م</td></tr>`;
+                // تم وضع خانة الوصف في dir="ltr" لمنع أي اختلال في ترتيب الكلمات والأقواس
+                return `<tr>
+                    <td>${item.category}</td>
+                    <td style="text-align:left;" dir="ltr">${item.desc}</td>
+                    <td>${item.qty}</td>
+                    <td>${item.price.toLocaleString()} ج.م</td>
+                    <td>${item.total.toLocaleString()} ج.م</td>
+                </tr>`;
             }).join('');
 
+            // استخدمنا Table للبيانات العلوية لمنع ظاهرة الانعكاس نهائياً
             return `
             <div class="a4-wrapper" id="invoiceTemplate">
                 <div class="inv-header-box">
@@ -552,16 +465,22 @@
                 
                 <div class="inv-title">فاتورة بيع ضريبية / شهادة ضمان</div>
                 
-                <div class="inv-info">
-                    <div style="text-align: right;">العميل: ${cName}<br>رقم الهاتف: <span dir="ltr" style="display:inline-block;">${cPhone}</span></div>
-                    <div style="text-align: left;">تاريخ الفاتورة: ${dateStr}<br>رقم الفاتورة: ${invNum}</div>
-                </div>
+                <table class="info-table" dir="rtl">
+                    <tr>
+                        <td style="text-align: right; width: 50%;">العميل: ${cName}</td>
+                        <td style="text-align: left; width: 50%;">تاريخ الفاتورة: <span dir="ltr">${dateStr}</span></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: right; width: 50%;">رقم الهاتف: <span dir="ltr">${cPhone}</span></td>
+                        <td style="text-align: left; width: 50%;">رقم الفاتورة: <span dir="ltr">${invNum}</span></td>
+                    </tr>
+                </table>
                 
                 <table class="inv-table">
                     <thead>
                         <tr>
-                            <th style="width: 5%;">م</th>
-                            <th style="width: 55%;">اسم الصنف والوصف</th>
+                            <th style="width: 15%;">النوع</th>
+                            <th style="width: 45%;">الوصف</th>
                             <th style="width: 10%;">الكمية</th>
                             <th style="width: 15%;">سعر الوحدة</th>
                             <th style="width: 15%;">الإجمالي</th>
@@ -591,20 +510,52 @@
             </div>`;
         }
 
+        async function saveToDailySheet(cName, cPhone) {
+            let pMethod = document.getElementById('payMethod').value;
+            // إرسال كل عنصر في الفاتورة كعملية منفصلة من نوع "اكسسوارات"
+            for (let i = 0; i < invoiceItems.length; i++) {
+                let item = invoiceItems[i];
+                let payload = {
+                    systemType: "Maintenance",
+                    orderId: invNum + (invoiceItems.length > 1 ? `-${i+1}` : ''),
+                    namePhone: cName + " " + cPhone,
+                    typeDetails: item.desc,
+                    technician: "-",
+                    type: "اكسسوارات", // تم تثبيتها كاكسسوارات كما طلبت
+                    maintRevenue: 0,
+                    maintCost: 0,
+                    goodsRevenue: item.total,
+                    goodsCost: item.cost || "", // تترك فارغة إن لم تكن مذكورة
+                    purchasesDetails: item.desc,
+                    purchasedItems: [{name: item.desc, qty: item.qty, sellPrice: item.price}],
+                    paymentMethod: pMethod
+                };
+                
+                await fetch(GOOGLE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ 'data': JSON.stringify(payload) })
+                }).catch(e => console.log(e));
+            }
+        }
+
         function printA4Invoice() {
             if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
-            let parsed = parseNamePhone();
-            let cName = parsed.name || "----------"; let cPhone = parsed.phone || "----------";
+            let cName = document.getElementById('cName').value.trim() || "----------"; 
+            let cPhone = document.getElementById('cPhone').value.trim() || "----------";
             
-            setPrintStyle('a4');
+            setPrintStyle();
             document.getElementById('printArea').innerHTML = generateInvoiceA4HTML(cName, cPhone);
-            setTimeout(() => { window.print(); }, 500);
+            setTimeout(() => { 
+                window.print(); 
+                saveToDailySheet(cName, cPhone); // حفظ في اليومية بعد الطباعة
+            }, 500);
         }
 
         function generatePDFandWhatsApp() {
             if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
-            let parsed = parseNamePhone();
-            let cName = parsed.name; let cPhone = parsed.phone;
+            let cName = document.getElementById('cName').value.trim(); 
+            let cPhone = document.getElementById('cPhone').value.trim();
             
             if(!cName || !cPhone) return alert("يرجى إدخال اسم العميل ورقم الموبايل في الأعلى ليتم تسمية الملف وإرساله.");
 
@@ -617,18 +568,18 @@
             let opt = { 
                 margin: 0, 
                 filename: fileName, 
-                image: { type: 'jpeg', quality: 0.98 }, 
+                image: { type: 'jpeg', quality: 1 }, 
                 html2canvas: { scale: 2, useCORS: true }, 
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
-                pagebreak: { mode: 'avoid-all' } // لإجبارها على عدم التقسيم لصفحات متعددة إن أمكن
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
             html2pdf().set(opt).from(pa.firstElementChild).save().then(() => {
                 pa.style.display = 'none'; pa.innerHTML = '';
                 
-                let finalTotal = document.getElementById('tFinalAmount').innerText;
+                // حفظ البيانات في اليومية
+                saveToDailySheet(cName, cPhone);
                 
-                let waTxt = `مرحباً بك في Level UP Store 🎮\nعزيزي ${cName}، شكراً لثقتك بنا.\n\nمرفق لسيادتكم الفاتورة / شهادة الضمان بقيمة ${finalTotal}.\n\nسيتم إرفاق الفاتورة في رسالة منفصلة.\n\nنتشرف بزيارتك دائماً!`;
+                let waTxt = `مرحباً بك في Level UP Store 🎮\nعزيزي ${cName}، شكراً لثقتك بنا.\n\nسيتم إرفاق الفاتورة في رسالة منفصلة.\n\nنتشرف بزيارتك دائماً!`;
                 window.open(`https://wa.me/2${cPhone}?text=${encodeURIComponent(waTxt)}`, '_blank');
             });
         }
