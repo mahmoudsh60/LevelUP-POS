@@ -78,38 +78,8 @@
         .totals-box h4 { margin: 0 0 5px 0; color: var(--mut); font-size: 13px; }
         .totals-box h3 { margin: 0; color: white; }
         
-        /* --- الفاتورة A4 Landscape --- */
         #printArea { display: none; }
-        .a4-wrapper { 
-            background: #ffffff; color: #000000; 
-            width: 297mm; min-height: 210mm; 
-            padding: 15mm 20mm; box-sizing: border-box; 
-            font-family: Arial, Tahoma, sans-serif; 
-            margin: 0 auto; direction: rtl;
-        }
         
-        .inv-header-box { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; text-align: center; border: 1px solid #e5e7eb; }
-        .inv-header-box h1 { margin: 0; font-size: 26px; font-weight: bold; color: #000;}
-        .inv-header-box p { margin: 5px 0 0 0; font-size: 16px; font-weight: bold; color: #333;}
-        
-        .inv-title { text-align: center; font-size: 22px; font-weight: bold; margin-bottom: 15px; text-decoration: underline;}
-        
-        .info-table { width: 100%; border: none; margin-bottom: 20px; font-size: 16px; font-weight: bold; }
-        .info-table td { padding: 4px 10px; border: none; }
-        
-        .inv-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; text-align: center; background: #fff;}
-        .inv-table th, .inv-table td { border: 1px solid #000; padding: 12px; font-size: 16px; line-height: 1.5;}
-        .inv-table th { background-color: #f1f5f9; font-weight: bold; color: #000;}
-        .inv-table td { font-weight: bold; }
-        
-        /* ضبط صندوق الإجمالي ليكون في نهاية الجدول من جهة اليسار */
-        .inv-summary-container { display: flex; justify-content: flex-end; width: 100%; margin-bottom: 15px; }
-        .inv-summary { width: 45%; border: 1px solid #000; padding: 10px 15px; background: #fff; font-size: 16px; font-weight: bold; line-height: 1.8; text-align: right;}
-        
-        .inv-footer { text-align: center; font-size: 14px; font-weight: bold; line-height: 1.6; margin-bottom: 25px; margin-top: 20px;}
-        .stamp-area { display: flex; justify-content: space-between; padding: 0 40px; font-size: 16px; font-weight: bold; margin-top: 30px;}
-        
-        /* General Print Mode Base */
         @media print {
             body > *:not(#printArea) { display: none !important; }
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
@@ -151,16 +121,12 @@
                 </div>
             </div>
 
+            <!-- تم إرجاع الاسم والرقم في خانة واحدة هنا لتغذية النظام بالكامل -->
             <div class="input-group">
-                <label>اسم العميل:</label>
-                <input type="text" id="cName" placeholder="مثال: احمد صلاح" oninput="syncData()">
-            </div>
-            <div class="input-group">
-                <label>رقم الهاتف:</label>
-                <input type="text" id="cPhone" placeholder="مثال: 01555886990" oninput="syncData()">
+                <label>الاسم ورقم الموبايل (مسافة بينهم):</label>
+                <input type="text" id="cNamePhone" oninput="syncData()" placeholder="مثال: محمود شوقي 01555886990">
             </div>
             
-            <!-- قسم طباعة الستيكرات -->
             <div style="border: 1px dashed var(--border); padding: 10px; border-radius: 8px; margin-bottom: 15px; margin-top: 20px;">
                 <h4 style="margin: 0 0 10px; color: var(--pri);">1. طباعة أجهزة الصيانة / الاستلام</h4>
                 <div class="input-group">
@@ -217,7 +183,6 @@
                 </div>
             </div>
             
-            <!-- 1. إضافة جهاز -->
             <div class="section-box">
                 <h4>🎮 إضافة جهاز للفاتورة</h4>
                 <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -250,7 +215,6 @@
                 </div>
             </div>
 
-            <!-- 2. إضافة ألعاب وحسابات -->
             <div class="section-box">
                 <h4>💿 باقة ألعاب / حسابات</h4>
                 <div style="display: flex; gap: 8px; margin-bottom: 10px;">
@@ -276,7 +240,6 @@
                 </div>
             </div>
 
-            <!-- 3. إضافة إكسسوارات -->
             <div class="section-box">
                 <h4>🕹️ إكسسوارات إضافية</h4>
                 <div style="display: flex; gap: 8px;">
@@ -287,7 +250,6 @@
                 </div>
             </div>
 
-            <!-- الفاتورة / السلة -->
             <h4 style="margin: 0 0 10px; color: var(--pri);">🧾 الأصناف في الفاتورة:</h4>
             <div class="cart-box">
                 <div class="cart-item cart-header">
@@ -325,13 +287,11 @@
         </div>
     </div>
 
-    <!-- المساحة المخصصة للطباعة -->
     <div id="printArea"></div>
 
     <script>
         const GOOGLE_URL = 'https://script.google.com/macros/s/AKfycbzsHNi9IU8P0cE57JkWQ1ZYK8W_7D1_R9klbJe2Fo9o6WPaOmyUm227fZYMIgz7bXdD/exec';
 
-        // إضافة اختبار و Modded games في أول القائمة
         const fullGamesList = [
             "اختبار", "Modded games", "A way out", "AC Unity", "Affected the minor UK", "Alan Wake Remastered", "Assassin's Creed Mirage", "Assassin's Creed Odyssey", 
             "Assassin's Creed Origins", "Assassin's Creed® Valhalla", "Astro Bot", "Baja: Edge of Control HD", "Batman Arkham knight", 
@@ -398,6 +358,17 @@
                 .catch(e => console.log(e));
         });
 
+        // دالة لفصل الاسم عن الرقم من الخانة المدمجة
+        function parseNamePhone() {
+            let raw = document.getElementById('cNamePhone').value.trim();
+            let phoneMatch = raw.match(/\d{8,}/);
+            let phone = phoneMatch ? phoneMatch[0] : "";
+            let name = raw.replace(phone, "").trim();
+            if(!name && !phone) return { name: "", phone: "" };
+            if(!name) name = "عميل";
+            return { name, phone };
+        }
+
         function fetchOrderDetails() {
             let oid = document.getElementById('searchOrderCode').value.trim();
             if(!oid) return;
@@ -405,8 +376,7 @@
 
             const order = allOngoing.find(o => o.orderId === oid);
             if(order) {
-                document.getElementById('cName').value = order.name; 
-                document.getElementById('cPhone').value = order.phone || "";
+                document.getElementById('cNamePhone').value = order.name + (order.phone ? " " + order.phone : "");
                 syncData();
             } else {
                 alert("لم يتم العثور على الإيصال.");
@@ -444,12 +414,11 @@
         }
 
         function syncData() {
-            let cName = document.getElementById('cName').value.trim() || "عميل";
-            let cPhone = document.getElementById('cPhone').value.trim() || "";
+            let parsed = parseNamePhone();
             let details = document.getElementById('cDetails').value.trim();
             let priceTxt = document.getElementById('cPricePrint').value.trim();
             
-            document.getElementById('prevNamePhone').innerText = cName + (cPhone ? " " + cPhone : "");
+            document.getElementById('prevNamePhone').innerText = parsed.name + (parsed.phone ? " " + parsed.phone : "");
             document.getElementById('prevDetails').innerText = details || "التفاصيل تظهر هنا...";
             document.getElementById('prevCount').innerText = document.getElementById('cCount').value || '1';
             document.getElementById('prevPriceTag').innerText = `السعر: ${priceTxt}`;
@@ -466,23 +435,22 @@
         }
 
         function printLabels() {
-            let cName = document.getElementById('cName').value.trim() || "عميل";
-            let cPhone = document.getElementById('cPhone').value.trim() || "";
+            let parsed = parseNamePhone();
             let details = document.getElementById('cDetails').value.trim(); 
             let priceTxt = document.getElementById('cPricePrint').value.trim();
             const count = parseInt(document.getElementById('cCount').value) || 1;
             
-            if(cName === "عميل" && !cPhone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
+            if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
             setPrintStyle('label');
             const pa = document.getElementById('printArea'); 
             pa.innerHTML = '';
             
             for(let i = 1; i <= count; i++) {
-                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${cName} ${cPhone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`; 
+                pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details">${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">جهاز ${i} من ${count}</div></div></div>`; 
             }
-            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${cName} ${cPhone}</div><div class="l-details" style="font-size: 10px;"><span style="background:black; color:white; padding:1px 4px; border-radius:3px; font-weight:bold; margin-bottom:2px; display:inline-block;">نسخة المحل</span><br>${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">إجمالي ${count} أجهزة</div></div></div>`;
-            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${cName} ${cPhone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
+            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 10px;"><span style="background:black; color:white; padding:1px 4px; border-radius:3px; font-weight:bold; margin-bottom:2px; display:inline-block;">نسخة المحل</span><br>${details}</div><div class="l-footer"><div class="l-date">${dateStr}</div><div class="l-price-tag">السعر: ${priceTxt}</div><div class="l-device">إجمالي ${count} أجهزة</div></div></div>`;
+            pa.innerHTML += `<div class="real-label"><div class="l-header"><span class="l-logo">Level UP</span><span class="l-order">${orderIdStr}</span></div><div class="l-name-phone">${parsed.name} ${parsed.phone}</div><div class="l-details" style="font-size: 11px; margin-top: 2px; text-align: center; padding: 0 2px;">إيصال استلام للعميل<br>الطلب: ${details}<br>العدد: ${count} أجهزة</div><div class="l-footer"><div class="l-date">${dateStr}</div></div></div>`;
             pa.innerHTML += `<div class="real-label"><div class="warning-text"><span style="font-size:11px;">⚠️ Level UP ⚠️</span><br><br>المحل غير مسؤول عن ترك<br>الأجهزة أكثر من أسبوع<br>(أقصى موعد: ${nextWeekStr})<br><br><span style="font-size:10px; color:black;">01555886990 - 01010763503</span><br><br>الأوردر: ${orderIdStr}</div></div>`;
             
             setTimeout(() => { window.print(); }, 500);
@@ -518,12 +486,11 @@
             let selectedGames = []; 
             document.querySelectorAll('#gamesList input[type="checkbox"]:checked').forEach(cb => selectedGames.push(cb.value));
             
-            // تحقق إذا كان الاختيار يحتوي على Modded games لإخفاء الـ Primary/Secondary
+            // تحقق إذا كان الاختيار يحتوي على Modded games
             let hasModded = selectedGames.includes("Modded games");
             
             let gamesTxt = selectedGames.length > 0 ? `(${selectedGames.join(', ')})` : "";
-            
-            // الوصف: إذا كان Modded لا تضع [Primary]، وإلا ضعه.
+            // إخفاء نوع الحساب (Primary/Secondary) إذا تم اختيار Modded games
             let desc = hasModded ? gamesTxt : `[${type}] ${gamesTxt}`;
             
             invoiceItems.push({ category: "الألعاب", desc: desc, qty, price, total: price * qty, cost: "" });
@@ -570,6 +537,7 @@
             document.getElementById('tFinalAmount').innerText = finalTotal.toLocaleString() + " ج.م";
         }
         
+        // --- مولد قالب الفاتورة بتصميم دقيق ومقاس ثابت ---
         function generateInvoiceA4HTML(cName, cPhone) {
             let total = 0;
             let tbody = invoiceItems.map((item) => {
@@ -583,54 +551,55 @@
                 </tr>`;
             }).join('');
 
+            // الـ Wrapper مصمم خصيصاً ليطابق مقاس A4 بالعرض بالبيكسل لضمان عدم ضغط المتصفح له
             return `
-            <div class="a4-wrapper" id="invoiceTemplate">
-                <div class="inv-header-box">
-                    <h1>Level UP Store</h1>
-                    <p>الإسماعيلية، شارع الأبراج، أرض الجمعيات<br>الهاتف: <span dir="ltr" style="display:inline-block;">01555886990 - 01010763503</span></p>
+            <div id="invoiceTemplate" style="width: 1122px; height: 794px; background: #ffffff; color: #000000; padding: 40px; box-sizing: border-box; font-family: Arial, Tahoma, sans-serif; direction: rtl; display: flex; flex-direction: column;">
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center; border: 1px solid #e5e7eb;">
+                    <h1 style="margin: 0; font-size: 28px; font-weight: bold; color: #000;">Level UP Store</h1>
+                    <p style="margin: 8px 0 0 0; font-size: 16px; font-weight: bold; color: #333;">الإسماعيلية، شارع الأبراج، أرض الجمعيات<br>الهاتف: <span dir="ltr" style="display:inline-block;">01555886990 - 01010763503</span></p>
                 </div>
                 
-                <div class="inv-title">فاتورة بيع ضريبية / شهادة ضمان</div>
+                <div style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 25px; text-decoration: underline;">فاتورة بيع ضريبية / شهادة ضمان</div>
                 
-                <table class="info-table" dir="rtl">
-                    <tr>
-                        <td style="text-align: right; width: 50%;">العميل: ${cName}</td>
-                        <td style="text-align: left; width: 50%;">تاريخ الفاتورة: <span dir="ltr">${dateStr}</span></td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: right; width: 50%;">رقم الهاتف: <span dir="ltr">${cPhone}</span></td>
-                        <td style="text-align: left; width: 50%;">رقم الفاتورة: <span dir="ltr">${invNum}</span></td>
-                    </tr>
-                </table>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 25px; font-size: 18px; font-weight: bold; padding: 0 10px;">
+                    <div style="text-align: right;">
+                        <div>العميل: ${cName}</div>
+                        <div>رقم الهاتف: <span dir="ltr">${cPhone}</span></div>
+                    </div>
+                    <div style="text-align: left;">
+                        <div>تاريخ الفاتورة: <span dir="ltr">${dateStr}</span></div>
+                        <div>رقم الفاتورة: <span dir="ltr">${invNum}</span></div>
+                    </div>
+                </div>
                 
-                <table class="inv-table">
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; text-align: center; background: #fff;">
                     <thead>
                         <tr>
-                            <th style="width: 15%;">النوع</th>
-                            <th style="width: 45%;">الوصف</th>
-                            <th style="width: 10%;">الكمية</th>
-                            <th style="width: 15%;">سعر الوحدة</th>
-                            <th style="width: 15%;">الإجمالي</th>
+                            <th style="width: 15%; border: 1px solid #000; padding: 12px; background-color: #f1f5f9; font-weight: bold; font-size: 18px;">النوع</th>
+                            <th style="width: 45%; border: 1px solid #000; padding: 12px; background-color: #f1f5f9; font-weight: bold; font-size: 18px;">الوصف</th>
+                            <th style="width: 10%; border: 1px solid #000; padding: 12px; background-color: #f1f5f9; font-weight: bold; font-size: 18px;">الكمية</th>
+                            <th style="width: 15%; border: 1px solid #000; padding: 12px; background-color: #f1f5f9; font-weight: bold; font-size: 18px;">سعر الوحدة</th>
+                            <th style="width: 15%; border: 1px solid #000; padding: 12px; background-color: #f1f5f9; font-weight: bold; font-size: 18px;">الإجمالي</th>
                         </tr>
                     </thead>
                     <tbody>${tbody}</tbody>
                 </table>
                 
-                <div class="inv-summary-container">
-                    <div class="inv-summary">
+                <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 25px;">
+                    <div style="width: 45%; border: 1px solid #000; padding: 15px; background: #fff; font-size: 18px; font-weight: bold; line-height: 1.8; text-align: right;">
                         المجموع الفرعي: ${total.toLocaleString()} ج.م.<br>
                         ضريبة القيمة المضافة: 0 ج.م.<br>
-                        <span style="font-size: 20px;">**الإجمالي النهائي: ${total.toLocaleString()} ج.م.**</span>
+                        <span style="font-size: 24px;">**الإجمالي النهائي: ${total.toLocaleString()} ج.م.**</span>
                     </div>
                 </div>
                 
-                <div class="inv-footer">
+                <div style="text-align: center; font-size: 16px; font-weight: bold; line-height: 1.6; margin-bottom: auto;">
                     شروط الدفع: الدفع ${document.getElementById('payMethod').value} عند الاستلام أو عبر التحويل البنكي.<br>
                     * تحتفظ الشركة بحقها في تطبيق شروط الضمان المعمول بها للأجهزة.<br>
                     شكراً لتعاملكم معنا! نتمنى زيارتكم مرة أخرى.
                 </div>
                 
-                <div class="stamp-area">
+                <div style="display: flex; justify-content: space-between; padding: 0 40px; font-size: 18px; font-weight: bold; margin-top: 30px;">
                     <div>توقيع المستلم: ..........................</div>
                     <div>ختم المحل:</div>
                 </div>
@@ -644,10 +613,10 @@
                 let payload = {
                     systemType: "Maintenance",
                     orderId: invNum + (invoiceItems.length > 1 ? `-${i+1}` : ''),
-                    namePhone: cName + " " + cPhone,
+                    namePhone: cName + (cPhone ? " " + cPhone : ""),
                     typeDetails: item.desc,
                     technician: "-",
-                    type: "اكسسوارات",
+                    type: "اكسسوارات", // تم التثبيت كإكسسوار
                     maintRevenue: 0,
                     maintCost: 0,
                     goodsRevenue: item.total,
@@ -667,33 +636,32 @@
 
         function printA4Invoice() {
             if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
-            let cName = document.getElementById('cName').value.trim() || "----------"; 
-            let cPhone = document.getElementById('cPhone').value.trim() || "----------";
+            let parsed = parseNamePhone();
             
             setPrintStyle('a4');
-            document.getElementById('printArea').innerHTML = generateInvoiceA4HTML(cName, cPhone);
+            document.getElementById('printArea').innerHTML = generateInvoiceA4HTML(parsed.name, parsed.phone);
             setTimeout(() => { 
                 window.print(); 
-                saveToDailySheet(cName, cPhone);
+                saveToDailySheet(parsed.name, parsed.phone);
             }, 500);
         }
 
         function generatePDFandWhatsApp() {
             if(invoiceItems.length === 0) return alert("الفاتورة فارغة!");
-            let cName = document.getElementById('cName').value.trim(); 
-            let cPhone = document.getElementById('cPhone').value.trim();
+            let parsed = parseNamePhone();
+            let cName = parsed.name; 
+            let cPhone = parsed.phone;
             
             if(!cName || !cPhone) return alert("يرجى إدخال اسم العميل ورقم الموبايل في الأعلى ليتم تسمية الملف وإرساله.");
 
             const pa = document.getElementById('printArea');
             pa.innerHTML = generateInvoiceA4HTML(cName, cPhone);
             
-            // إظهار الفاتورة بخواص Absolute لتثبيت المقاس لـ html2pdf لمنع الضغط والتشوه
+            // خصائص العرض الثابت لضمان السنطرة والمقاس الصحيح قبل التقاط الـ PDF
+            pa.style.display = 'block'; 
             pa.style.position = 'absolute';
-            pa.style.left = '0';
+            pa.style.left = '-9999px'; // نقلها خارج الشاشة لمنع تشوه التنسيق بسبب التمرير
             pa.style.top = '0';
-            pa.style.zIndex = '-1';
-            pa.style.display = 'block';
             
             let fileName = `${cName}_${cPhone}.pdf`;
             
@@ -701,7 +669,7 @@
                 margin: 0, 
                 filename: fileName, 
                 image: { type: 'jpeg', quality: 1 }, 
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 1122 }, // ضبط عرض الشاشة الافتراضية
+                html2canvas: { scale: 2, useCORS: true }, 
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
 
