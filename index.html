@@ -109,6 +109,22 @@
     </style>
 </head>
 <body>
+    
+    <!-- قسم الحضور والانصراف المضاف حديثاً -->
+    <div class="panel" style="margin: auto; max-width: 1400px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+        <h3 style="margin: 0; color: #10b981;">⏱️ تسجيل الحضور والانصراف</h3>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <select id="empName" style="padding: 10px; border-radius: 6px; background: #0f1422; color: white; border: 1px solid var(--border);">
+                <option value="محمود">محمود</option>
+                <option value="يسري">يسري</option>
+                <option value="بدر">بدر</option>
+                <option value="أحمد">أحمد</option>
+            </select>
+            <button onclick="recordAttendance('حضور')" style="background: #10b981; color: black; width: auto; padding: 10px 20px;">تسجيل حضور 🟢</button>
+            <button onclick="recordAttendance('انصراف')" style="background: #ef4444; color: white; width: auto; padding: 10px 20px;">تسجيل انصراف 🔴</button>
+        </div>
+    </div>
+
     <div class="dashboard">
         <!-- قسم الاستلام والبيانات الشخصية والستيكرات -->
         <div class="panel">
@@ -357,6 +373,29 @@
                 .then(data => { allOngoing = data; renderQueue(); })
                 .catch(e => console.log(e));
         });
+        
+        // --- دالة تسجيل الحضور والانصراف ---
+        function recordAttendance(type) {
+            let empName = document.getElementById('empName').value;
+            let payload = {
+                systemType: "Attendance",
+                name: empName,
+                action: type,
+                date: new Date().toLocaleString('en-GB')
+            };
+            
+            fetch(GOOGLE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 'data': JSON.stringify(payload) })
+            }).then(() => {
+                let btnMsg = type === 'حضور' ? 'تم تسجيل الحضور بنجاح' : 'تم تسجيل الانصراف بنجاح';
+                alert(btnMsg + " لـ " + empName);
+            }).catch(e => {
+                alert("حدث خطأ أثناء الاتصال بالنظام، يرجى المحاولة مرة أخرى.");
+                console.log(e);
+            });
+        }
 
         // دالة لفصل الاسم عن الرقم من الخانة المدمجة
         function parseNamePhone() {
@@ -434,6 +473,7 @@
             }
         }
 
+        // --- إصلاح دالة طباعة الستيكر للتسجيل في الـ Backend وتحديث الطابور ---
         function printLabels() {
             let parsed = parseNamePhone();
             let details = document.getElementById('cDetails').value.trim(); 
@@ -442,6 +482,40 @@
             
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
+            // 1- إرسال البيانات للـ Backend عشان تتسجل 
+            let payload = {
+                systemType: "Maintenance",
+                orderId: orderIdStr,
+                namePhone: parsed.name + (parsed.phone ? " " + parsed.phone : ""),
+                typeDetails: details + ` (العدد: ${count})`,
+                technician: "-",
+                type: "استلام", 
+                maintRevenue: priceTxt || 0,
+                maintCost: 0,
+                goodsRevenue: 0,
+                goodsCost: "",
+                purchasesDetails: "",
+                purchasedItems: [],
+                paymentMethod: "آجل" 
+            };
+
+            fetch(GOOGLE_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ 'data': JSON.stringify(payload) })
+            }).catch(e => console.log("Error saving to backend:", e));
+
+            // 2- إضافة العملية للطابور فوق مباشرة (لتظهر للأدمن)
+            allOngoing.unshift({
+                orderId: orderIdStr,
+                name: parsed.name,
+                phone: parsed.phone,
+                details: details,
+                status: 'pending'
+            });
+            renderQueue(); // تحديث شريط الأجهزة في الانتظار بدون Refresh
+
+            // 3- تجهيز الطباعة الفعلية
             setPrintStyle('label');
             const pa = document.getElementById('printArea'); 
             pa.innerHTML = '';
@@ -551,7 +625,6 @@
                 </tr>`;
             }).join('');
 
-            // الـ Wrapper مصمم خصيصاً ليطابق مقاس A4 بالعرض بالبيكسل لضمان عدم ضغط المتصفح له
             return `
             <div id="invoiceTemplate" style="width: 1122px; height: 794px; background: #ffffff; color: #000000; padding: 40px; box-sizing: border-box; font-family: Arial, Tahoma, sans-serif; direction: rtl; display: flex; flex-direction: column;">
                 <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; text-align: center; border: 1px solid #e5e7eb;">
@@ -657,10 +730,9 @@
             const pa = document.getElementById('printArea');
             pa.innerHTML = generateInvoiceA4HTML(cName, cPhone);
             
-            // خصائص العرض الثابت لضمان السنطرة والمقاس الصحيح قبل التقاط الـ PDF
             pa.style.display = 'block'; 
             pa.style.position = 'absolute';
-            pa.style.left = '-9999px'; // نقلها خارج الشاشة لمنع تشوه التنسيق بسبب التمرير
+            pa.style.left = '-9999px'; 
             pa.style.top = '0';
             
             let fileName = `${cName}_${cPhone}.pdf`;
@@ -674,7 +746,6 @@
             };
 
             html2pdf().set(opt).from(pa.firstElementChild).save().then(() => {
-                // إعادة الإخفاء بعد التحميل
                 pa.style.display = 'none'; 
                 pa.style.position = 'static';
                 pa.innerHTML = '';
