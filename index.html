@@ -16,7 +16,7 @@
         .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1400px; margin: auto; }
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
         
-        /* شريط الحضور والانصراف العلوي - مطابق للصورة الأولى */
+        /* شريط الحضور والانصراف */
         .top-bar {
             background: #111827;
             border: 1px solid var(--border);
@@ -24,19 +24,39 @@
             padding: 12px 20px;
             margin: auto;
             max-width: 1400px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .top-bar .title { font-size: 16px; font-weight: bold; color: #10b981; display: flex; align-items: center; gap: 8px;}
-        .top-bar .actions { display: flex; gap: 10px; align-items: center; }
+        .top-bar .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap;}
         .top-bar select { padding: 8px; border-radius: 6px; background: #1f2937; color: white; border: 1px solid #374151; font-family: inherit; }
-        .btn-in { background: #10b981; color: #000; padding: 8px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .top-bar button { width: auto !important; padding: 8px 15px !important; margin: 0 !important; font-size: 14px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; transition: 0.2s;}
+        .btn-in { background: #10b981; color: #000; }
         .btn-in:hover { background: #059669; color: white;}
-        .btn-out { background: #ef4444; color: white; padding: 8px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-out { background: #ef4444; color: white; }
         .btn-out:hover { background: #dc2626; }
+
+        /* كارت حالة الموظف (الجديد) */
+        #empCard {
+            display: none; 
+            background: #1f2937; 
+            border: 1px solid #374151; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            margin: auto; 
+            max-width: 1400px; 
+            margin-bottom: 20px; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.4);}
         .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; }
@@ -68,7 +88,6 @@
         .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
         .label-preview .l-date { font-size: 12px; font-weight: bold; }
 
-        /* كروت الأجهزة في الانتظار - مطابقة للصورة الثالثة */
         .queue-container-wrapper { background: #0f1422; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 20px;}
         .queue-container-wrapper h4 { margin: 0 0 15px 0; color: var(--pri); font-size: 14px;}
         #queueContainer { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; }
@@ -89,7 +108,6 @@
         .queue-card .c-name { font-weight: bold; font-size: 14px; margin-bottom: 4px; color: white;}
         .queue-card .c-details { font-size: 11px; margin-bottom: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
-        /* زرار إنهاء العملية الشفاف بدون خلفية */
         .btn-done { 
             background: transparent; 
             color: #10b981; 
@@ -153,7 +171,7 @@
 </head>
 <body>
     
-    <!-- شريط الحضور والانصراف (نفس تصميم الصورة الأولى) -->
+    <!-- شريط الحضور والانصراف -->
     <div class="top-bar">
         <div class="title">⏱️ تسجيل الحضور والانصراف</div>
         <div class="actions">
@@ -164,6 +182,18 @@
             <button class="btn-in" onclick="recordAttendance('حضور')">تسجيل حضور 🟢</button>
             <button class="btn-out" onclick="recordAttendance('انصراف')">تسجيل انصراف 🔴</button>
         </div>
+    </div>
+
+    <!-- كارت الموظف الذي يظهر عند تسجيل الدخول/الخروج -->
+    <div id="empCard">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="font-size: 24px; background: #374151; padding: 8px; border-radius: 50%;">👤</div>
+            <div>
+                <div id="cardEmpName" style="font-weight: bold; color: white; font-size: 15px;">الاسم</div>
+                <div id="cardEmpStatus" style="font-size: 13px; color: #94a3b8; margin-top: 2px;">الحالة</div>
+            </div>
+        </div>
+        <div id="cardEmpTime" style="font-weight: bold; font-family: Arial, sans-serif; font-size: 16px; direction: ltr;">--:-- --</div>
     </div>
 
     <div class="dashboard">
@@ -419,27 +449,40 @@
                 .catch(e => console.log(e));
         });
         
-        // --- دالة تسجيل الحضور والانصراف (مع ضمان إرسال البيانات بشكل صحيح للتليجرام) ---
+        // --- دالة تسجيل الحضور والانصراف (بدون Alert + بتظهر الكارت + بترسل للسيرفر) ---
         function recordAttendance(actionType) {
             let empName = document.getElementById('empName').value;
+            let now = new Date();
+            let timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            // تحديث الكارت وإظهاره
+            let card = document.getElementById('empCard');
+            document.getElementById('cardEmpName').innerText = empName;
+            document.getElementById('cardEmpTime').innerText = timeString;
+            
+            if(actionType === 'حضور') {
+                document.getElementById('cardEmpStatus').innerHTML = '🟢 متواجد الآن';
+                document.getElementById('cardEmpTime').style.color = '#10b981';
+            } else {
+                document.getElementById('cardEmpStatus').innerHTML = '🔴 سجل انصراف / غادر';
+                document.getElementById('cardEmpTime').style.color = '#ef4444';
+            }
+            card.style.display = 'flex';
+
+            // إرسال البيانات للسيرفر بنفس الصيغة الأصلية عشان التليجرام يقراها
             let payload = {
-                systemType: "Attendance", 
-                type: actionType,      
-                action: actionType,    
+                systemType: "Attendance",
                 name: empName,
-                date: new Date().toLocaleString('en-GB')
+                action: actionType,
+                date: now.toLocaleString('en-GB')
             };
             
             fetch(GOOGLE_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ 'data': JSON.stringify(payload) })
-            }).then(() => {
-                let btnMsg = actionType === 'حضور' ? 'تم تسجيل الحضور بنجاح' : 'تم تسجيل الانصراف بنجاح';
-                alert(btnMsg + " لـ " + empName);
             }).catch(e => {
-                alert("حدث خطأ أثناء الاتصال بالنظام، يرجى المحاولة مرة أخرى.");
-                console.log(e);
+                console.log("Error sending attendance to Telegram:", e);
             });
         }
 
@@ -514,8 +557,6 @@
                 method: 'POST', 
                 body: formData,
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            }).then(()=> {
-                console.log("تم تحديث الحالة بنجاح.");
             }).catch(e => console.log(e));
         }
 
@@ -540,7 +581,6 @@
             }
         }
 
-        // إخفاء إجمالي المشتريات والتكاليف من أشعار التليجرام الخاص بالستيكر
         function printLabels() {
             let parsed = parseNamePhone();
             let details = document.getElementById('cDetails').value.trim(); 
@@ -549,7 +589,7 @@
             
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
-            // تم إزالة حقول التكاليف (goodsCost و goodsRevenue) لعدم إرسالها للـ Backend
+            // استبدال الفراغ بـ "-" لعدم ظهور "0 ج" في التليجرام
             let payload = {
                 systemType: "Maintenance",
                 orderId: orderIdStr,
@@ -557,7 +597,12 @@
                 typeDetails: details + ` (العدد: ${count})`,
                 technician: "-",
                 type: "استلام", 
-                maintRevenue: priceTxt || "", 
+                maintRevenue: priceTxt || "-", 
+                maintCost: "-",
+                goodsRevenue: "-", 
+                goodsCost: "-",
+                purchasesDetails: "-",
+                purchasedItems: [],
                 paymentMethod: "آجل",
                 status: "ongoing"
             };
