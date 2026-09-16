@@ -115,10 +115,9 @@
         <h3 style="margin: 0; color: #10b981;">⏱️ تسجيل الحضور والانصراف</h3>
         <div style="display: flex; gap: 10px; align-items: center;">
             <select id="empName" style="padding: 10px; border-radius: 6px; background: #0f1422; color: white; border: 1px solid var(--border);">
-                <option value="محمود">محمود</option>
-                <option value="يسري">يسري</option>
-                <option value="بدر">بدر</option>
-                <option value="أحمد">أحمد</option>
+                <!-- تم التعديل بناءً على طلبك ليكون الأسماء فقط عمر ياسر وعمر كيلاني -->
+                <option value="عمر ياسر">عمر ياسر</option>
+                <option value="عمر كيلاني">عمر كيلاني</option>
             </select>
             <button onclick="recordAttendance('حضور')" style="background: #10b981; color: black; width: auto; padding: 10px 20px;">تسجيل حضور 🟢</button>
             <button onclick="recordAttendance('انصراف')" style="background: #ef4444; color: white; width: auto; padding: 10px 20px;">تسجيل انصراف 🔴</button>
@@ -137,7 +136,6 @@
                 </div>
             </div>
 
-            <!-- تم إرجاع الاسم والرقم في خانة واحدة هنا لتغذية النظام بالكامل -->
             <div class="input-group">
                 <label>الاسم ورقم الموبايل (مسافة بينهم):</label>
                 <input type="text" id="cNamePhone" oninput="syncData()" placeholder="مثال: محمود شوقي 01555886990">
@@ -368,17 +366,26 @@
             document.getElementById('prevOrder').innerText = orderIdStr;
             document.getElementById('prevDate').innerText = dateStr;
 
+            // تحديث جلب الكروت لدعم الحالات بشكل أفضل
             fetch(GOOGLE_URL + '?action=getOngoing')
                 .then(res => res.json())
-                .then(data => { allOngoing = data; renderQueue(); })
+                .then(data => { 
+                    // في حال كان السيرفر يرسل المصفوفة كصفوف بدلاً من Objects
+                    if(data.length > 0 && Array.isArray(data[0])) {
+                        allOngoing = data.map(row => ({ orderId: row[0], name: row[1], phone: row[2], details: row[3], status: row[4] }));
+                    } else {
+                        allOngoing = data; 
+                    }
+                    renderQueue(); 
+                })
                 .catch(e => console.log(e));
         });
         
-        // --- دالة تسجيل الحضور والانصراف ---
+        // --- دالة تسجيل الحضور والانصراف المعدلة للتليجرام ---
         function recordAttendance(type) {
             let empName = document.getElementById('empName').value;
             let payload = {
-                systemType: "Attendance",
+                systemType: "Attendance", // هذا المفتاح هو اللي بيشغل التليجرام في السيرفر
                 name: empName,
                 action: type,
                 date: new Date().toLocaleString('en-GB')
@@ -397,7 +404,6 @@
             });
         }
 
-        // دالة لفصل الاسم عن الرقم من الخانة المدمجة
         function parseNamePhone() {
             let raw = document.getElementById('cNamePhone').value.trim();
             let phoneMatch = raw.match(/\d{8,}/);
@@ -431,6 +437,7 @@
         function renderQueue() {
             const container = document.getElementById('queueContainer');
             container.innerHTML = '';
+            // يعرض الأجهزة اللي حالتها ongoing ومش موجودة في hiddenOrders
             let pendingOrders = allOngoing.filter(o => o.status !== 'done' && !hiddenOrders.includes(o.orderId));
             
             if (pendingOrders.length === 0) {
@@ -445,11 +452,33 @@
             });
         }
 
+        // --- دالة إنهاء العملية وتغيير الحالة لـ done ---
         function markAsDone(orderId) {
-            hiddenOrders.push(orderId); localStorage.setItem('hiddenOrders', JSON.stringify(hiddenOrders));
+            // إخفاء الكارت من الشاشة فوراً
+            hiddenOrders.push(orderId); 
+            localStorage.setItem('hiddenOrders', JSON.stringify(hiddenOrders));
+            
+            // تحديث الحالة في مصفوفة الجافاسكريبت
+            let orderIndex = allOngoing.findIndex(o => o.orderId === orderId);
+            if(orderIndex !== -1) allOngoing[orderIndex].status = 'done';
+            
             renderQueue();
-            const formData = new URLSearchParams(); formData.append('data', JSON.stringify({ systemType: "UpdateStatus", orderId: orderId, status: "done" }));
-            fetch(GOOGLE_URL, { method: 'POST', body: formData }).catch(e => console.log(e));
+            
+            // إرسال طلب للسيرفر (Google Apps Script) لتغيير الحالة لـ done
+            const formData = new URLSearchParams(); 
+            formData.append('data', JSON.stringify({ 
+                systemType: "UpdateStatus", 
+                orderId: orderId, 
+                status: "done" 
+            }));
+            
+            fetch(GOOGLE_URL, { 
+                method: 'POST', 
+                body: formData,
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+            }).then(()=> {
+                console.log("تم تحديث حالة الأوردر بنجاح لـ Done.");
+            }).catch(e => console.log(e));
         }
 
         function syncData() {
@@ -473,7 +502,7 @@
             }
         }
 
-        // --- إصلاح دالة طباعة الستيكر للتسجيل في الـ Backend وتحديث الطابور ---
+        // --- إخفاء التكاليف من الاستلام / تعديل payload ---
         function printLabels() {
             let parsed = parseNamePhone();
             let details = document.getElementById('cDetails').value.trim(); 
@@ -482,7 +511,7 @@
             
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
-            // 1- إرسال البيانات للـ Backend عشان تتسجل 
+            // جعل قيم البضائع فارغة تماماً حتى لا تظهر في التليجرام
             let payload = {
                 systemType: "Maintenance",
                 orderId: orderIdStr,
@@ -490,13 +519,14 @@
                 typeDetails: details + ` (العدد: ${count})`,
                 technician: "-",
                 type: "استلام", 
-                maintRevenue: priceTxt || 0,
-                maintCost: 0,
-                goodsRevenue: 0,
-                goodsCost: "",
+                maintRevenue: priceTxt || "", // نرسل السعر فقط
+                maintCost: "",
+                goodsRevenue: "", // قمنا بتفريغها حتى لا تظهر في إشعار التليجرام
+                goodsCost: "",    // قمنا بتفريغها
                 purchasesDetails: "",
                 purchasedItems: [],
-                paymentMethod: "آجل" 
+                paymentMethod: "آجل",
+                status: "ongoing" // حفظ الحالة المبدئية
             };
 
             fetch(GOOGLE_URL, {
@@ -505,17 +535,15 @@
                 body: new URLSearchParams({ 'data': JSON.stringify(payload) })
             }).catch(e => console.log("Error saving to backend:", e));
 
-            // 2- إضافة العملية للطابور فوق مباشرة (لتظهر للأدمن)
             allOngoing.unshift({
                 orderId: orderIdStr,
                 name: parsed.name,
                 phone: parsed.phone,
                 details: details,
-                status: 'pending'
+                status: 'ongoing' // تم إعادتها كعملية جارية لتظهر في الكروت
             });
-            renderQueue(); // تحديث شريط الأجهزة في الانتظار بدون Refresh
+            renderQueue(); 
 
-            // 3- تجهيز الطباعة الفعلية
             setPrintStyle('label');
             const pa = document.getElementById('printArea'); 
             pa.innerHTML = '';
@@ -560,11 +588,8 @@
             let selectedGames = []; 
             document.querySelectorAll('#gamesList input[type="checkbox"]:checked').forEach(cb => selectedGames.push(cb.value));
             
-            // تحقق إذا كان الاختيار يحتوي على Modded games
             let hasModded = selectedGames.includes("Modded games");
-            
             let gamesTxt = selectedGames.length > 0 ? `(${selectedGames.join(', ')})` : "";
-            // إخفاء نوع الحساب (Primary/Secondary) إذا تم اختيار Modded games
             let desc = hasModded ? gamesTxt : `[${type}] ${gamesTxt}`;
             
             invoiceItems.push({ category: "الألعاب", desc: desc, qty, price, total: price * qty, cost: "" });
@@ -611,7 +636,6 @@
             document.getElementById('tFinalAmount').innerText = finalTotal.toLocaleString() + " ج.م";
         }
         
-        // --- مولد قالب الفاتورة بتصميم دقيق ومقاس ثابت ---
         function generateInvoiceA4HTML(cName, cPhone) {
             let total = 0;
             let tbody = invoiceItems.map((item) => {
@@ -689,7 +713,7 @@
                     namePhone: cName + (cPhone ? " " + cPhone : ""),
                     typeDetails: item.desc,
                     technician: "-",
-                    type: "اكسسوارات", // تم التثبيت كإكسسوار
+                    type: "اكسسوارات", 
                     maintRevenue: 0,
                     maintCost: 0,
                     goodsRevenue: item.total,
