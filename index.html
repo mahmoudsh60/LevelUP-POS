@@ -16,6 +16,28 @@
         .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1400px; margin: auto; }
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
         
+        /* شريط الحضور والانصراف العلوي - مطابق للصورة الأولى */
+        .top-bar {
+            background: #111827;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin: auto;
+            max-width: 1400px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .top-bar .title { font-size: 16px; font-weight: bold; color: #10b981; display: flex; align-items: center; gap: 8px;}
+        .top-bar .actions { display: flex; gap: 10px; align-items: center; }
+        .top-bar select { padding: 8px; border-radius: 6px; background: #1f2937; color: white; border: 1px solid #374151; font-family: inherit; }
+        .btn-in { background: #10b981; color: #000; padding: 8px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-in:hover { background: #059669; color: white;}
+        .btn-out { background: #ef4444; color: white; padding: 8px 15px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-out:hover { background: #dc2626; }
+
         .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.4);}
         .panel h2 { color: var(--pri); margin-top: 0; border-bottom: 2px dashed var(--border); padding-bottom: 10px; }
         
@@ -30,13 +52,11 @@
         
         button { background: var(--pri); color: #000; padding: 12px; border: none; border-radius: 6px; font-weight: 900; font-family: inherit; cursor: pointer; width: 100%; font-size: 15px; transition: 0.2s ease-in-out; }
         button:hover { background: var(--pri-hover); color: white; transform: translateY(-1px); }
-        button:disabled { opacity: 0.6; cursor: not-allowed; }
         
         .btn-wa { background: #10b981; color: #000; margin-top: 15px; } 
         .btn-wa:hover { background: #059669; color: white; }
         .btn-qr { background: #3b82f6; color: white; margin-top: 10px; }
 
-        /* Labels Preview Styles */
         .preview-wrapper { background: #090c14; padding: 15px; border-radius: 8px; display: flex; justify-content: center; margin-bottom: 15px; border: 1px dashed var(--pri); }
         .label-preview { width: 80mm; height: 50mm; background: white; color: black; padding: 4mm; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
         .label-preview .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 2px; margin-bottom: 4px;}
@@ -48,20 +68,44 @@
         .label-preview .l-device { font-size: 12px; font-weight: bold; border: 1px dashed #000; padding: 1px 4px; }
         .label-preview .l-date { font-size: 12px; font-weight: bold; }
 
-        /* Queue Styles */
-        .queue-container-wrapper { background: #0f1422; border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 20px;}
-        .queue-container-wrapper h4 { margin: 0 0 10px 0; color: var(--pri); font-size: 14px;}
-        .queue-card { background: #1a2235; border: 1px solid var(--pri); border-radius: 8px; padding: 10px; min-width: 140px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.3);}
-        .queue-card .order-id { font-size: 11px; color: var(--mut); margin-bottom: 2px;}
-        .queue-card .c-name { font-weight: bold; font-size: 13px; margin-bottom: 4px; color: var(--pri);}
-        .queue-card .c-details { font-size: 11px; margin-bottom: 8px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
-        .btn-done { padding: 4px; font-size: 11px; background: #10b981; color: #000; margin: 0; width: 100%; border-radius: 4px; font-weight: bold;}
-        .btn-done:hover { background: #059669; color:white; }
+        /* كروت الأجهزة في الانتظار - مطابقة للصورة الثالثة */
+        .queue-container-wrapper { background: #0f1422; border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 20px;}
+        .queue-container-wrapper h4 { margin: 0 0 15px 0; color: var(--pri); font-size: 14px;}
+        #queueContainer { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; }
+        
+        .queue-card { 
+            background: #1a2235; 
+            border: 1px solid #2d3748; 
+            border-radius: 8px; 
+            padding: 12px; 
+            min-width: 150px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            text-align: center;
+        }
+        .queue-card .order-id { font-size: 12px; color: var(--pri); margin-bottom: 4px;}
+        .queue-card .c-name { font-weight: bold; font-size: 14px; margin-bottom: 4px; color: white;}
+        .queue-card .c-details { font-size: 11px; margin-bottom: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+        
+        /* زرار إنهاء العملية الشفاف بدون خلفية */
+        .btn-done { 
+            background: transparent; 
+            color: #10b981; 
+            border: 1px solid #10b981;
+            padding: 6px; 
+            font-size: 12px; 
+            width: 100%; 
+            border-radius: 4px; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-done:hover { background: #10b981; color: #000; }
         
         .section-box { background: #0f1422; border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
         .section-box h4 { margin: 0 0 15px 0; color: var(--pri); font-size: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 5px;}
         
-        /* Dropdown Checkbox */
         .dropdown-check-list { display: inline-block; width: 100%; position: relative; }
         .dropdown-check-list .anchor { width: 100%; padding: 10px; background: #0f1422; border: 1px solid var(--border); border-radius: 6px; color: white; display: block; cursor: pointer; box-sizing: border-box; }
         .dropdown-check-list .anchor::after { content: "▼"; float: left; font-size: 12px; color: var(--mut); margin-top: 3px;}
@@ -85,7 +129,6 @@
             #printArea { display: block !important; position: static; width: 100%; margin: 0; padding: 0; }
             body, html { background: white; margin: 0 !important; padding: 0 !important;}
 
-            /* Label specific print styles */
             .real-label { width: 40mm; height: 24.5mm; box-sizing: border-box; padding: 1.5mm; display: flex; flex-direction: column; page-break-after: always; page-break-inside: avoid; font-family: 'Tajawal', sans-serif; color: black; overflow: hidden; background: white;}
             .real-label:last-child { page-break-after: auto; } 
             .real-label .l-header { width: 100%; display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 1px; margin-bottom: 1px;}
@@ -110,17 +153,16 @@
 </head>
 <body>
     
-    <!-- قسم الحضور والانصراف المضاف حديثاً -->
-    <div class="panel" style="margin: auto; max-width: 1400px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
-        <h3 style="margin: 0; color: #10b981;">⏱️ تسجيل الحضور والانصراف</h3>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <select id="empName" style="padding: 10px; border-radius: 6px; background: #0f1422; color: white; border: 1px solid var(--border);">
-                <!-- تم التعديل بناءً على طلبك ليكون الأسماء فقط عمر ياسر وعمر كيلاني -->
+    <!-- شريط الحضور والانصراف (نفس تصميم الصورة الأولى) -->
+    <div class="top-bar">
+        <div class="title">⏱️ تسجيل الحضور والانصراف</div>
+        <div class="actions">
+            <select id="empName">
                 <option value="عمر ياسر">عمر ياسر</option>
                 <option value="عمر كيلاني">عمر كيلاني</option>
             </select>
-            <button onclick="recordAttendance('حضور')" style="background: #10b981; color: black; width: auto; padding: 10px 20px;">تسجيل حضور 🟢</button>
-            <button onclick="recordAttendance('انصراف')" style="background: #ef4444; color: white; width: auto; padding: 10px 20px;">تسجيل انصراف 🔴</button>
+            <button class="btn-in" onclick="recordAttendance('حضور')">تسجيل حضور 🟢</button>
+            <button class="btn-out" onclick="recordAttendance('انصراف')">تسجيل انصراف 🔴</button>
         </div>
     </div>
 
@@ -192,8 +234,8 @@
             
             <div class="queue-container-wrapper">
                 <h4>⏳ الأجهزة في الانتظار:</h4>
-                <div id="queueContainer" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px;">
-                    <div style="color: var(--mut); font-size: 13px;">جاري تحميل البيانات...</div>
+                <div id="queueContainer">
+                    <div style="color: var(--mut); font-size: 13px; text-align:center; width:100%;">جاري تحميل البيانات...</div>
                 </div>
             </div>
             
@@ -241,9 +283,7 @@
                     <div style="flex: 2;">
                         <div class="dropdown-check-list" id="gamesList">
                             <span class="anchor" onclick="document.getElementById('gamesList').classList.toggle('visible')">اختر الألعاب (اضغط هنا)</span>
-                            <ul class="items" id="gamesUl">
-                                <!-- سيتم ملؤها بالجافاسكريبت -->
-                            </ul>
+                            <ul class="items" id="gamesUl"></ul>
                         </div>
                     </div>
                 </div>
@@ -366,11 +406,9 @@
             document.getElementById('prevOrder').innerText = orderIdStr;
             document.getElementById('prevDate').innerText = dateStr;
 
-            // تحديث جلب الكروت لدعم الحالات بشكل أفضل
             fetch(GOOGLE_URL + '?action=getOngoing')
                 .then(res => res.json())
                 .then(data => { 
-                    // في حال كان السيرفر يرسل المصفوفة كصفوف بدلاً من Objects
                     if(data.length > 0 && Array.isArray(data[0])) {
                         allOngoing = data.map(row => ({ orderId: row[0], name: row[1], phone: row[2], details: row[3], status: row[4] }));
                     } else {
@@ -381,13 +419,14 @@
                 .catch(e => console.log(e));
         });
         
-        // --- دالة تسجيل الحضور والانصراف المعدلة للتليجرام ---
-        function recordAttendance(type) {
+        // --- دالة تسجيل الحضور والانصراف (مع ضمان إرسال البيانات بشكل صحيح للتليجرام) ---
+        function recordAttendance(actionType) {
             let empName = document.getElementById('empName').value;
             let payload = {
-                systemType: "Attendance", // هذا المفتاح هو اللي بيشغل التليجرام في السيرفر
+                systemType: "Attendance", 
+                type: actionType,      
+                action: actionType,    
                 name: empName,
-                action: type,
                 date: new Date().toLocaleString('en-GB')
             };
             
@@ -396,7 +435,7 @@
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ 'data': JSON.stringify(payload) })
             }).then(() => {
-                let btnMsg = type === 'حضور' ? 'تم تسجيل الحضور بنجاح' : 'تم تسجيل الانصراف بنجاح';
+                let btnMsg = actionType === 'حضور' ? 'تم تسجيل الحضور بنجاح' : 'تم تسجيل الانصراف بنجاح';
                 alert(btnMsg + " لـ " + empName);
             }).catch(e => {
                 alert("حدث خطأ أثناء الاتصال بالنظام، يرجى المحاولة مرة أخرى.");
@@ -437,7 +476,6 @@
         function renderQueue() {
             const container = document.getElementById('queueContainer');
             container.innerHTML = '';
-            // يعرض الأجهزة اللي حالتها ongoing ومش موجودة في hiddenOrders
             let pendingOrders = allOngoing.filter(o => o.status !== 'done' && !hiddenOrders.includes(o.orderId));
             
             if (pendingOrders.length === 0) {
@@ -446,25 +484,25 @@
             pendingOrders.slice(0, 6).forEach(order => {
                 container.innerHTML += `
                     <div class="queue-card">
-                        <div><div class="order-id">${order.orderId}</div><div class="c-name">${order.name}</div><div class="c-details">${order.details || 'صيانة'}</div></div>
-                        <button class="btn-done" onclick="markAsDone('${order.orderId}')">✅ إنهاء العملية</button>
+                        <div>
+                            <div class="order-id">${order.orderId}</div>
+                            <div class="c-name">${order.name}</div>
+                            <div class="c-details">${order.details || 'بدون تفاصيل'}</div>
+                        </div>
+                        <button class="btn-done" onclick="markAsDone('${order.orderId}')">☑️ إنهاء العملية</button>
                     </div>`;
             });
         }
 
-        // --- دالة إنهاء العملية وتغيير الحالة لـ done ---
         function markAsDone(orderId) {
-            // إخفاء الكارت من الشاشة فوراً
             hiddenOrders.push(orderId); 
             localStorage.setItem('hiddenOrders', JSON.stringify(hiddenOrders));
             
-            // تحديث الحالة في مصفوفة الجافاسكريبت
             let orderIndex = allOngoing.findIndex(o => o.orderId === orderId);
             if(orderIndex !== -1) allOngoing[orderIndex].status = 'done';
             
             renderQueue();
             
-            // إرسال طلب للسيرفر (Google Apps Script) لتغيير الحالة لـ done
             const formData = new URLSearchParams(); 
             formData.append('data', JSON.stringify({ 
                 systemType: "UpdateStatus", 
@@ -477,7 +515,7 @@
                 body: formData,
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
             }).then(()=> {
-                console.log("تم تحديث حالة الأوردر بنجاح لـ Done.");
+                console.log("تم تحديث الحالة بنجاح.");
             }).catch(e => console.log(e));
         }
 
@@ -502,7 +540,7 @@
             }
         }
 
-        // --- إخفاء التكاليف من الاستلام / تعديل payload ---
+        // إخفاء إجمالي المشتريات والتكاليف من أشعار التليجرام الخاص بالستيكر
         function printLabels() {
             let parsed = parseNamePhone();
             let details = document.getElementById('cDetails').value.trim(); 
@@ -511,7 +549,7 @@
             
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
-            // جعل قيم البضائع فارغة تماماً حتى لا تظهر في التليجرام
+            // تم إزالة حقول التكاليف (goodsCost و goodsRevenue) لعدم إرسالها للـ Backend
             let payload = {
                 systemType: "Maintenance",
                 orderId: orderIdStr,
@@ -519,14 +557,9 @@
                 typeDetails: details + ` (العدد: ${count})`,
                 technician: "-",
                 type: "استلام", 
-                maintRevenue: priceTxt || "", // نرسل السعر فقط
-                maintCost: "",
-                goodsRevenue: "", // قمنا بتفريغها حتى لا تظهر في إشعار التليجرام
-                goodsCost: "",    // قمنا بتفريغها
-                purchasesDetails: "",
-                purchasedItems: [],
+                maintRevenue: priceTxt || "", 
                 paymentMethod: "آجل",
-                status: "ongoing" // حفظ الحالة المبدئية
+                status: "ongoing"
             };
 
             fetch(GOOGLE_URL, {
@@ -540,7 +573,7 @@
                 name: parsed.name,
                 phone: parsed.phone,
                 details: details,
-                status: 'ongoing' // تم إعادتها كعملية جارية لتظهر في الكروت
+                status: 'ongoing' 
             });
             renderQueue(); 
 
