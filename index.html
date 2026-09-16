@@ -16,7 +16,7 @@
         .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px; max-width: 1400px; margin: auto; }
         @media (max-width: 900px) { .dashboard { grid-template-columns: 1fr; } }
         
-        /* شريط الحضور والانصراف */
+        /* شريط الحضور */
         .top-bar {
             background: #111827;
             border: 1px solid var(--border);
@@ -38,24 +38,47 @@
         .top-bar button { width: auto !important; padding: 8px 15px !important; margin: 0 !important; font-size: 14px; font-weight: bold; border-radius: 6px; border: none; cursor: pointer; transition: 0.2s;}
         .btn-in { background: #10b981; color: #000; }
         .btn-in:hover { background: #059669; color: white;}
-        .btn-out { background: #ef4444; color: white; }
-        .btn-out:hover { background: #dc2626; }
 
-        /* كارت حالة الموظف (الجديد) */
-        #empCard {
-            display: none; 
-            background: #1f2937; 
-            border: 1px solid #374151; 
-            padding: 12px 20px; 
-            border-radius: 8px; 
-            margin: auto; 
-            max-width: 1400px; 
-            margin-bottom: 20px; 
-            justify-content: space-between; 
-            align-items: center;
+        /* حاوية كروت الموظفين */
+        #empCardsContainer {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+
+        /* كارت الموظف المستقل */
+        .emp-card {
+            background: #1f2937;
+            border: 1px solid #374151;
+            padding: 12px 15px;
+            border-radius: 8px;
+            min-width: 250px;
+            flex: 1;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             animation: fadeIn 0.4s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
+        .emp-card.paused { border-color: #f59e0b; opacity: 0.9; }
+        .emp-card .e-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; border-bottom: 1px dashed #374151; padding-bottom: 8px;}
+        .emp-card .e-name { font-weight: bold; font-size: 15px; color: white; }
+        .emp-card .e-status { font-size: 12px; font-weight: bold; margin-top: 2px;}
+        .active-txt { color: #10b981; }
+        .paused-txt { color: #f59e0b; }
+        .emp-card .e-details { font-size: 12px; color: #cbd5e1; margin-bottom: 12px; display: flex; justify-content: space-between;}
+        .emp-card .e-actions { display: flex; gap: 5px; flex-wrap: wrap;}
+        .emp-card .e-actions button { padding: 5px; font-size: 11px; border-radius: 4px; border: none; font-weight: bold; cursor: pointer; flex: 1; transition: 0.2s;}
+        .btn-pause { background: #374151; color: white; border: 1px solid #4b5563 !important;}
+        .btn-pause:hover { background: #4b5563; }
+        .btn-finance { background: #3b82f6; color: white; border: 1px solid #2563eb !important;}
+        .btn-finance:hover { background: #2563eb; }
+        .btn-end { background: transparent; color: #ef4444; border: 1px solid #ef4444 !important; }
+        .btn-end:hover { background: #ef4444; color: white; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         .panel { background: var(--card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.4);}
@@ -93,32 +116,14 @@
         #queueContainer { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; }
         
         .queue-card { 
-            background: #1a2235; 
-            border: 1px solid #2d3748; 
-            border-radius: 8px; 
-            padding: 12px; 
-            min-width: 150px; 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            text-align: center;
+            background: #1a2235; border: 1px solid #2d3748; border-radius: 8px; padding: 12px; 
+            min-width: 150px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; text-align: center;
         }
         .queue-card .order-id { font-size: 12px; color: var(--pri); margin-bottom: 4px;}
         .queue-card .c-name { font-weight: bold; font-size: 14px; margin-bottom: 4px; color: white;}
         .queue-card .c-details { font-size: 11px; margin-bottom: 12px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
         
-        .btn-done { 
-            background: transparent; 
-            color: #10b981; 
-            border: 1px solid #10b981;
-            padding: 6px; 
-            font-size: 12px; 
-            width: 100%; 
-            border-radius: 4px; 
-            font-weight: bold;
-            transition: 0.3s;
-        }
+        .btn-done { background: transparent; color: #10b981; border: 1px solid #10b981; padding: 6px; font-size: 12px; width: 100%; border-radius: 4px; font-weight: bold; transition: 0.3s; }
         .btn-done:hover { background: #10b981; color: #000; }
         
         .section-box { background: #0f1422; border: 1px solid var(--border); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
@@ -171,30 +176,20 @@
 </head>
 <body>
     
-    <!-- شريط الحضور والانصراف -->
+    <!-- شريط تسجيل الحضور -->
     <div class="top-bar">
-        <div class="title">⏱️ تسجيل الحضور والانصراف</div>
+        <div class="title">⏱️ لوحة الموظفين (الشيفت)</div>
         <div class="actions">
             <select id="empName">
                 <option value="عمر ياسر">عمر ياسر</option>
                 <option value="عمر كيلاني">عمر كيلاني</option>
             </select>
-            <button class="btn-in" onclick="recordAttendance('حضور')">تسجيل حضور 🟢</button>
-            <button class="btn-out" onclick="recordAttendance('انصراف')">تسجيل انصراف 🔴</button>
+            <button class="btn-in" onclick="startShift()">تسجيل حضور 🟢</button>
         </div>
     </div>
 
-    <!-- كارت الموظف الذي يظهر عند تسجيل الدخول/الخروج -->
-    <div id="empCard">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <div style="font-size: 24px; background: #374151; padding: 8px; border-radius: 50%;">👤</div>
-            <div>
-                <div id="cardEmpName" style="font-weight: bold; color: white; font-size: 15px;">الاسم</div>
-                <div id="cardEmpStatus" style="font-size: 13px; color: #94a3b8; margin-top: 2px;">الحالة</div>
-            </div>
-        </div>
-        <div id="cardEmpTime" style="font-weight: bold; font-family: Arial, sans-serif; font-size: 16px; direction: ltr;">--:-- --</div>
-    </div>
+    <!-- حاوية كروت الموظفين الحالية (تُملأ برمجياً) -->
+    <div id="empCardsContainer"></div>
 
     <div class="dashboard">
         <!-- قسم الاستلام والبيانات الشخصية والستيكرات -->
@@ -411,6 +406,7 @@
 
         let invoiceItems = [];
         let allOngoing = [];
+        let activeEmployees = [];
         let hiddenOrders = JSON.parse(localStorage.getItem('hiddenOrders') || '[]');
 
         const today = new Date();
@@ -422,69 +418,144 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const gamesUl = document.getElementById('gamesUl');
-            fullGamesList.forEach(game => {
-                gamesUl.innerHTML += `<li><input type="checkbox" value="${game}" /> ${game}</li>`;
-            });
+            fullGamesList.forEach(game => { gamesUl.innerHTML += `<li><input type="checkbox" value="${game}" /> ${game}</li>`; });
 
             const accSelect = document.getElementById('accSelect');
-            accessoriesDB.forEach(item => {
-                let opt = document.createElement('option'); opt.value = item.id; opt.text = item.name;
-                accSelect.appendChild(opt);
-            });
+            accessoriesDB.forEach(item => { let opt = document.createElement('option'); opt.value = item.id; opt.text = item.name; accSelect.appendChild(opt); });
             updateAccPrice();
 
             document.getElementById('prevOrder').innerText = orderIdStr;
             document.getElementById('prevDate').innerText = dateStr;
 
+            // جلب الأجهزة الجارية (Queue)
             fetch(GOOGLE_URL + '?action=getOngoing')
                 .then(res => res.json())
                 .then(data => { 
                     if(data.length > 0 && Array.isArray(data[0])) {
                         allOngoing = data.map(row => ({ orderId: row[0], name: row[1], phone: row[2], details: row[3], status: row[4] }));
-                    } else {
-                        allOngoing = data; 
-                    }
+                    } else { allOngoing = data; }
                     renderQueue(); 
-                })
-                .catch(e => console.log(e));
-        });
-        
-        // --- دالة تسجيل الحضور والانصراف (بدون Alert + بتظهر الكارت + بترسل للسيرفر) ---
-        function recordAttendance(actionType) {
-            let empName = document.getElementById('empName').value;
-            let now = new Date();
-            let timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-            
-            // تحديث الكارت وإظهاره
-            let card = document.getElementById('empCard');
-            document.getElementById('cardEmpName').innerText = empName;
-            document.getElementById('cardEmpTime').innerText = timeString;
-            
-            if(actionType === 'حضور') {
-                document.getElementById('cardEmpStatus').innerHTML = '🟢 متواجد الآن';
-                document.getElementById('cardEmpTime').style.color = '#10b981';
-            } else {
-                document.getElementById('cardEmpStatus').innerHTML = '🔴 سجل انصراف / غادر';
-                document.getElementById('cardEmpTime').style.color = '#ef4444';
-            }
-            card.style.display = 'flex';
+                }).catch(e => console.log(e));
 
-            // إرسال البيانات للسيرفر بنفس الصيغة الأصلية عشان التليجرام يقراها
-            let payload = {
-                systemType: "Attendance",
-                name: empName,
-                action: actionType,
-                date: now.toLocaleString('en-GB')
-            };
+            // جلب الموظفين المفتوح لهم شيفت الآن (Attendance)
+            fetch(GOOGLE_URL + '?action=getAttendance')
+                .then(res => res.json())
+                .then(data => {
+                    activeEmployees = data;
+                    renderEmpCards();
+                }).catch(e => console.log("Error loading attendance:", e));
+        });
+
+        // ============================================
+        // 🔹 وظائف نظام كروت الموظفين (الجديد)
+        // ============================================
+        
+        function renderEmpCards() {
+            const container = document.getElementById('empCardsContainer');
+            container.innerHTML = '';
             
-            fetch(GOOGLE_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ 'data': JSON.stringify(payload) })
-            }).catch(e => {
-                console.log("Error sending attendance to Telegram:", e);
+            if (activeEmployees.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+            container.style.display = 'flex';
+
+            activeEmployees.forEach(emp => {
+                let isPaused = emp.status === 'paused';
+                let statusText = isPaused ? '<span class="paused-txt">🟡 إيقاف مؤقت</span>' : '<span class="active-txt">🟢 متواجد الآن</span>';
+                let cardClass = isPaused ? 'emp-card paused' : 'emp-card';
+                let timeStr = emp.checkIn; // يمكن استخراج الوقت فقط لو أردت
+                
+                let cardHTML = `
+                <div class="${cardClass}">
+                    <div>
+                        <div class="e-head">
+                            <span style="font-size:20px; background:#374151; padding:6px; border-radius:50%;">👤</span>
+                            <div>
+                                <div class="e-name">${emp.name}</div>
+                                <div class="e-status">${statusText}</div>
+                            </div>
+                        </div>
+                        <div class="e-details">
+                            <span>الدخول: ${timeStr}</span>
+                            <span style="color:#ef4444; font-weight:bold;">سحب: ${emp.withdrawals || 0} ج</span>
+                        </div>
+                    </div>
+                    <div class="e-actions">
+                        <button class="btn-pause" onclick="togglePause('${emp.name}', '${emp.status}')">
+                            ${isPaused ? '▶️ استئناف' : '⏸️ إيقاف مؤقت'}
+                        </button>
+                        <button class="btn-finance" onclick="addFinance('${emp.name}')">💸 مسحوبات</button>
+                        <button class="btn-end" onclick="endShift('${emp.name}')">⏹️ إنهاء</button>
+                    </div>
+                </div>`;
+                container.innerHTML += cardHTML;
             });
         }
+
+        function startShift() {
+            let name = document.getElementById('empName').value;
+            // التحقق إذا كان الموظف فاتح شيفت أصلاً
+            if(activeEmployees.find(e => e.name === name)) {
+                return alert("⚠️ هذا الموظف قام بتسجيل الدخول بالفعل (الشيفت مفتوح).");
+            }
+            
+            let timeString = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            // تحديث محلي سريع (لتحسين تجربة المستخدم)
+            activeEmployees.push({ name: name, status: 'active', checkIn: timeString, withdrawals: 0, notes: '' });
+            renderEmpCards();
+
+            // إرسال للسيرفر
+            let payload = { systemType: "Attendance", action: "start", empName: name };
+            fetch(GOOGLE_URL, { method: 'POST', body: new URLSearchParams({ 'data': JSON.stringify(payload) }) });
+        }
+
+        function togglePause(name, currentStatus) {
+            let emp = activeEmployees.find(e => e.name === name);
+            if(!emp) return;
+            
+            let newAction = currentStatus === 'active' ? 'pause' : 'resume';
+            emp.status = currentStatus === 'active' ? 'paused' : 'active';
+            renderEmpCards();
+            
+            let payload = { systemType: "Attendance", action: newAction, empName: name };
+            fetch(GOOGLE_URL, { method: 'POST', body: new URLSearchParams({ 'data': JSON.stringify(payload) }) });
+        }
+
+        function addFinance(name) {
+            let amount = prompt(`أدخل مبلغ السحب لـ (${name}):\n(مثال: 50)`);
+            if (!amount || isNaN(amount) || amount <= 0) return;
+            
+            let note = prompt(`اكتب سبب السحب لـ (${name}) (اختياري):`);
+            if (note === null) note = "";
+
+            let emp = activeEmployees.find(e => e.name === name);
+            if(emp) {
+                emp.withdrawals = (parseFloat(emp.withdrawals) || 0) + parseFloat(amount);
+                renderEmpCards();
+            }
+
+            let payload = { systemType: "Attendance", action: "finance", empName: name, withdrawal: amount, note: note };
+            fetch(GOOGLE_URL, { method: 'POST', body: new URLSearchParams({ 'data': JSON.stringify(payload) }) });
+        }
+
+        function endShift(name) {
+            if(!confirm(`⚠️ هل أنت متأكد من إنهاء شيفت الموظف (${name})؟\nسيتم تسجيل الانصراف وإغلاق الكارت.`)) return;
+            
+            // إزالة الموظف من الكروت المفتوحة محلياً
+            activeEmployees = activeEmployees.filter(e => e.name !== name);
+            renderEmpCards();
+
+            // إرسال للسيرفر
+            let payload = { systemType: "Attendance", action: "end", empName: name };
+            fetch(GOOGLE_URL, { method: 'POST', body: new URLSearchParams({ 'data': JSON.stringify(payload) }) });
+        }
+
+
+        // ============================================
+        // 🔹 باقي وظائف النظام الأساسية 
+        // ============================================
 
         function parseNamePhone() {
             let raw = document.getElementById('cNamePhone').value.trim();
@@ -547,17 +618,9 @@
             renderQueue();
             
             const formData = new URLSearchParams(); 
-            formData.append('data', JSON.stringify({ 
-                systemType: "UpdateStatus", 
-                orderId: orderId, 
-                status: "done" 
-            }));
+            formData.append('data', JSON.stringify({ systemType: "UpdateStatus", orderId: orderId, status: "done" }));
             
-            fetch(GOOGLE_URL, { 
-                method: 'POST', 
-                body: formData,
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            }).catch(e => console.log(e));
+            fetch(GOOGLE_URL, { method: 'POST', body: formData, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }).catch(e => console.log(e));
         }
 
         function syncData() {
@@ -589,7 +652,6 @@
             
             if(!parsed.name && !parsed.phone) return alert("يرجى إدخال الاسم ورقم الموبايل أولاً.");
 
-            // استبدال الفراغ بـ "-" لعدم ظهور "0 ج" في التليجرام
             let payload = {
                 systemType: "Maintenance",
                 orderId: orderIdStr,
@@ -613,13 +675,7 @@
                 body: new URLSearchParams({ 'data': JSON.stringify(payload) })
             }).catch(e => console.log("Error saving to backend:", e));
 
-            allOngoing.unshift({
-                orderId: orderIdStr,
-                name: parsed.name,
-                phone: parsed.phone,
-                details: details,
-                status: 'ongoing' 
-            });
+            allOngoing.unshift({ orderId: orderIdStr, name: parsed.name, phone: parsed.phone, details: details, status: 'ongoing' });
             renderQueue(); 
 
             setPrintStyle('label');
